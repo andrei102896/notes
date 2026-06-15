@@ -1,0 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Fjalla+One&family=Inter:wght@600;700&display=swap");
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+html,
+body {
+  color-scheme: light;
+  background-color: transparent;
+}
+
+@theme {
+  --spacing: 0.25rem;
+  --font-sans: "Fjalla One", sans-serif;
+  --font-ui: "Inter", system-ui, sans-serif;
+  /* Design point sizes at the 686px/16px reference; in rem so they ride the panel knob. */
+  --text-air-letter: 1.625rem; /* 26px — A–Z index letters (Fjalla One Regular, doc 4_NN_AI) */
+  --text-subject-tab: 1.5rem; /* 24px — subject tab labels (Fjalla One Regular, doc 2_NN_SUBJECT TAB) */
+  --text-note-body: 1.125rem; /* 18px — note body */
+  --text-brand-title: 0.75rem; /* 12px — "NOTES FOR NET" (Inter Bold) */
+  --text-brand-sub: 0.5625rem; /* 9px — "CHROME EXTENSION" (Inter Semi Bold) */
+  --text-navlabel: 1.4375rem; /* 23px — ADD NOTE / DELETE TAB (Figma) */
+  --text-navmin: 1.3125rem; /* 21px — MIN MAX DELETE (Figma) */
+  --text-navribbon: 1.125rem; /* 18px — THIS TAB NOTES (Figma) */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 47.4% 11.2%);
+  --color-dashboard-frosted: hsl(0 0% 78%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222.2 47.4% 11.2%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(222.2 47.4% 11.2%);
+  --color-primary: #313131;
+  --color-primary-foreground: hsl(210 40% 98%);
+  --color-secondary: hsl(0 0% 5.1%);
+  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --color-muted: #d0d0d0;
+  --color-muted-foreground: #666666;
+  --color-air-box: #686868; /* AI index boxes + header bar (Figma) */
+  --color-subject-tab: #3f3f3f; /* subject tab boxes (Figma) */
+  --color-ribbon: #565656; /* THIS TAB NOTES ribbon (Figma) */
+  --color-chrome-ext: #1e1d1d; /* CHROME EXTENSION pill (Figma) */
+  --color-mintext: #252525; /* MIN MAX DELETE text (Figma) */
+  --color-accent: #29abe2;
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+  --color-border: hsl(0 0% 5.1%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(222.2 84% 4.9%);
+  --radius-sm: calc(0.5rem - 4px);
+  --radius-md: calc(0.5rem - 2px);
+  --radius-lg: 0.5rem;
+  --text-shadow-lg: 0 0 6px #000000;
+  --border-color-muted: #666666;
+}
+
+.nn-dashboard-content-frosted {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+}
+
+/* "This Tab Notes" label: gray ribbon with a pointed right edge toward the Min control. */
+.nn-tab-notes-ribbon {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 0.6rem) 0,
+    100% 50%,
+    calc(100% - 0.6rem) 100%,
+    0 100%
+  );
+}
+
+#nn-scroll-bookmarks-overlay-host {
+  color-scheme: light;
+  background-color: transparent;
+}
+
+#nn-scroll-bookmarks-overlay-host,
+#nn-scroll-bookmarks-overlay-host *,
+#nn-scroll-bookmarks-overlay-host *::before,
+#nn-scroll-bookmarks-overlay-host *::after {
+  font-family: "Fjalla One", sans-serif;
+}
+
+/* Note body editor uses system-ui so bold/italic are visually distinct */
+#nn-scroll-bookmarks-overlay-host [data-note-body],
+#nn-scroll-bookmarks-overlay-host [data-note-body] * {
+  font-family: system-ui, sans-serif;
+  font-weight: 400;
+}
+
+#nn-scroll-bookmarks-overlay-host [data-note-body] b,
+#nn-scroll-bookmarks-overlay-host [data-note-body] strong {
+  font-weight: 700;
+}
+
+/* Nested italic/underline inside bold must inherit weight (the * rule above sets 400 on all nodes). */
+#nn-scroll-bookmarks-overlay-host [data-note-body] :is(i, em, u) {
+  font-weight: inherit;
+}
+
+/* Crosshair cursor during anchor pick mode */
+body.nn-picking-anchor,
+body.nn-picking-anchor * {
+  cursor: crosshair !important;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}

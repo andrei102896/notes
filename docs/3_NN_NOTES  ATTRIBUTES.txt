@@ -1,0 +1,236 @@
+-------*NOTES:  ATTRIBUTES
+
+
+
+
+*actual size [pixel dimension: X and Y] TBD
+
+
+*notes become scrollable as text entered demands
+
+​
+*single default font Fjallo One and colors of font:
+
+	-bold white color font for note heading
+
+	-standard black color font for note body
+
+	-upper and lower case text for subject heading parameter and note body
+
+
+*note body text formatting accents of bold, italicized and underlined
+
+
+*expand/ collapse/ delete controls for each individual note
+
+
+*auto populates page URL parameter
+
+
+*auto populates date that note was created parameter
+
+
+*page link function:
+        -page link takes user directly to the page that note refers to 
+   [see NOTE LINK: BEHAVIOR below]  
+
+
+*page position anchor function:
+        -takes user directly to the page and the position on that page specifically that the note refers to
+   [see NOTE ANCHOR: BEHAVIOR below]
+
+
+*copy/ paste note function:
+        -copies all attributes of a note to paste into another note in any subject tab
+
+
+*single color fully opaque note background
+
+
+*have blue highlighted color border if note refers to the page being viewed
+
+
+
+
+
+
+-------*NOTES:  BEHAVIOR
+
+
+
+
+*a note is added to a subject tab dashboard by left clicking on ADD NOTE
+
+
+*when a new note is added:
+
+	-it auto populates with the URL of the webpage user is on and the date the note was created
+
+	-it is linked automatically to the webpage being viewed, verified by the auto populated URL and the blue border around the note whether expanded or collapsed  
+
+	-it will populate to the top of the note stack/ top of the dashboard AND THE DASHBOARD WILL SCROLL TO THE TOP AS WELL
+
+
+*new note created will remain in this subject tab dashboard even if it is not interacted with: i.e., note heading, note body, etc., and will remain LINKED to the webpage it was made on
+
+
+*left single click note header to title the note
+
+
+*left click in note body to add text and click away to deselect
+​
+
+*notes would be able to be arranged in the subject tab dashboard via left click drag and drop  
+
+
+*single note separation from a stack of notes:
+
+        -a note would be able to be separated from a stack of notes by left clicking note header while holding Ctrl/ Cmd and dragging, 
+	creating a space equivalent to the note height when collapsed 
+
+
+*multiple note rearranging and/ or separation from a stack of notes: 
+
+	-left click then shift left click a successive group of notes or, 
+
+	-left click then ctrl/ cmd left click non successive notes so as to:
+
+        	-create a space
+        	
+		-rearrange notes
+
+
+
+*regardless of what web page the user is on, they can interact with any note in any subject tab dashboard
+
+
+*notes would always ‘snap’ to each other, whether expanded or collapsed maintaining any space between notes previously established [see note separation above] 
+
+
+*even though notes 'snap' together, notes will need to be separated by a very slight distance to keep them individually discernable even though adjacent regarding snapping 
+
+
+*when notes are minimized or maximized, whether individually or via min/ max all notes in the dashboard macro controls; any existing spacing will be maintained
+
+
+*if user deletes an individual note a prompt will pop up saying:   THIS CANNOT BE UNDONE:  PROCEED?  YES  |  NO
+      
+
+*when that note is deleted all other notes will snap together closing the gap left by the deleted note with all previous separation of notes being maintained​
+
+
+*to delete all notes in a subject tab, user left clicks DELETE under, This Tab Notes in dashboard macro controls, and a prompt [modal] will pop up saying:
+     THIS CANNOT BE UNDONE:  PROCEED?  YES  |  NO
+
+
+*if user left clicks yes, all notes will be deleted, but the subject tab where the deleted notes were, will remain available per chance user wants to start over adding notes again
+
+
+* auto populated URL can be: 
+
+	-changed and will work provided it is a valid URL
+
+	-URL can be deleted and if user does, LINK button will be grayed out [potentially being a personal note]
+
+
+*LINK function:
+
+	-the LINK function, facilitated by the auto populated URL, allows user to: 
+
+	-left click on the LINK button will take them to the webpage the note was made on, directly in the same browser tab they are on [HARD NAVIGATION] with NN remaining maximized
+
+	-right click on the LINK button will take them to the webpage the note was made on, in a new browser tab, preserving the previous browser tab [SOFT NAVIGATION] with NN being minimized [hidden]
+
+
+
+*ANCHOR function:
+
+	-ANCHOR function allows setting the exact position on the page the note refers to
+
+	-after setting an ANCHOR on a note left or right clicking the ANCHOR button navigates to both the page and specific place on the page, the note refers to
+
+	-to set an ANCHOR the for page position: 
+		
+		-left click ANCHOR button
+
+		-preferably cursor turns into an ANCHOR icon 
+		
+		-NN dashboard will minimize
+		
+		-NOTE: at this point, prior to setting ANCHOR, scrolling browser tab with middle mouse wheel will be possible  
+		
+		-left click on the page area to set ANCHOR position
+		
+		-NN dashboard again maximizes
+		
+		-ANCHOR position is set
+		
+		-ANCHOR button on note will highlight blue
+
+ 
+	-to access an existing anchor for the page position: 
+		
+		-left click on ANCHOR button will take them to the webpage the note was made on, directly in the same browser tab they are on [HARD NAVIGATION]
+ 		
+		-right click on ANCHOR button will take them both to the webpage and the specific place on that page the note was made on, but in a new browser tab, preserving the original 				browser tab [SOFT NAVIGATION]
+	
+	
+	-to remove ANCHOR for page position: 
+		
+		-ctrl/ cmd and left click ANCHOR button
+		
+		-ANCHOR is now removed
+
+		-ANCHOR button highlight turns off
+
+ 
+
+
+
+-------*COPY/ PASTE PARAMETERS: 
+
+   
+
+*copy note parameter, would copy:
+        
+	-note subject heading             
+        
+	-note text
+        
+	-note page URL
+        
+	-note date created
+        
+	-note page link
+        
+	-note page anchor
+
+​
+
+*to copy one note into another note:
+        
+        -user would copy the note to be copied by left clicking COPY button on the note to be copied
+
+        -if the copied note is unwanted, left click trash can icon to delete the note and a prompt will pop up saying:   THIS CANNOT BE UNDONE:  PROCEED?  YES  |  NO     
+
+        -if user left clicks, yes, the note will be deleted, any other notes in the dashboard will snap together filling gap left by deleted note and with all previous separation of notes being 	maintained
+
+       
+
+*to paste the copied note into another note:
+
+	-left click subject tab where note is to be pasted
+        
+	-on that dashboard left click ADD NOTE
+        
+	-on new note added, left click PASTE button 
+        
+	-new note has all attributes of copied note
+
+                    
+
+​
+
+
+
+​

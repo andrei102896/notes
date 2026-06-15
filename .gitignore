@@ -1,0 +1,35 @@
+# Node dependencies
+node_modules/
+
+# Vite build output / Chrome extension bundle (@crxjs/vite-plugin)
+dist/
+
+# Vite cache
+.vite/
+
+# Environment variables (local secrets)
+.env
+.env.local
+.env.*.local
+
+# Chrome extension signing keys — never commit these
+*.pem
+
+# npm / yarn / pnpm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage (e.g. Vitest)
+coverage/
+
+# Optional manual packaging artifacts
+*.crx
