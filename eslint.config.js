@@ -97,6 +97,16 @@ export default tseslint.config(
     },
   },
   {
+    files: ["scripts/**/*.{js,mjs,cjs}"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+        ...globals.webextensions,
+      },
+    },
+  },
+  {
     files: ["eslint.config.js"],
     rules: {
       "import/no-unresolved": "off",
