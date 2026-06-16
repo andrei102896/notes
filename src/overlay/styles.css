@@ -16,6 +16,7 @@ body {
   --text-air-letter: 1.625rem; /* 26px — A–Z index letters (Fjalla One Regular, doc 4_NN_AI) */
   --text-subject-tab: 1.5rem; /* 24px — subject tab labels (Fjalla One Regular, doc 2_NN_SUBJECT TAB) */
   --text-note-body: 1.125rem; /* 18px — note body */
+  --text-note-title: 1.4375rem; /* 23px — note title (Fjalla One Regular, Figma BOX_TITLE text) */
   --text-brand-title: 0.75rem; /* 12px — "NOTES FOR NET" (Inter Bold) */
   --text-brand-sub: 0.5625rem; /* 9px — "CHROME EXTENSION" (Inter Semi Bold) */
   --text-navlabel: 1.4375rem; /* 23px — ADD NOTE / DELETE TAB (Figma) */
@@ -36,6 +37,9 @@ body {
   --color-muted-foreground: #666666;
   --color-air-box: #686868; /* AI index boxes + header bar (Figma) */
   --color-subject-tab: #3f3f3f; /* subject tab boxes (Figma) */
+  --color-note: #d9d9d9; /* note card bg + B/I/U inactive boxes (Figma BG_NOTE_01 / Rectangle 30-32) */
+  --color-note-field: #fefefe; /* URL label / URL field / date box bg (Figma BOX_URL / BOX_URL_ADDRESS / BOX_DATE) */
+  --color-note-action: #000000; /* LINK / COPY action buttons (Figma BOX_LINK / BOX_COPY) */
   --color-ribbon: #565656; /* THIS TAB NOTES ribbon (Figma) */
   --color-chrome-ext: #1e1d1d; /* CHROME EXTENSION pill (Figma) */
   --color-mintext: #252525; /* MIN MAX DELETE text (Figma) */
@@ -81,11 +85,22 @@ body {
   font-family: "Fjalla One", sans-serif;
 }
 
-/* Note body editor uses system-ui so bold/italic are visually distinct */
+/* Note body: Fjalla One 18px, standard black (doc 3_NN_NOTES). Bold/italic render via
+   font synthesis since Fjalla One is single-weight. */
 #nn-scroll-bookmarks-overlay-host [data-note-body],
 #nn-scroll-bookmarks-overlay-host [data-note-body] * {
-  font-family: system-ui, sans-serif;
+  font-family: "Fjalla One", sans-serif;
   font-weight: 400;
+}
+#nn-scroll-bookmarks-overlay-host [data-note-body] {
+  font-size: var(--text-note-body);
+  color: #000000;
+}
+
+/* Note title: 23px (Figma BOX_TITLE text). Set here (ID-scoped, beats Input's md:text-sm)
+   rather than via a text-* utility, which twMerge conflates with the white color class. */
+#nn-scroll-bookmarks-overlay-host [data-note-title] {
+  font-size: var(--text-note-title);
 }
 
 #nn-scroll-bookmarks-overlay-host [data-note-body] b,

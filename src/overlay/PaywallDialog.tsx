@@ -3,6 +3,7 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
 function NNLogoForBanner(): React.ReactElement {
@@ -34,8 +35,10 @@ export function PaywallDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
+        aria-describedby={undefined}
         className="top-10 left-20 translate-x-0 translate-y-0 h-11 max-w-none sm:max-w-none w-[calc(100%-5rem)] p-0 rounded-none border-none flex flex-row items-center bg-[#D9D9D9] gap-0"
       >
+        <DialogTitle className="sr-only">Notes for Net trial status</DialogTitle>
         <div className="pl-2">
           <NNLogoForBanner />
         </div>

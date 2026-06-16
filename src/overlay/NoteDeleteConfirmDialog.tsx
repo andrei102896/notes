@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -28,6 +29,9 @@ export function NoteDeleteConfirmDialog({
       >
         <DialogHeader>
           <DialogTitle>THIS CANNOT BE UNDONE: PROCEED?</DialogTitle>
+          <DialogDescription className="sr-only">
+            Permanently delete this note. This action cannot be undone.
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -36,6 +37,9 @@ export function SubjectTabDeleteConfirmDialog({
       >
         <DialogHeader>
           <DialogTitle>THIS CANNOT BE UNDONE: PROCEED?</DialogTitle>
+          <DialogDescription className="sr-only">
+            This action cannot be undone.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogFooter>

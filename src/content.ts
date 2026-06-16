@@ -182,6 +182,12 @@ function initPendingNavigationState(): void {
   initPendingOverlayOpen();
 }
 
+// A prior, now-orphaned content script (e.g. left after an extension update that
+// re-injected this script into an already-open tab) may have an overlay shell still
+// in the DOM whose React root is dead. Remove it so this fresh instance owns the
+// overlay. No-op on a normal page load, where no shell exists yet.
+document.getElementById(OVERLAY_SHELL_ID)?.remove();
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initPendingNavigationState);
 } else {

@@ -70,7 +70,7 @@ export function Note({
     <Card
       onMouseDown={() => onActivate(note.id)}
       className={cn(
-        "border-4 bg-note p-0",
+        "border-[6px] bg-note p-0",
         isSelected && "ring-2 ring-primary ring-offset-2",
         matchesCurrentPage ? "border-accent" : "border-border",
       )}
@@ -89,6 +89,7 @@ export function Note({
           <Input
             type="text"
             aria-label="Note heading"
+            data-note-title
             value={note.heading}
             readOnly={isReadOnly}
             onChange={(event) => {
@@ -111,7 +112,7 @@ export function Note({
             }}
             onFocus={() => onActivate(note.id)}
             placeholder="Note heading..."
-            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 text-2xl md:text-2xl leading-none font-bold text-white uppercase outline-none placeholder:text-white/80 text-shadow-lg cursor-pointer"
+            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-bold text-white outline-none placeholder:text-white/80 text-shadow-lg cursor-pointer"
           />
           <div className="flex shrink-0 items-stretch">
             <CollapsibleTrigger asChild>

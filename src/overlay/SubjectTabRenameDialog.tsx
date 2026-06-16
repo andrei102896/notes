@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -66,10 +67,13 @@ export function SubjectTabRenameDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="left-[calc(50%+var(--spacing)*10)]"
+        className="left-[calc(50%+var(--spacing)*10)] w-80"
       >
         <DialogHeader>
           <DialogTitle>Rename subject tab</DialogTitle>
+          <DialogDescription className="sr-only">
+            Enter a new name for this subject tab.
+          </DialogDescription>
         </DialogHeader>
 
         <Input

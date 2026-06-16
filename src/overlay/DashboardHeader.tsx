@@ -122,8 +122,8 @@ export function DashboardHeader({
   }, [activeSubjectTabId]);
 
   return (
-    <header className="sticky top-0 z-20 flex h-auto flex-col border-b-2 border-border bg-air-box">
-      <div className="relative z-[1] flex h-10 shrink-0 items-center justify-center gap-2 border-b-2 border-background bg-air-box px-2">
+    <header className="sticky top-0 z-20 flex h-auto flex-col bg-air-box">
+      <div className="relative z-[1] flex h-10 shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2">
         <BrandLogo />
         <span className="bg-accent px-2 py-0.5 font-ui text-brand-title font-bold uppercase tracking-widest text-accent-foreground">
           Notes for Net
@@ -132,11 +132,11 @@ export function DashboardHeader({
           Chrome Extension
         </span>
       </div>
-      <div className="flex h-10 items-center justify-between gap-0.5 border-y-2 border-background bg-dashboard-frosted px-1">
+      <div className="flex h-8 items-center justify-start gap-0.5 border-y-2 border-background bg-background pr-1">
         <Button
           variant="default"
           size="sm"
-          className="shrink-0 border-[3px] border-background whitespace-nowrap px-2 text-navlabel uppercase text-accent-foreground"
+          className="shrink-0 h-7 border-[3px] border-background whitespace-nowrap p-3.5 text-navlabel uppercase text-accent-foreground"
           disabled={!canAddNote}
           aria-disabled={!canAddNote}
           onClick={() => {
@@ -148,7 +148,7 @@ export function DashboardHeader({
           Add Note
         </Button>
 
-        <ButtonGroup className="items-center gap-0.5 bg-muted [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
+        <ButtonGroup className="items-center gap-0.5 bg-muted [&_button]:h-7 [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
           <ButtonGroupText className="nn-tab-notes-ribbon whitespace-nowrap rounded-none bg-ribbon pr-4 text-navribbon text-accent-foreground">
             This Tab Notes
           </ButtonGroupText>
@@ -183,7 +183,7 @@ export function DashboardHeader({
         <Button
           variant="default"
           size="sm"
-          className="shrink-0 border-[3px] border-background whitespace-nowrap px-2 text-navlabel uppercase text-accent-foreground"
+          className="shrink-0 h-7 border-[3px] border-background whitespace-nowrap p-3.5 text-navlabel uppercase text-accent-foreground"
           disabled={!canDeleteSubjectTab}
           aria-disabled={!canDeleteSubjectTab}
           onClick={() => {
@@ -198,14 +198,14 @@ export function DashboardHeader({
         {isOnTrial || isReadOnly ? (
           <button
             type="button"
-            className="h-full cursor-pointer border-[3px] border-background p-0 leading-none [&>svg]:h-full [&>svg]:w-auto"
+            className="h-8 cursor-pointer p-0 leading-none [&>svg]:h-full [&>svg]:w-auto"
             onClick={() => onTrialBannerOpenChange?.(true)}
             aria-label="Open trial info"
           >
             <NNLogoTrial />
           </button>
         ) : (
-          <div className="h-full border-[3px] border-background [&>svg]:h-full [&>svg]:w-auto">
+          <div className="h-7 [&>svg]:h-full [&>svg]:w-auto">
             <NNLogo />
           </div>
         )}

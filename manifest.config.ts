@@ -6,7 +6,7 @@ export default defineManifest({
   description:
     "Save bookmarks with exact scroll position and restore it later.",
   version: "1.0.0",
-  permissions: ["storage", "tabs", "activeTab", "unlimitedStorage"],
+  permissions: ["storage", "tabs", "activeTab", "scripting", "unlimitedStorage"],
   host_permissions: ["<all_urls>"],
   icons: {
     16: "src/assets/icons/extension-icon.png",

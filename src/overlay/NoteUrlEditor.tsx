@@ -219,7 +219,7 @@ export function NoteUrlEditor({
   return (
     <div className="bg-background">
       <div className="flex items-stretch border-b border-black">
-        <div className="flex h-5 w-12 shrink-0 items-center justify-center border-r border-black bg-background text-xs font-bold leading-none">
+        <div className="flex h-5 w-12 shrink-0 items-center justify-center border-r border-black bg-note-field text-xs font-bold leading-none">
           URL
         </div>
 
@@ -265,11 +265,11 @@ export function NoteUrlEditor({
             }
           }}
           className={cn(
-            "h-5 min-w-0 flex-1 rounded-none border-0 px-2 text-xs font-semibold shadow-none focus-visible:ring-0",
+            "h-5 min-w-0 flex-1 rounded-none border-0 bg-note-field px-2 text-xs font-semibold shadow-none focus-visible:ring-0",
             error ? "bg-destructive/10" : undefined,
           )}
         />
-        <div className="flex h-5 w-26 shrink-0 items-center justify-center border-l border-black bg-background px-2 text-xs font-bold leading-none">
+        <div className="flex h-5 w-26 shrink-0 items-center justify-center border-l border-black bg-note-field px-2 text-xs font-bold leading-none">
           {formatCreatedDateForBox(createdAt)}
         </div>
       </div>
@@ -306,7 +306,7 @@ export function NoteUrlEditor({
               persistPendingSubjectTab(target);
               openInNewTab(target);
             }}
-            className="h-9 w-12 shrink-0 px-0 font-semibold text-md"
+            className="h-9 w-12 shrink-0 bg-note-action px-0 font-semibold text-md text-white hover:bg-note-action/90"
           >
             LINK
           </Button>
@@ -403,7 +403,7 @@ export function NoteUrlEditor({
               "h-9 px-2 font-semibold text-md",
               anchor || isPicking
                 ? "bg-accent text-white hover:bg-accent/90"
-                : "bg-background text-primary hover:bg-muted border border-white",
+                : "bg-background text-black hover:bg-muted border border-white",
             )}
           >
             {isPicking ? "PICKING…" : "ANCHOR"}
@@ -425,7 +425,7 @@ export function NoteUrlEditor({
               }, 1500);
             }}
             className={cn(
-              "h-9 px-2 text-md font-semibold transition-colors",
+              "h-9 bg-note-action px-2 text-md font-semibold text-white transition-colors hover:bg-note-action/90",
               isCopyFlashing && "bg-accent hover:bg-accent",
             )}
           >
@@ -439,7 +439,7 @@ export function NoteUrlEditor({
                 onInteract();
                 onPasteNote?.();
               }}
-              className="h-9 px-2 text-md font-semibold text-primary hover:bg-white bg-white"
+              className="h-9 px-2 text-md font-semibold text-black hover:bg-white bg-white"
             >
               PASTE
             </Button>
@@ -472,7 +472,7 @@ export function NoteUrlEditor({
                   // Ignore clipboard permission failures silently.
                 }
               }}
-              className="h-9 px-2 text-md text-primary hover:bg-white bg-white font-semibold"
+              className="h-9 px-2 text-md text-black hover:bg-white bg-white font-semibold"
             >
               PASTE
             </Button>

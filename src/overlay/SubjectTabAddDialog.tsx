@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -63,10 +64,13 @@ export function SubjectTabAddDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="left-[calc(50%+var(--spacing)*10)]"
+        className="left-[calc(50%+var(--spacing)*10)] w-80"
       >
         <DialogHeader>
           <DialogTitle>New subject tab</DialogTitle>
+          <DialogDescription className="sr-only">
+            Enter a name for the new subject tab.
+          </DialogDescription>
         </DialogHeader>
 
         <Input

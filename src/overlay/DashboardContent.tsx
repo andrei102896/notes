@@ -122,7 +122,7 @@ export function DashboardContent({
       className="nn-dashboard-content-frosted flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
       aria-label="Dashboard content"
     >
-      <div className="min-h-0 flex-1 overflow-auto p-6">
+      <div className="min-h-0 flex-1 overflow-auto py-6 px-4">
         {notes.length > 0 ? (
           <NotesList
             notesById={notesById}

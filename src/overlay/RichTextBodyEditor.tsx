@@ -287,7 +287,7 @@ export const RichTextBodyEditor = forwardRef<
           }}
           onBeforeInput={(event) => {
             const native = event.nativeEvent as InputEvent;
-            if (!native.inputType.startsWith("insert")) {
+            if (!native.inputType?.startsWith("insert")) {
               return;
             }
             ensureTypingFormatBeforeInput();
@@ -330,7 +330,7 @@ export const RichTextBodyEditor = forwardRef<
               );
             }
           }}
-          className="h-[11.3125rem] w-full overflow-y-auto bg-background px-3 py-3 text-sm outline-none"
+          className="h-[11.3125rem] w-full overflow-y-auto bg-background px-3 py-3 outline-none"
         />
       </div>
     </div>

@@ -70,6 +70,45 @@ chrome.action.onClicked.addListener((tab) => {
   });
 });
 
+/**
+ * On install/update the previously-injected content scripts in already-open tabs
+ * are orphaned (their extension context is invalidated), so the toolbar toggle
+ * stops working until the tab is reloaded. Re-inject the page content script into
+ * existing http(s) tabs so the toggle keeps working without a manual refresh.
+ */
+async function reinjectContentScriptsIntoOpenTabs(): Promise<void> {
+  const contentScripts = chrome.runtime.getManifest().content_scripts ?? [];
+  for (const script of contentScripts) {
+    const files = script.js;
+    if (!files || files.length === 0) {
+      continue;
+    }
+    // Skip the ExtPay content script (extensionpay.com only).
+    if (script.matches?.some((pattern) => pattern.includes("extensionpay.com"))) {
+      continue;
+    }
+    let tabs: chrome.tabs.Tab[];
+    try {
+      tabs = await chrome.tabs.query({});
+    } catch {
+      continue;
+    }
+    for (const tab of tabs) {
+      if (typeof tab.id !== "number" || !tab.url || !/^https?:/.test(tab.url)) {
+        continue;
+      }
+      chrome.scripting.executeScript({ target: { tabId: tab.id }, files }, () => {
+        // Restricted pages (CSP, store pages, etc.) throw — ignore.
+        void chrome.runtime.lastError;
+      });
+    }
+  }
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  void reinjectContentScriptsIntoOpenTabs();
+});
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (isOpenUrlInNewTabMessage(message)) {
     const targetUrl = message.payload?.url;
