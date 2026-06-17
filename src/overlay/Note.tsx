@@ -10,11 +10,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
+import type { FormatState } from "@/lib/richTextFormat";
 import { cn } from "@/lib/utils";
 import { NoteUrlEditor } from "@/overlay/NoteUrlEditor";
 import {
   RichTextBodyEditor,
-  type FormatState,
   type RichTextBodyEditorHandle,
 } from "@/overlay/RichTextBodyEditor";
 import type { NNCopiedNote, NNSyncNote } from "@/types/nnData";

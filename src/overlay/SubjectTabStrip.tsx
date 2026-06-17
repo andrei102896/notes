@@ -6,18 +6,15 @@ import {
   useState,
 } from "react";
 
-import { Plus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { indexOfFirstTabForLetter, type AirLetter } from "@/lib/airSubjectTabs";
 import { SubjectTabAddDialog } from "@/overlay/SubjectTabAddDialog";
 import { SubjectTabRenameDialog } from "@/overlay/SubjectTabRenameDialog";
+import type { SubjectTabStripItem } from "@/types/nnData";
 
-export type SubjectTabStripItem = {
-  id: string;
-  name: string;
-};
+/** Defer deselect so a double-click can open rename instead (SUBJECT-TABS-2). */
+const DESELECT_DEFER_MS = 200;
 
 export type SubjectTabStripHandle = {
   /** Select and scroll to the first tab whose name starts with `letter` (AIR-2). */
@@ -200,8 +197,8 @@ export const SubjectTabStrip = forwardRef<
         <Button
           variant="icon"
           size="icon"
-          /* Square, one letter-box tall — same height as the brand-bar header (per design). */
-          className="relative z-30 shrink-0 border-border bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100"
+          /* One A–Z cell tall (var(--air-cell)) — top-aligned with letter A. */
+          className="relative z-30 h-[var(--air-cell)] shrink-0 border-border bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100"
           type="button"
           onClick={() => {
             if (isReadOnly) {
@@ -215,7 +212,9 @@ export const SubjectTabStrip = forwardRef<
           aria-haspopup="dialog"
           aria-expanded={addDialogOpen}
         >
-          <Plus aria-hidden />
+          <span data-add-tab-glyph aria-hidden>
+            +
+          </span>
         </Button>
 
         <Tabs
@@ -254,7 +253,7 @@ export const SubjectTabStrip = forwardRef<
                       pendingDeselectTimerRef.current = setTimeout(() => {
                         pendingDeselectTimerRef.current = null;
                         onSelectTab(tab.id);
-                      }, 280);
+                      }, DESELECT_DEFER_MS);
                     }
                   }}
                   onDoubleClick={(e) => {
@@ -267,7 +266,7 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  className="w-[7.5rem]! h-[7.5rem]! shrink-0 snap-start rotate-90 translate-x-[2.5rem] origin-top-left"
+                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 snap-start justify-start leading-tight rotate-90 translate-x-[2.5rem] origin-top-left"
                 >
                   {tab.name.toUpperCase()}
                 </TabsTrigger>

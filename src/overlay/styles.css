@@ -14,7 +14,7 @@ body {
   --font-ui: "Inter", system-ui, sans-serif;
   /* Design point sizes at the 686px/16px reference; in rem so they ride the panel knob. */
   --text-air-letter: 1.625rem; /* 26px — A–Z index letters (Fjalla One Regular, doc 4_NN_AI) */
-  --text-subject-tab: 1.5rem; /* 24px — subject tab labels (Fjalla One Regular, doc 2_NN_SUBJECT TAB) */
+  --text-subject-label: 1.5rem; /* 24px — subject tabs (css.txt WORDS_*); name ≠ --color-subject-tab (text-* utility collision) */
   --text-note-body: 1.125rem; /* 18px — note body */
   --text-note-title: 1.4375rem; /* 23px — note title (Fjalla One Regular, Figma BOX_TITLE text) */
   --text-brand-title: 0.75rem; /* 12px — "NOTES FOR NET" (Inter Bold) */
@@ -22,6 +22,7 @@ body {
   --text-navlabel: 1.4375rem; /* 23px — ADD NOTE / DELETE TAB (Figma) */
   --text-navmin: 1.3125rem; /* 21px — MIN MAX DELETE (Figma) */
   --text-navribbon: 1.125rem; /* 18px — THIS TAB NOTES (Figma) */
+  --text-add-glyph: 3.5rem; /* 56px — "+" add-tab glyph (Figma 55.77px) */
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 47.4% 11.2%);
   --color-dashboard-frosted: hsl(0 0% 78%);
@@ -42,6 +43,8 @@ body {
   --color-note-action: #000000; /* LINK / COPY action buttons (Figma BOX_LINK / BOX_COPY) */
   --color-ribbon: #565656; /* THIS TAB NOTES ribbon (Figma) */
   --color-chrome-ext: #1e1d1d; /* CHROME EXTENSION pill (Figma) */
+  --color-mn-stroke: #282828; /* outer panel + NN BIG BOX stroke (Figma) */
+  --color-logo-box: #2c2c2c; /* NN logo box (Figma LOGO BOX) */
   --color-mintext: #252525; /* MIN MAX DELETE text (Figma) */
   --color-accent: #29abe2;
   --color-accent-foreground: hsl(0 0% 100%);
@@ -54,6 +57,7 @@ body {
   --radius-md: calc(0.5rem - 2px);
   --radius-lg: 0.5rem;
   --text-shadow-lg: 0 0 6px #000000;
+  --shadow-air: 0 4px 4.5px 4px rgba(0, 0, 0, 0.25); /* A–Z shadow (Figma "AI SHADOW") */
   --border-color-muted: #666666;
 }
 
@@ -76,6 +80,8 @@ body {
 #nn-scroll-bookmarks-overlay-host {
   color-scheme: light;
   background-color: transparent;
+  /* One A–Z box: 26 fill the panel height; "+" = 1 cell, a subject tab = 3. */
+  --air-cell: calc(100vh / 26);
 }
 
 #nn-scroll-bookmarks-overlay-host,
@@ -101,6 +107,12 @@ body {
    rather than via a text-* utility, which twMerge conflates with the white color class. */
 #nn-scroll-bookmarks-overlay-host [data-note-title] {
   font-size: var(--text-note-title);
+}
+
+/* Size in CSS, not a text-* class: twMerge drops it vs the button's text color. */
+#nn-scroll-bookmarks-overlay-host [data-add-tab-glyph] {
+  font-size: var(--text-add-glyph);
+  line-height: 1;
 }
 
 #nn-scroll-bookmarks-overlay-host [data-note-body] b,

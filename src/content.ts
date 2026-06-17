@@ -18,6 +18,45 @@ import {
 import { App } from "@/overlay/App";
 import overlayCss from "@/overlay/styles.css?inline";
 
+/**
+ * Radix's a11y check reads the host doc, not our iframe dialogs — false positive.
+ * Filter only those two messages.
+ */
+function suppressRadixCrossRealmDialogWarnings(): void {
+  const SUPPRESS_FLAG = "__nnRadixDialogWarningsSuppressed";
+  const flags = window as unknown as Record<string, boolean>;
+  if (flags[SUPPRESS_FLAG]) {
+    return;
+  }
+  flags[SUPPRESS_FLAG] = true;
+
+  const FALSE_POSITIVES = [
+    "`DialogContent` requires a `DialogTitle`",
+    "Missing `Description` or `aria-describedby={undefined}`",
+  ];
+  const isRadixFalsePositive = (args: unknown[]): boolean =>
+    typeof args[0] === "string" &&
+    FALSE_POSITIVES.some((message) => (args[0] as string).includes(message));
+
+  const originalError = console.error;
+  console.error = (...args: unknown[]): void => {
+    if (isRadixFalsePositive(args)) {
+      return;
+    }
+    originalError(...args);
+  };
+
+  const originalWarn = console.warn;
+  console.warn = (...args: unknown[]): void => {
+    if (isRadixFalsePositive(args)) {
+      return;
+    }
+    originalWarn(...args);
+  };
+}
+
+suppressRadixCrossRealmDialogWarnings();
+
 registerContentPanelHost();
 
 /**
@@ -329,9 +368,16 @@ function mountOverlayInFrame(frame: HTMLIFrameElement): HTMLElement {
   doc.body.style.height = "100%";
   doc.body.style.overflow = "hidden";
   doc.body.style.background = "transparent";
+  // Keep wheel scroll inside the iframe; don't scroll the host page behind it.
+  doc.documentElement.style.overscrollBehavior = "none";
+  doc.body.style.overscrollBehavior = "none";
 
-  /* React mounts here; {@link App} renders <main id="nn-scroll-bookmarks-overlay-host">. */
-  return doc.body;
+  // Avoid createRoot on document.body — extensions mutate it; root on a child div.
+  const appRoot = doc.createElement("div");
+  appRoot.id = "nn-overlay-app-root";
+  appRoot.style.height = "100%";
+  doc.body.appendChild(appRoot);
+  return appRoot;
 }
 
 function configureOverlayShell(shell: HTMLDivElement): void {

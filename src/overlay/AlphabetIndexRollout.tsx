@@ -6,7 +6,7 @@ import {
   type AirLetter,
 } from "@/lib/airSubjectTabs";
 import { cn } from "@/lib/utils";
-import type { SubjectTabStripItem } from "@/overlay/SubjectTabStrip";
+import type { SubjectTabStripItem } from "@/types/nnData";
 
 type AlphabetIndexRolloutProps = {
   tabs: SubjectTabStripItem[];
@@ -30,7 +30,7 @@ export function AlphabetIndexRollout({
   return (
     <div
       className={cn(
-        "flex h-full w-10 shrink-0 flex-col overflow-y-auto overflow-x-hidden hidden-scrollbar border-r border-border bg-air-box",
+        "flex h-full w-10 shrink-0 flex-col overflow-hidden border-r border-border bg-air-box shadow-air",
         className,
       )}
       aria-label="Alphabetical index"
@@ -50,7 +50,7 @@ export function AlphabetIndexRollout({
               onLetterSelect(letter);
             }}
             className={cn(
-              "flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden border-b border-l border-border text-center font-normal outline-none",
+              "flex h-[var(--air-cell)] w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden border-b border-l border-border text-center font-normal outline-none",
               "text-air-letter leading-none",
               "bg-air-box text-accent-foreground",
               hasMatch && "hover:bg-accent",

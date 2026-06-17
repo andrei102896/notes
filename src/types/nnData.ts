@@ -20,6 +20,12 @@ export type NNSubjectTab = {
   createdAt: number;
 };
 
+/** UI subset of {@link NNSubjectTab} for the tab strip + alphabetical index. */
+export type SubjectTabStripItem = {
+  id: string;
+  name: string;
+};
+
 /**
  * Stored position of a page anchor set by the user via the ANCHOR pick flow.
  * Uses document-relative coordinates so the position survives scrolling.

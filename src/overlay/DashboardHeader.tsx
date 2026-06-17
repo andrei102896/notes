@@ -51,10 +51,7 @@ function NNLogo(): React.ReactElement {
   );
 }
 
-/**
- * Brand-cluster NN mark. Independent presentational copy of {@link NNLogo}, rem-sized so it
- * rides the panel knob. Deliberately NOT the right-side payment logo button (off-limits).
- */
+/** Brand-cluster NN mark (white NN) — NOT the off-limits payment logo. */
 function BrandLogo(): React.ReactElement {
   return (
     <svg
@@ -64,16 +61,13 @@ function BrandLogo(): React.ReactElement {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      <rect x="0.5" y="0.5" width="62" height="29" fill="white" stroke="black" />
       <path
         d="M35.5083 4.92908V12.1556C35.5083 15.0218 35.4221 17.2442 35.0737 19.6742L35.0151 20.0863L35.4087 20.2191L35.4956 20.2484L35.8403 20.3646L36.0571 20.0717C37.2652 18.4381 38.7074 16.7609 40.5034 14.9261L41.2954 14.1293L50.5933 4.92908H54.0396V22.3978H51.4556V15.0062C51.4556 11.9485 51.542 9.74468 51.7583 7.43396L51.7993 6.99451L50.9204 6.79919L50.7271 7.05994C49.2637 9.03214 47.3176 11.121 45.269 13.1703H45.2681L36.061 22.3949H32.9243V4.92908H35.5083Z"
-        fill="black"
-        stroke="black"
+        fill="white"
       />
       <path
         d="M12.2393 5.04956L21.6025 14.1912V14.1902C23.7909 16.3281 25.4869 18.2403 26.8779 20.0945L27.085 20.3708L27.417 20.2751L27.5068 20.2488L27.9248 20.1277L27.8633 19.697C27.5149 17.2801 27.4277 15.0739 27.4277 12.2273V5.04956H30.0371V22.3982H26.8701L17.5967 13.2302H17.5957C15.5302 11.1943 13.5743 9.1175 12.1006 7.15796L11.9111 6.90698L11.6035 6.96851L11.4717 6.9939L11.0293 7.08179L11.0713 7.53198C11.2876 9.82672 11.377 12.0146 11.377 15.0554V22.3953H8.76172V5.04956H12.2393Z"
-        fill="black"
-        stroke="black"
+        fill="white"
       />
     </svg>
   );
@@ -124,15 +118,24 @@ export function DashboardHeader({
   return (
     <header className="sticky top-0 z-20 flex h-auto flex-col bg-air-box">
       <div className="relative z-[1] flex h-10 shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2">
-        <BrandLogo />
-        <span className="bg-accent px-2 py-0.5 font-ui text-brand-title font-bold uppercase tracking-widest text-accent-foreground">
-          Notes for Net
-        </span>
-        <span className="bg-chrome-ext px-2 py-0.5 font-ui text-brand-sub font-semibold uppercase tracking-wide text-accent-foreground">
-          Chrome Extension
-        </span>
+        <div className="flex items-stretch border-2 border-mn-stroke bg-accent">
+          <span className="flex items-center bg-logo-box">
+            <BrandLogo />
+          </span>
+          <div className="flex items-center justify-center px-2">
+            {/* nudge down 1px — Inter caps sit above the optical center */}
+            <span className="relative top-px font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground">
+              Notes for Net
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-center bg-chrome-ext px-1 py-1">
+          <span className="relative top-px font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
+            Chrome Extension
+          </span>
+        </div>
       </div>
-      <div className="flex h-8 items-center justify-start gap-0.5 border-y-2 border-background bg-background pr-1">
+      <div className="flex h-8 items-center justify-start gap-0.5 border-y-2 border-background bg-background pr-0.5">
         <Button
           variant="default"
           size="sm"

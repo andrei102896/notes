@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { browsingContextWindowForTabUrl } from "@/lib/browsingContextWindow";
+import { PENDING_SUBJECT_TAB_PREFIX } from "@/lib/nnSyncKeys";
 import {
   clearPendingAnchorState,
   markOverlayReopenOnNextNavigation,
   setPendingAnchorForNavigation,
   setPendingAnchorForNewTab,
 } from "@/lib/pendingNavigation";
+import type { FormatState } from "@/lib/richTextFormat";
 import { cn } from "@/lib/utils";
 import { getContentPanelClient } from "@/messaging/contentPanelBridge";
-import type { FormatState } from "@/overlay/RichTextBodyEditor";
 import type { NNAnchorPosition } from "@/types/nnData";
 
 function formatCreatedDateForBox(timestamp: number): string {
@@ -151,7 +152,6 @@ export function NoteUrlEditor({
 
   const openableDraftUrl = toOpenableUrl(draft);
   const canOpenLink = openableDraftUrl !== null;
-  const PENDING_SUBJECT_TAB_PREFIX = "nn_pending_subject_tab_";
 
   const getPendingSubjectTabStorageKeys = useCallback(
     (targetUrl: string): string[] => {

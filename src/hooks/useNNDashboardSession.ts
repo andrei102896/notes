@@ -8,6 +8,7 @@ import {
 import { useBrowserTabLocation } from "@/hooks/useBrowserTabLocation";
 import { visibleNotesForDashboard } from "@/lib/nnDashboardNotes";
 import { noteListLayoutKey, resolveNoteListLayout } from "@/lib/nnNoteLayout";
+import { PENDING_SUBJECT_TAB_PREFIX } from "@/lib/nnSyncKeys";
 import {
   DEFAULT_NN_SYNC,
   DEFAULT_PAGE_SESSION,
@@ -32,8 +33,6 @@ import type {
   NNSyncNote,
   NNSyncPayload,
 } from "@/types/nnData";
-
-const PENDING_SUBJECT_TAB_PREFIX = "nn_pending_subject_tab_";
 
 function trimTrailingSlash(url: string): string {
   return url.length > 1 && url.endsWith("/") ? url.slice(0, -1) : url;
@@ -75,7 +74,7 @@ export function useNNDashboardSession(): {
   sync: NNSyncPayload;
   pageSession: NNPageSessionState;
   patchSession: (patch: Partial<NNPageSessionState>) => void;
-  /** Either notes in the selected subject tab, or notes matching this tab’s URL when none selected. */
+  /** Notes in the selected subject tab; empty when none is selected. */
   visibleNotes: NNSyncNote[];
   browserTabUrlKey: string | null;
   browserTabHref: string;
@@ -248,15 +247,17 @@ export function useNNDashboardSession(): {
     [pageSession.activeSubjectTabId, browserTabUrlKey],
   );
 
-  const visibleNotes = useMemo(
-    () =>
-      visibleNotesForDashboard({
-        notes: sync.notes,
-        activeSubjectTabId: pageSession.activeSubjectTabId,
-        browserTabUrlKey,
-      }),
-    [sync.notes, pageSession.activeSubjectTabId, browserTabUrlKey],
-  );
+  const visibleNotes = useMemo(() => {
+    // None selected → list isn't rendered; skip the O(n) URL filter.
+    if (pageSession.activeSubjectTabId === null) {
+      return [];
+    }
+    return visibleNotesForDashboard({
+      notes: sync.notes,
+      activeSubjectTabId: pageSession.activeSubjectTabId,
+      browserTabUrlKey,
+    });
+  }, [sync.notes, pageSession.activeSubjectTabId, browserTabUrlKey]);
 
   const resolvedNoteListLayout = useMemo(() => {
     if (noteLayoutStorageKey === null) {
