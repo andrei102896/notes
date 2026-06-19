@@ -1,19 +1,15 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   clampSubjectTabName,
   SUBJECT_TAB_NAME_MAX_LEN,
 } from "@/lib/subjectTabName";
+import {
+  ModalCancelButton,
+  ModalOkButton,
+  NnModalFrame,
+} from "@/overlay/NnModalFrame";
 
 export type SubjectTabAddDialogProps = {
   open: boolean;
@@ -61,22 +57,24 @@ export function SubjectTabAddDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="left-[calc(50%+var(--spacing)*10)] w-80"
+    <NnModalFrame
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Add subject tab"
+      widthClassName="w-[30rem]"
+    >
+      <label
+        htmlFor={fieldId}
+        className="text-subject-label uppercase leading-none text-modal-foreground"
       >
-        <DialogHeader>
-          <DialogTitle>New subject tab</DialogTitle>
-          <DialogDescription className="sr-only">
-            Enter a name for the new subject tab.
-          </DialogDescription>
-        </DialogHeader>
+        Add subject tab
+      </label>
 
+      <div className="flex items-center gap-3">
         <Input
           id={fieldId}
           ref={inputRef}
-          className="w-full min-w-0"
+          className="w-44 min-w-0 border-white bg-note-field"
           value={draft}
           maxLength={SUBJECT_TAB_NAME_MAX_LEN}
           placeholder="Name"
@@ -93,25 +91,15 @@ export function SubjectTabAddDialog({
           aria-label="New subject tab name"
         />
 
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="muted"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-          >
+        <div className="ml-auto flex gap-3">
+          <ModalCancelButton onClick={() => onOpenChange(false)}>
             Cancel
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            disabled={!canSubmit}
-            onClick={() => void submit()}
-          >
+          </ModalCancelButton>
+          <ModalOkButton disabled={!canSubmit} onClick={() => void submit()}>
             OK
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </ModalOkButton>
+        </div>
+      </div>
+    </NnModalFrame>
   );
 }

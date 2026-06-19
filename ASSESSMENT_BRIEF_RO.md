@@ -339,3 +339,50 @@ LINK/ANCHOR/COPY/PASTE, DnD, persistență, A–Z) sunt implementate și acum al
 de calitate (#1, coada lui #2, #4, #8–#10), nu fidelitate de design.
 
 *Modificat în această sesiune: cod sursă (commit-urile „Sprint 1") + acest addendum + `AGENTS.md` §10.*
+
+---
+
+## 9. Actualizare 2026-06-19 (Sprint 2) — ce s-a făcut
+
+Lucrări livrate după Sprint 1. `typecheck`/`lint`/`build` trec curat. Necomise încă în git
+(3 grupuri logice de modificări). Mapare pe §4/§7:
+
+**A. Persistență rescrisă pe model per-sesiune-de-tab (rezolvă §4.3 #4 + #5; corectează §8 #5).**
+Stratul per-URL (`nnSessionsByUrl`/`getPageSession`/`patchPageSession`) era de fapt **nelegat**
+— nota din Sprint 1 „pare LEGATĂ" era greșită: `patchSession` modifica doar starea React.
+Înlocuit cu o **sesiune per-tab** conformă cu `docs/1` („persistență temporară … o singură
+sesiune de tab de browser"): starea vizibil/ascuns a panoului **și** tab-ul subiect selectat
+urmează tab-ul la orice navigare în același tab (URL manual, link, săgeți înainte/înapoi) și se
+resetează doar la închiderea tab-ului. Funcționa parțial înainte doar accidental, prin bfcache.
+- `src/lib/tabSession.ts` (nou): `TabSessionState {open, activeSubjectTabId}` + helperele
+  `getTabSession()`/`patchTabSession()` (mesaje către background).
+- `background.ts`: deține starea în `chrome.storage.session`, cheie `nn_tab_session_<tabId>`,
+  prin `GET_TAB_SESSION`/`SET_TAB_SESSION` (pe `sender.tab.id`); curățată la `tabs.onRemoved`.
+- `content.ts`: deschide overlay-ul la load dacă `session.open`; scrie `open` în
+  `showOverlay`/`hideOverlay`. `useNNDashboardSession`: restaurează `activeSubjectTabId` din
+  sesiune la montare și îl persistă în `patchSession`.
+- **Cod mort șters:** `nnSessionsByUrl` + funcțiile per-URL (`nnStorage.ts`), intrarea de schemă
+  (`storageService.ts`), `PENDING_SUBJECT_TAB_PREFIX` (`nnSyncKeys.ts`), `persistPendingSubjectTab`
+  (`NoteUrlEditor.tsx`). Capcana „cod mort dar prezent" din §5 (nnSessionsByUrl) e închisă.
+
+**B. Fix dimensionare margine dreaptă (coada lui §6/§3).** `content.ts` măsoară lățimea
+scrollbar-ului gazdă (`innerWidth − documentElement.clientWidth`) și o expune ca variabila CSS
+`--nn-scrollbar-gutter`; bara din header folosește `w-[var(--nn-scrollbar-gutter,18px)]` în loc
+de 18px fix, deci logo-ul NN nu mai e tăiat de scrollbar pe ecrane mici/zoom. Logo-ul de trial
+(roșu) era supradimensionat (`h-full`) și acum refolosește `BrandLogo` într-o cutie roșie egală
+cu logo-ul albastru; SVG-ul `NNLogoTrial` a fost eliminat.
+
+**C. Redesign modale (fidelitate de design).** Header NN comun extras în `BrandLockup.tsx`;
+nou `NnModalFrame.tsx` (panou `--color-modal` închis, bară-header cu bordură accent 1px sus+laturi
+și doar umbră jos, corp conținut cu cadru accent 7px laturi+jos) + butoane `Cancel`/`OK`
+(`min-w` comun, OK roșu la ștergere). Cele 4 modale + empty-state-ul mutate pe acest cadru;
+ștergerile trec `NO`/`YES` → `CANCEL`/`OK`; Add/Rename pe un singur rând input+butoane. Tokeni noi
+în `styles.css` (`--color-modal`, `--color-modal-foreground`, `--color-modal-cancel`,
+`--color-modal-delete`). Literele NN îngroșate prin contur alb 1px.
+
+**Rămâne deschis (neschimbat):** §1 rebuild plătit, coada §6 (constante px, migrare gap-uri, QA
+rezoluții), §4.2 grup „This Tab Notes", §7 câmp „price", §8 debounce scrieri, §9 font auto-găzduit
++ scoatere react-query, §10 teste. Verificarea manuală în browser a celor trei livrări de mai sus
+nu a fost încă rulată de un om (build curat, dar fără QA vizual pe rezoluții/stări de trial).
+
+*Modificat în această sesiune: cod sursă (necomis) + acest §9 + `AGENTS.md` §11.*

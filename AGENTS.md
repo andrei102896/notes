@@ -281,3 +281,53 @@ Resolved / changed:
 Unchanged / still off-limits: payment-trial code (§7) and the human-owned paid rebuild
 (real ExtPay id + prod trial). react-query is still mounted and Fjalla One still loads from
 Google Fonts (both still "dead weight / network dependency" per §6/§5).
+
+## 11. Progress since 2026-06-19 — re-read before relying on §6/§8/§10
+
+Work landed this session. `typecheck`/`lint`/`build` stay clean. Supersedes specific
+earlier claims — verify current code.
+
+**Persistence reworked to a per-tab-session model (supersedes §8/§10 "per-URL session").**
+The old per-URL layer was confirmed never wired (the §10 "appears wired" note was wrong):
+`pageSession`/`patchSession` only touched React state. It's now replaced by a **per-tab
+session** matching the docs ("temporary persistence … single browser tab session"): NN's
+open-state *and* selected subject follow the tab across every same-tab navigation (manual
+URL, link, back/forward) and reset only on tab close.
+- New `src/lib/tabSession.ts`: `TabSessionState {open, activeSubjectTabId}` +
+  `getTabSession()`/`patchTabSession()` message helpers + message-type guards.
+- `background.ts` owns the state in `chrome.storage.session` keyed `nn_tab_session_<tabId>`
+  (durable across SW restart, auto-clears at browser-session end), via `GET_TAB_SESSION`/
+  `SET_TAB_SESSION` keyed on `sender.tab.id`, cleared on `chrome.tabs.onRemoved`.
+- `content.ts` opens the overlay on load when `session.open`, and writes `open` in
+  `showOverlay`/`hideOverlay`. `useNNDashboardSession` restores `activeSubjectTabId` from the
+  tab session on mount and persists it in `patchSession`.
+- **Dead code removed:** `nnSessionsByUrl` / `getUrlSessionMap` / `getPageSession` /
+  `patchPageSession` / `normalizePageSession` (`nnStorage.ts`), the `nnSessionsByUrl` schema
+  entry (`storageService.ts`), `PENDING_SUBJECT_TAB_PREFIX` (`nnSyncKeys.ts`), and the
+  per-URL `persistPendingSubjectTab` plumbing in `NoteUrlEditor.tsx`. The §6/§8/§10
+  references to `nnSessionsByUrl` as "dead but present" are now resolved (it's gone). The
+  `markOverlayReopenOnNextNavigation`/`claimPendingOverlay` pending-overlay path remains for
+  anchor coordination / new-tab opens (idempotent with the tab-session open).
+
+**Scrollbar clipping fix (right edge).** `content.ts` `syncOverlayViewportMetrics` now
+measures `window.innerWidth - document.documentElement.clientWidth` and exposes it as the
+iframe CSS var `--nn-scrollbar-gutter`; the header gutter uses
+`w-[var(--nn-scrollbar-gutter,18px)]` instead of the old fixed 18px, so the NN box clears
+the host scrollbar on any screen/zoom. The trial (red) logo was oversized (`h-full`) and now
+reuses `BrandLogo` in a red box matching the blue non-trial logo; the standalone
+`NNLogoTrial` SVG was removed.
+
+**Modal redesign (shared brand header + frame).** New `src/overlay/BrandLockup.tsx`
+(`BrandLogo` + `BrandLockup` — the NN/"Notes for Net"/"Chrome Extension" cluster, lifted out
+of `DashboardHeader` and now shared). New `src/overlay/NnModalFrame.tsx`: a Dialog shell
+(dark `--color-modal` panel; header bar via `ModalBrandBar` with a 1px accent top+sides
+border and a bottom shadow only; content body with a 7px accent frame on sides+bottom) plus
+`ModalCancelButton`/`ModalOkButton` (shared `min-w` so OK matches CANCEL; red OK when
+destructive). All four dialogs (`SubjectTabAddDialog`, `SubjectTabRenameDialog`,
+`SubjectTabDeleteConfirmDialog`, `NoteDeleteConfirmDialog`) and the `DashboardContent`
+empty-state were refactored onto this frame; deletes switched `NO`/`YES` → `CANCEL`/`OK`;
+Add/Rename use a single-row input+buttons layout. New `@theme` tokens in `styles.css`:
+`--color-modal` #3c3c3c, `--color-modal-foreground` #e0e0e0, `--color-modal-cancel` #4d4d4d,
+`--color-modal-delete` #e22929. NN glyphs are bolded via a 1px white path stroke. Note:
+`NoteUrlEditor`'s `activeSubjectTabId` prop is now unused (kept in the type to avoid
+unthreading the 5-component prop chain).

@@ -2,7 +2,6 @@ import { LEGACY_NN_SYNC_DATA_KEY } from "@/lib/nnSyncKeys";
 import type {
   NNCopiedNote,
   NNNoteIndex,
-  NNPageSessionState,
   NNSyncMeta,
   NNSyncPayload,
 } from "@/types/nnData";
@@ -25,8 +24,6 @@ type SyncStorageSchema = {
 
 type LocalStorageSchema = {
   pendingSyncMergeState: PendingSyncMergeState;
-  /** Keyed by normalized page URL (see `sessionUrlKey`). */
-  nnSessionsByUrl: Record<string, NNPageSessionState>;
   /** In-app note copy buffer (NOTE-COPYPASTE). Persisted across tabs/navigations. */
   nnCopyBuffer: NNCopiedNote;
 };

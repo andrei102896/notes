@@ -8,7 +8,7 @@ import {
 import { useBrowserTabLocation } from "@/hooks/useBrowserTabLocation";
 import { visibleNotesForDashboard } from "@/lib/nnDashboardNotes";
 import { noteListLayoutKey, resolveNoteListLayout } from "@/lib/nnNoteLayout";
-import { PENDING_SUBJECT_TAB_PREFIX } from "@/lib/nnSyncKeys";
+import { getTabSession, patchTabSession } from "@/lib/tabSession";
 import {
   DEFAULT_NN_SYNC,
   DEFAULT_PAGE_SESSION,
@@ -33,42 +33,6 @@ import type {
   NNSyncNote,
   NNSyncPayload,
 } from "@/types/nnData";
-
-function trimTrailingSlash(url: string): string {
-  return url.length > 1 && url.endsWith("/") ? url.slice(0, -1) : url;
-}
-
-function pendingSubjectTabKeysForUrl(href: string): string[] {
-  const keys = new Set<string>([
-    `${PENDING_SUBJECT_TAB_PREFIX}${href}`,
-    `${PENDING_SUBJECT_TAB_PREFIX}${trimTrailingSlash(href)}`,
-  ]);
-  try {
-    const canonicalHref = trimTrailingSlash(new URL(href).href);
-    keys.add(`${PENDING_SUBJECT_TAB_PREFIX}${canonicalHref}`);
-  } catch {
-    /* best-effort key generation */
-  }
-  return Array.from(keys);
-}
-
-async function consumePendingSubjectTabId(
-  href: string,
-): Promise<string | null> {
-  const keys = pendingSubjectTabKeysForUrl(href);
-  if (keys.length === 0) {
-    return null;
-  }
-  const values = await chrome.storage.local.get(keys);
-  await chrome.storage.local.remove(keys);
-  for (const key of keys) {
-    const value = values[key];
-    if (typeof value === "string" && value.length > 0) {
-      return value;
-    }
-  }
-  return null;
-}
 
 export function useNNDashboardSession(): {
   sync: NNSyncPayload;
@@ -103,42 +67,35 @@ export function useNNDashboardSession(): {
     DEFAULT_PAGE_SESSION(),
   );
 
-  const pageStorageKey = browserTabUrlKey;
-
+  // Mount-only: a hard navigation remounts React, so this runs once per page load
+  // and restores the tab session's selected subject. SPA URL changes keep the same
+  // mount (no reset) — open-state + subject persist for the tab session (docs/1).
   useEffect(() => {
-    if (pageStorageKey === null) {
-      return;
-    }
-
     let cancelled = false;
 
     void (async () => {
-      const [initialSync, pendingSubjectTabId] = await Promise.all([
+      const [initialSync, tabSession] = await Promise.all([
         ensureNNSyncInitialized(),
-        consumePendingSubjectTabId(browserTabHref),
+        getTabSession(),
       ]);
       if (cancelled) {
         return;
       }
       setSync(initialSync);
-      const canRestorePendingSubjectTab =
-        pendingSubjectTabId !== null &&
-        initialSync.subjectTabs.some((tab) => tab.id === pendingSubjectTabId);
-
-      let resolvedActiveSubjectTabId: string | null = null;
-      if (canRestorePendingSubjectTab) {
-        resolvedActiveSubjectTabId = pendingSubjectTabId;
-      }
+      const restored = tabSession.activeSubjectTabId;
+      const canRestore =
+        restored !== null &&
+        initialSync.subjectTabs.some((tab) => tab.id === restored);
 
       setPageSession({
-        activeSubjectTabId: resolvedActiveSubjectTabId,
+        activeSubjectTabId: canRestore ? restored : null,
       });
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [browserTabHref, pageStorageKey]);
+  }, []);
 
   useEffect(() => {
     return subscribeNNSync((next) => {
@@ -151,9 +108,25 @@ export function useNNDashboardSession(): {
   const patchSession = useCallback(
     (patch: Partial<NNPageSessionState>) => {
       setPageSession((prev) => ({ ...prev, ...patch }));
+      // Persist the subject so it follows the tab across navigation (docs/1).
+      if ("activeSubjectTabId" in patch) {
+        patchTabSession({ activeSubjectTabId: patch.activeSubjectTabId ?? null });
+      }
     },
     [],
   );
+
+  // Cross-tab safety: if the selected subject was deleted in another browser tab,
+  // fall back to the default current-page view instead of leaving a stale id that
+  // renders an empty, instruction-less notes list.
+  useEffect(() => {
+    if (
+      pageSession.activeSubjectTabId !== null &&
+      !sync.subjectTabs.some((tab) => tab.id === pageSession.activeSubjectTabId)
+    ) {
+      patchSession({ activeSubjectTabId: null });
+    }
+  }, [sync.subjectTabs, pageSession.activeSubjectTabId, patchSession]);
 
   const addSubjectTab = useCallback(
     async (name: string): Promise<string | null> => {

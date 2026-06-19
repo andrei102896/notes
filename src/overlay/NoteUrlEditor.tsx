@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { browsingContextWindowForTabUrl } from "@/lib/browsingContextWindow";
-import { PENDING_SUBJECT_TAB_PREFIX } from "@/lib/nnSyncKeys";
 import {
   clearPendingAnchorState,
   markOverlayReopenOnNextNavigation,
@@ -100,7 +99,6 @@ type NoteUrlEditorProps = {
 export function NoteUrlEditor({
   value,
   anchor,
-  activeSubjectTabId,
   createdAt,
   onSave,
   onSaveAnchor,
@@ -153,39 +151,6 @@ export function NoteUrlEditor({
   const openableDraftUrl = toOpenableUrl(draft);
   const canOpenLink = openableDraftUrl !== null;
 
-  const getPendingSubjectTabStorageKeys = useCallback(
-    (targetUrl: string): string[] => {
-      const keys = new Set<string>([
-        `${PENDING_SUBJECT_TAB_PREFIX}${targetUrl}`,
-      ]);
-      try {
-        const canonicalHref = trimTrailingSlash(new URL(targetUrl).href);
-        keys.add(`${PENDING_SUBJECT_TAB_PREFIX}${canonicalHref}`);
-      } catch {
-        /* malformed URL should not happen here */
-      }
-      return Array.from(keys);
-    },
-    [],
-  );
-
-  const persistPendingSubjectTab = useCallback(
-    (targetUrl: string) => {
-      if (!activeSubjectTabId) {
-        return;
-      }
-      const keys = getPendingSubjectTabStorageKeys(targetUrl);
-      if (keys.length === 0) {
-        return;
-      }
-      const payload = Object.fromEntries(
-        keys.map((key) => [key, activeSubjectTabId]),
-      );
-      chrome.storage.local.set(payload);
-    },
-    [activeSubjectTabId, getPendingSubjectTabStorageKeys],
-  );
-
   const openInNewTab = useCallback((targetUrl: string) => {
     chrome.runtime.sendMessage(
       {
@@ -204,7 +169,6 @@ export function NoteUrlEditor({
   const navigateSameTab = useCallback(
     (targetUrl: string, options: { scrollToAnchor?: boolean }) => {
       const tabWin = browsingContextWindowForTabUrl();
-      persistPendingSubjectTab(targetUrl);
       if (options.scrollToAnchor && anchor) {
         setPendingAnchorForNavigation(tabWin, targetUrl, anchor);
       } else {
@@ -213,7 +177,7 @@ export function NoteUrlEditor({
       markOverlayReopenOnNextNavigation(tabWin, targetUrl);
       tabWin.location.href = targetUrl;
     },
-    [anchor, persistPendingSubjectTab],
+    [anchor],
   );
 
   return (
@@ -303,7 +267,6 @@ export function NoteUrlEditor({
               }
               const tabWin = browsingContextWindowForTabUrl();
               clearPendingAnchorState(tabWin, target);
-              persistPendingSubjectTab(target);
               openInNewTab(target);
             }}
             className="h-9 w-12 shrink-0 bg-note-action px-0 font-semibold text-md text-white hover:bg-note-action/90"
@@ -395,7 +358,6 @@ export function NoteUrlEditor({
               if (!targetUrl) {
                 return;
               }
-              persistPendingSubjectTab(targetUrl);
               setPendingAnchorForNewTab(targetUrl, anchor);
               openInNewTab(targetUrl);
             }}

@@ -43,17 +43,6 @@ export const DEFAULT_PAGE_SESSION = (): NNPageSessionState => ({
   activeSubjectTabId: null,
 });
 
-function normalizePageSession(
-  raw: Partial<NNPageSessionState> | undefined,
-): NNPageSessionState {
-  if (!raw || typeof raw !== "object") {
-    return DEFAULT_PAGE_SESSION();
-  }
-  return {
-    activeSubjectTabId: raw.activeSubjectTabId ?? null,
-  };
-}
-
 function normalizeMeta(raw: unknown): NNSyncMeta {
   if (!raw || typeof raw !== "object") {
     return { ...DEFAULT_META };
@@ -771,34 +760,6 @@ export async function setNNSync(payload: NNSyncPayload): Promise<void> {
   if (keysToRemove.length > 0) {
     await storageService.sync.removeMany(keysToRemove);
   }
-}
-
-export async function getUrlSessionMap(): Promise<
-  Record<string, NNPageSessionState>
-> {
-  const raw = await storageService.local.get("nnSessionsByUrl");
-  return raw ?? {};
-}
-
-export async function getPageSession(
-  pageUrlKey: string,
-): Promise<NNPageSessionState> {
-  const map = await getUrlSessionMap();
-  return normalizePageSession(map[pageUrlKey]);
-}
-
-export async function patchPageSession(
-  pageUrlKey: string,
-  patch: Partial<NNPageSessionState>,
-): Promise<NNPageSessionState> {
-  const map = await getUrlSessionMap();
-  const prev = normalizePageSession(map[pageUrlKey]);
-  const next: NNPageSessionState = { ...prev, ...patch };
-  await storageService.local.set("nnSessionsByUrl", {
-    ...map,
-    [pageUrlKey]: next,
-  });
-  return next;
 }
 
 export function subscribeNNSync(

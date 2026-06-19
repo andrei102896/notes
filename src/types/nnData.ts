@@ -9,8 +9,9 @@
  *   to return to the current-tab view (NOTES-CORE-6, DASHBOARD-UI-3 intent).
  *
  * Persistent data: `chrome.storage.local` — sharded keys (`nnSyncMeta`, `nnNoteIndex`, `nnNote:<id>`,
- * `nnLayout:<context>`). Assembled in memory as {@link NNSyncPayload}. Per–browser-tab UI:
- * `chrome.storage.local` (`nnSessionsByUrl` + `NNPageSessionState`).
+ * `nnLayout:<context>`). Assembled in memory as {@link NNSyncPayload}. Per–browser-tab UI
+ * ({@link NNPageSessionState}): held in the background's per-tab session
+ * (`chrome.storage.session`, keyed by tabId — see `src/lib/tabSession.ts`), not persisted per URL.
  */
 
 export type NNSubjectTab = {
@@ -113,9 +114,9 @@ export type NNSyncPayload = {
 };
 
 /**
- * Local-only UI for this host URL (one map entry per normalized tab URL in `nnSessionsByUrl`).
- * When the tab navigates to another URL, a different entry loads — note *rows* live in
- * {@link NNSyncPayload}; this only holds subject-tab selection.
+ * Local-only UI state for one browser-tab session (held in `chrome.storage.session` keyed by
+ * tabId; see `src/lib/tabSession.ts`). Follows the tab across navigation and clears on tab
+ * close — note *rows* live in {@link NNSyncPayload}; this only holds subject-tab selection.
  */
 export type NNPageSessionState = {
   /**

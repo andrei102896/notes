@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
+import { ModalBrandBar } from "@/overlay/NnModalFrame";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
 import { NotesList } from "@/overlay/NotesList";
 import { storageService } from "@/services/storageService";
@@ -135,11 +136,14 @@ export const DashboardContent = forwardRef<
         className="nn-dashboard-content-frosted flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
         aria-label="Dashboard content"
       >
-        <div className="flex min-h-0 flex-1 items-center justify-center p-6">
-          <div className="flex flex-col items-center rounded bg-white px-12 py-8 text-center shadow-sm">
-            <p className="text-base font-medium text-foreground">
-              Select or create a subject tab to view, edit or add notes to.
-            </p>
+        <div className="flex min-h-0 flex-1 items-center justify-center p-4">
+          <div className="flex w-full flex-col">
+            <ModalBrandBar />
+            <div className="flex flex-col gap-6 border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-navmin uppercase leading-tight text-modal-foreground">
+              <p>Select a subject tab to view, edit or add notes to</p>
+              <p className="text-accent">or</p>
+              <p>Create a new subject tab to add notes to</p>
+            </div>
           </div>
         </div>
       </section>
@@ -151,7 +155,7 @@ export const DashboardContent = forwardRef<
       className="nn-dashboard-content-frosted flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
       aria-label="Dashboard content"
     >
-      <div ref={notesScrollRef} className="min-h-0 flex-1 overflow-auto py-6 px-4">
+      <div ref={notesScrollRef} className="min-h-0 flex-1 overflow-auto py-4 px-6">
         {notes.length > 0 ? (
           <NotesList
             notesById={notesById}

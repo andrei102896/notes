@@ -11,6 +11,7 @@ import {
   pendingAnchorStorageKeysForUrl,
   purgeOrphanPendingAnchorKeys,
 } from "@/lib/pendingNavigation";
+import { getTabSession, patchTabSession } from "@/lib/tabSession";
 import {
   registerContentPanelHost,
   scrollToAnchorInPage,
@@ -252,10 +253,21 @@ function initPendingOverlayOpen(): void {
   });
 }
 
+/**
+ * Per-tab-session restore: if NN was open in this tab before navigating, reopen it
+ * on the new page (docs/1_NN_DASHBOARD — open-state persists for the tab session).
+ */
+function initTabSessionOverlay(): void {
+  void getTabSession().then((session) => {
+    if (session.open) showOverlayWhenReady();
+  });
+}
+
 function initPendingNavigationState(): void {
   // Anchor first — creates the deferred promise that overlay-open waits on.
   initPendingAnchorScroll();
   initPendingOverlayOpen();
+  initTabSessionOverlay();
 }
 
 // A prior, now-orphaned content script (e.g. left after an extension update that
@@ -458,10 +470,23 @@ function syncOverlayViewportMetrics(shell: HTMLElement): void {
   shell.style.height = `${height}px`;
   shell.style.width = `${panelWidth}px`;
 
+  // Measured host scrollbar width — the panel hugs the viewport's right edge, so the
+  // overlay UI must inset by this much to clear the scrollbar (0 for overlay/auto-hiding
+  // scrollbars, where nothing overlaps). +2px safety margin.
+  const scrollbarPx = Math.max(
+    0,
+    window.innerWidth - document.documentElement.clientWidth,
+  );
+  const scrollbarGutter = scrollbarPx > 0 ? `${scrollbarPx + 2}px` : "0px";
+
   // Null-guard: the first call runs before the iframe is appended/mounted.
   const iframeDoc = shell.querySelector("iframe")?.contentDocument;
   if (iframeDoc) {
     iframeDoc.documentElement.style.fontSize = `${rootFontPx}px`;
+    iframeDoc.documentElement.style.setProperty(
+      "--nn-scrollbar-gutter",
+      scrollbarGutter,
+    );
   }
 }
 
@@ -499,6 +524,8 @@ function showOverlay(): void {
   window.requestAnimationFrame(() => {
     shell.style.transform = "translateX(0)";
   });
+  // Persist open-state so it survives navigation within this tab session.
+  patchTabSession({ open: true });
 }
 
 function hideOverlay(): void {
@@ -513,6 +540,8 @@ function hideOverlay(): void {
 
   overlayShellSlideOpen = false;
   shell.style.transform = "translateX(100%)";
+  // Persist closed-state so navigation within this tab session does not reopen it.
+  patchTabSession({ open: false });
 
   hideOverlayTimer = window.setTimeout(() => {
     shell.style.visibility = "hidden";

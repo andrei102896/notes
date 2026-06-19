@@ -48,6 +48,10 @@ body {
   --color-mintext: #252525; /* MIN MAX DELETE text (Figma) */
   --color-accent: #29abe2;
   --color-accent-foreground: hsl(0 0% 100%);
+  --color-modal: #3c3c3c; /* modal panel bg (Figma MODAL BG) */
+  --color-modal-foreground: #e0e0e0; /* modal light text + OK button text */
+  --color-modal-cancel: #4d4d4d; /* CANCEL button text */
+  --color-modal-delete: #e22929; /* destructive OK box (Figma OK BOX); ≠ --color-destructive */
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(210 40% 98%);
   --color-border: hsl(0 0% 5.1%);

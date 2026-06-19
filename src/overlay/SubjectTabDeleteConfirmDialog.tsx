@@ -1,14 +1,10 @@
 import React from "react";
 
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ModalCancelButton,
+  ModalOkButton,
+  NnModalFrame,
+} from "@/overlay/NnModalFrame";
 
 export type SubjectTabDeleteConfirmDialogProps = {
   open: boolean;
@@ -30,37 +26,22 @@ export function SubjectTabDeleteConfirmDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="left-[calc(50%+var(--spacing)*10)]"
-      >
-        <DialogHeader>
-          <DialogTitle>THIS CANNOT BE UNDONE: PROCEED?</DialogTitle>
-          <DialogDescription className="sr-only">
-            This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
-
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="muted"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-          >
-            NO
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={() => void confirm()}
-          >
-            YES
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <NnModalFrame
+      open={open}
+      onOpenChange={onOpenChange}
+      title="This action cannot be undone. Proceed?"
+    >
+      <p className="text-center text-subject-label uppercase leading-tight text-modal-foreground">
+        This cannot be undone: proceed?
+      </p>
+      <div className="flex justify-center gap-3">
+        <ModalCancelButton onClick={() => onOpenChange(false)}>
+          Cancel
+        </ModalCancelButton>
+        <ModalOkButton destructive onClick={() => void confirm()}>
+          OK
+        </ModalOkButton>
+      </div>
+    </NnModalFrame>
   );
 }

@@ -5,9 +5,6 @@ export const NN_LAYOUT_KEY_PREFIX = "nnLayout:";
 /** Legacy monolithic blob — migrated to sharded keys on first read. */
 export const LEGACY_NN_SYNC_DATA_KEY = "nnSyncData";
 
-/** Local key prefix: pending subject-tab handoff across navigation. */
-export const PENDING_SUBJECT_TAB_PREFIX = "nn_pending_subject_tab_";
-
 export function noteStorageKey(noteId: string): string {
   return `${NN_NOTE_KEY_PREFIX}${noteId}`;
 }

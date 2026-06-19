@@ -3,6 +3,13 @@ import {
   isExtPayConfigured,
 } from "@/lib/extpay";
 import { setPendingOverlayForNewTab } from "@/lib/pendingNavigation";
+import {
+  DEFAULT_TAB_SESSION,
+  isGetTabSessionMessage,
+  isSetTabSessionMessage,
+  tabSessionStorageKey,
+  type TabSessionState,
+} from "@/lib/tabSession";
 
 if (isExtPayConfigured) {
   getExtPayClient().startBackground();
@@ -40,6 +47,33 @@ function isOpenUrlInNewTabMessage(
   const m = message as Record<string, unknown>;
   return m.type === "OPEN_URL_IN_NEW_TAB";
 }
+
+function readTabSession(tabId: number): Promise<TabSessionState> {
+  const key = tabSessionStorageKey(tabId);
+  return new Promise((resolve) => {
+    chrome.storage.session.get(key, (result) => {
+      if (chrome.runtime.lastError) {
+        resolve({ ...DEFAULT_TAB_SESSION });
+        return;
+      }
+      const stored = result[key];
+      resolve({ ...DEFAULT_TAB_SESSION, ...(stored as Partial<TabSessionState>) });
+    });
+  });
+}
+
+async function patchTabSessionRecord(
+  tabId: number,
+  patch: Partial<TabSessionState>,
+): Promise<void> {
+  const next = { ...(await readTabSession(tabId)), ...patch };
+  await chrome.storage.session.set({ [tabSessionStorageKey(tabId)]: next });
+}
+
+/** Tab closed → its session ends (docs/1_NN_DASHBOARD: persistence is per tab session). */
+chrome.tabs.onRemoved.addListener((tabId) => {
+  void chrome.storage.session.remove(tabSessionStorageKey(tabId));
+});
 
 chrome.action.onClicked.addListener((tab) => {
   if (!tab.id) {
@@ -90,7 +124,29 @@ chrome.runtime.onInstalled.addListener(() => {
   void reinjectContentScriptsIntoOpenTabs();
 });
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (isGetTabSessionMessage(message)) {
+    const tabId = sender.tab?.id;
+    if (typeof tabId !== "number") {
+      sendResponse({ ...DEFAULT_TAB_SESSION });
+      return true;
+    }
+    void readTabSession(tabId).then(sendResponse);
+    return true;
+  }
+
+  if (isSetTabSessionMessage(message)) {
+    const tabId = sender.tab?.id;
+    if (typeof tabId !== "number") {
+      sendResponse({ ok: false });
+      return true;
+    }
+    void patchTabSessionRecord(tabId, message.payload).then(() => {
+      sendResponse({ ok: true });
+    });
+    return true;
+  }
+
   if (isOpenUrlInNewTabMessage(message)) {
     const targetUrl = message.payload?.url;
     if (!targetUrl) {
