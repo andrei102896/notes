@@ -2,7 +2,9 @@
 
 Governance and context file for ALL agent work on this repository. Read this fully
 before touching any file. Last full assessment: 2026-06-11 (see `ASSESSMENT_BRIEF_RO.md`
-for the complete findings in Romanian).
+for the complete findings in Romanian). **Progress update: 2026-06-18 — several §6/§8
+items below are now resolved; see §10 here and `ASSESSMENT_BRIEF_RO.md` §8 before relying
+on the baseline claims.**
 
 ---
 
@@ -21,10 +23,10 @@ for the complete findings in Romanian).
   button sends `TOGGLE_OVERLAY` to the active tab).
 
 **Provenance warning:** this code was delivered by an external agency (Tapptitude), which
-is off the project and unavailable for questions. It was delivered incomplete. The README,
-the package name (`scroll-bookmarks-overlay`), and the manifest description all describe an
-older "scroll bookmarks" starter the product was built on — they do NOT describe the real
-product. The de-facto spec exists only as JSDoc comments citing ticket IDs
+is off the project and unavailable for questions. It was delivered incomplete and built on
+an older "scroll bookmarks" starter — originally the README, the `package.json` name, and
+the manifest description all still described that starter rather than the real product
+(corrected 2026-06-18, see §10). The de-facto spec exists only as JSDoc comments citing ticket IDs
 (NOTES-CORE-*, SUBJECT-TABS-*, AIR-2, NOTE-COPYPASTE, …) and a `anchor-keep-pm/jira.md`
 file that is NOT in the repo. Treat every behavior as unverified until traced in code.
 
@@ -49,16 +51,16 @@ Additional repo-specific rules:
 ```
 manifest.config.ts        MV3 manifest source (consumed by @crxjs/vite-plugin)
 vite.config.ts            Vite + react + tailwindcss + crx plugins; "@" → src alias
-package.json              STALE name "scroll-bookmarks-overlay"; scripts below
+package.json              name "notes-for-net" (was the stale starter name); scripts below
 tsconfig.json             strict, ES2022, bundler resolution, "@/*" path
 components.json           shadcn config (style new-york, css = src/overlay/styles.css)
-.env.example              VITE_EXTPAY_EXTENSION_ID only — VITE_TRIAL_MODE is MISSING (§8)
-README.md                 STALE — describes the old scroll-bookmarks starter
+.env.example              VITE_EXTPAY_EXTENSION_ID + VITE_TRIAL_MODE (both documented)
+README.md                 describes Notes for Net (rewritten 2026-06-18)
 scripts/render-extension-icon.mjs   sharp: SVG → 128px padded PNG
 nn-chrome-extension.zip   agency delivery artifact (source-only snapshot, no build)
 
 src/background.ts         Service worker: ExtPay init/onPaid broadcast; action click →
-                          TOGGLE_OVERLAY; OPEN_URL_IN_NEW_TAB; legacy OPEN_SCROLL_BOOKMARK (dead)
+                          TOGGLE_OVERLAY; OPEN_URL_IN_NEW_TAB
 src/content.ts            Content script on <all_urls>: mounts the panel shell + iframe,
                           pending-anchor scroll restore, show/hide/toggle. THE sizing file.
 src/messaging/
@@ -72,7 +74,6 @@ src/services/
                           remapped to chrome.storage.local (§8). Nothing syncs.
 src/types/
   nnData.ts               NN domain model + the most accurate JSDoc "spec" in the repo
-  bookmark.ts             Legacy starter type (dead)
 src/hooks/
   useNNDashboardSession.ts  Central dashboard state hook (storage CRUD + layout + filtering)
   useBrowserTabLocation.ts  Host tab URL tracking (350ms poll + history events)
@@ -248,3 +249,35 @@ and the 7-minute dev trial — payments are entirely disabled in that artifact. 
   `styles.css`; one-off CSS only for host-page-level concerns.
 - No console logging anywhere and many empty `catch {}` blocks — current code is silent
   about failures (a known weakness; don't imitate it in new code without discussing).
+
+## 10. Progress since 2026-06-11 (Sprint 1) — re-read before relying on §6/§8
+
+Work landed after the baseline. `typecheck`/`lint`/`build` stay clean. These items change
+what §6/§8 say is broken — verify against current code before acting on the old claims.
+Full status + remaining-work list is in `ASSESSMENT_BRIEF_RO.md` §8.
+
+Resolved / changed:
+- **§6 sizing — core shipped.** `content.ts` now sets a viewport-proportional panel width
+  (`panelWidth = viewportWidth × REFERENCE_PANEL_WIDTH_PX/REFERENCE_VIEWPORT_PX`, clamped)
+  and an iframe root font-size knob (`rootFontPx = panelWidth/686 × 16`) on every
+  `visualViewport` resize, so rem sizes scale with the panel. A `--air-cell: calc(100vh/26)`
+  grid drives the A–Z rail, the "+" button, subject tabs (3 cells) and the two header bars
+  (1 cell each). The "no width logic / constant ~758px" root cause is gone. STILL OPEN:
+  hardcoded px constants that don't ride the knob, the stored `gapBeforePxByNoteId`
+  migration, and a full multi-resolution QA pass.
+- **§8 stored-XSS trap closed.** `src/lib/sanitizeNoteHtml.ts` (allowlist DOMParser
+  sanitizer) is applied on render/emit/format/paste in `RichTextBodyEditor.tsx`.
+- **Identity (done).** manifest `name`/`description`, `package.json` name, and the **README**
+  now describe "Notes for Net"; dead starter code removed (`OPEN_SCROLL_BOOKMARK`,
+  `types/bookmark.ts`). Only the internal host element id `#nn-scroll-bookmarks-overlay-host`
+  keeps the legacy name (functional; left to avoid breaking the CSS scoped to that id).
+- **Permissions trimmed** to `storage`/`scripting`/`unlimitedStorage` (`tabs`+`activeTab`
+  removed); `<all_urls>` kept. `.env.example` now documents `VITE_TRIAL_MODE`.
+- **Per-URL session persistence appears wired** (`pageSession`/`patchSession` used in
+  `App.tsx` + `useNNDashboardSession`) — verify at runtime.
+- **Header rebuilt to Figma `css.txt`** + A–Z active-letter highlight, subject-strip
+  bottom snap alignment, note-DnD single-separation model + cursor-stick fix.
+
+Unchanged / still off-limits: payment-trial code (§7) and the human-owned paid rebuild
+(real ExtPay id + prod trial). react-query is still mounted and Fjalla One still loads from
+Google Fonts (both still "dead weight / network dependency" per §6/§5).

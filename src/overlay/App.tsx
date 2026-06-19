@@ -7,7 +7,10 @@ import {
   isExtPayConfigured,
 } from "@/lib/extpay";
 import { AlphabetIndexRollout } from "@/overlay/AlphabetIndexRollout";
-import { DashboardContent } from "@/overlay/DashboardContent";
+import {
+  DashboardContent,
+  type DashboardContentHandle,
+} from "@/overlay/DashboardContent";
 import { DashboardHeader } from "@/overlay/DashboardHeader";
 import { PaywallDialog } from "@/overlay/PaywallDialog";
 import {
@@ -67,6 +70,7 @@ export function App(): React.ReactElement {
     pageSession.activeSubjectTabId === null;
 
   const subjectTabStripRef = useRef<SubjectTabStripHandle>(null);
+  const dashboardContentRef = useRef<DashboardContentHandle>(null);
   const trialExpiryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const trialStartMsRef = useRef<number | null>(null);
@@ -243,6 +247,16 @@ export function App(): React.ReactElement {
             return;
           }
           patchSession({ activeSubjectTabId: id });
+          // A–Z: drop the highlighted letter if the chosen tab doesn't begin
+          // with it (doc 4_NN_AI).
+          if (activeAirLetter !== null) {
+            const selected = subjectTabsForDisplay.find((t) => t.id === id);
+            const firstLetter =
+              selected?.name.trim().charAt(0).toUpperCase() ?? "";
+            if (firstLetter !== activeAirLetter) {
+              setActiveAirLetter(null);
+            }
+          }
         }}
         onCreateTab={async (name) => {
           if (isReadOnly) {
@@ -283,6 +297,8 @@ export function App(): React.ReactElement {
             const createdNoteId = await addNote();
             if (createdNoteId) {
               setActiveNoteId(createdNoteId);
+              // New note prepends to the top; scroll the dashboard to reveal it.
+              dashboardContentRef.current?.scrollNotesToTop();
             }
           }}
           onDeleteActiveSubjectTab={async () => {
@@ -317,6 +333,7 @@ export function App(): React.ReactElement {
           }}
         />
         <DashboardContent
+          ref={dashboardContentRef}
           notes={visibleNotes}
           browserTabUrlKey={browserTabUrlKey}
           activeSubjectTabId={pageSession.activeSubjectTabId}

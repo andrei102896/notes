@@ -20,37 +20,6 @@ function NNLogoTrial(): React.ReactElement {
 
 
 
-function NNLogo(): React.ReactElement {
-  return (
-    <svg
-      width="63"
-      height="30"
-      viewBox="0 0 63 30"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        x="0.5"
-        y="0.5"
-        width="62"
-        height="29"
-        fill="white"
-        stroke="black"
-      />
-      <path
-        d="M35.5083 4.92908V12.1556C35.5083 15.0218 35.4221 17.2442 35.0737 19.6742L35.0151 20.0863L35.4087 20.2191L35.4956 20.2484L35.8403 20.3646L36.0571 20.0717C37.2652 18.4381 38.7074 16.7609 40.5034 14.9261L41.2954 14.1293L50.5933 4.92908H54.0396V22.3978H51.4556V15.0062C51.4556 11.9485 51.542 9.74468 51.7583 7.43396L51.7993 6.99451L50.9204 6.79919L50.7271 7.05994C49.2637 9.03214 47.3176 11.121 45.269 13.1703H45.2681L36.061 22.3949H32.9243V4.92908H35.5083Z"
-        fill="black"
-        stroke="black"
-      />
-      <path
-        d="M12.2393 5.04956L21.6025 14.1912V14.1902C23.7909 16.3281 25.4869 18.2403 26.8779 20.0945L27.085 20.3708L27.417 20.2751L27.5068 20.2488L27.9248 20.1277L27.8633 19.697C27.5149 17.2801 27.4277 15.0739 27.4277 12.2273V5.04956H30.0371V22.3982H26.8701L17.5967 13.2302H17.5957C15.5302 11.1943 13.5743 9.1175 12.1006 7.15796L11.9111 6.90698L11.6035 6.96851L11.4717 6.9939L11.0293 7.08179L11.0713 7.53198C11.2876 9.82672 11.377 12.0146 11.377 15.0554V22.3953H8.76172V5.04956H12.2393Z"
-        fill="black"
-        stroke="black"
-      />
-    </svg>
-  );
-}
-
 /** Brand-cluster NN mark (white NN) — NOT the off-limits payment logo. */
 function BrandLogo(): React.ReactElement {
   return (
@@ -117,7 +86,7 @@ export function DashboardHeader({
 
   return (
     <header className="sticky top-0 z-20 flex h-auto flex-col bg-air-box">
-      <div className="relative z-[1] flex h-10 shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2">
+      <div className="relative z-[1] flex h-[var(--air-cell)] shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2 shadow-[0px_9px_10.3px_rgba(0,0,0,0.52)]">
         <div className="flex items-stretch border-2 border-mn-stroke bg-accent">
           <span className="flex items-center bg-logo-box">
             <BrandLogo />
@@ -135,11 +104,11 @@ export function DashboardHeader({
           </span>
         </div>
       </div>
-      <div className="flex h-8 items-center justify-start gap-0.5 border-y-2 border-background bg-background pr-0.5">
+      <div className="flex h-[var(--air-cell)] items-stretch justify-start bg-air-box">
         <Button
           variant="default"
           size="sm"
-          className="shrink-0 h-7 border-[3px] border-background whitespace-nowrap p-3.5 text-navlabel uppercase text-accent-foreground"
+          className="shrink-0 h-full border-[3px] border-background whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
           disabled={!canAddNote}
           aria-disabled={!canAddNote}
           onClick={() => {
@@ -151,7 +120,7 @@ export function DashboardHeader({
           Add Note
         </Button>
 
-        <ButtonGroup className="items-center gap-0.5 bg-muted [&_button]:h-7 [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
+        <ButtonGroup className="items-stretch gap-0.5 bg-muted [&_button]:h-full [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
           <ButtonGroupText className="nn-tab-notes-ribbon whitespace-nowrap rounded-none bg-ribbon pr-4 text-navribbon text-accent-foreground">
             This Tab Notes
           </ButtonGroupText>
@@ -183,35 +152,47 @@ export function DashboardHeader({
           </Button>
         </ButtonGroup>
 
-        <Button
-          variant="default"
-          size="sm"
-          className="shrink-0 h-7 border-[3px] border-background whitespace-nowrap p-3.5 text-navlabel uppercase text-accent-foreground"
-          disabled={!canDeleteSubjectTab}
-          aria-disabled={!canDeleteSubjectTab}
-          onClick={() => {
-            if (canDeleteSubjectTab) {
-              setDeleteConfirmOpen(true);
-            }
-          }}
-        >
-          Delete Tab
-        </Button>
-
-        {isOnTrial || isReadOnly ? (
-          <button
-            type="button"
-            className="h-8 cursor-pointer p-0 leading-none [&>svg]:h-full [&>svg]:w-auto"
-            onClick={() => onTrialBannerOpenChange?.(true)}
-            aria-label="Open trial info"
+        {/* DELETE TAB + NN form one unit: each keeps its 3px white border and they
+            sit flush, so the abutting borders read as a white divider between them
+            and a white surround around the pair (css.txt BOX_DELETE TAB + BOX_NN).
+            ml-auto pins the pair to the right edge so no gray slack trails the NN box. */}
+        <div className="ml-auto flex items-stretch">
+          <Button
+            variant="default"
+            size="sm"
+            className="shrink-0 h-full border-[3px] border-background whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
+            disabled={!canDeleteSubjectTab}
+            aria-disabled={!canDeleteSubjectTab}
+            onClick={() => {
+              if (canDeleteSubjectTab) {
+                setDeleteConfirmOpen(true);
+              }
+            }}
           >
-            <NNLogoTrial />
-          </button>
-        ) : (
-          <div className="h-7 [&>svg]:h-full [&>svg]:w-auto">
-            <NNLogo />
-          </div>
-        )}
+            Delete Tab
+          </Button>
+
+          {isOnTrial || isReadOnly ? (
+            <button
+              type="button"
+              className="h-full cursor-pointer p-0 leading-none [&>svg]:h-full [&>svg]:w-auto"
+              onClick={() => onTrialBannerOpenChange?.(true)}
+              aria-label="Open trial info"
+            >
+              <NNLogoTrial />
+            </button>
+          ) : (
+            <div className="flex h-full items-center border-[3px] border-background bg-accent px-2">
+              <BrandLogo />
+            </div>
+          )}
+        </div>
+
+        {/* Right-edge gutter. The panel hugs the browser's right edge, where the host
+            scrollbar paints over the panel's last ~15px and would clip the NN box. A
+            rem-based padding scales down on small panels (laptop) and still clips, so this
+            is a FIXED px width. Solid white per design feedback ("white, not gray"). */}
+        <div aria-hidden className="w-[18px] shrink-0 bg-background" />
       </div>
 
       <SubjectTabDeleteConfirmDialog

@@ -625,7 +625,10 @@ export async function addNote(input: {
 export async function updateNote(
   noteId: string,
   patch: Partial<
-    Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded">
+    Pick<
+      NNSyncNote,
+      "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt"
+    >
   >,
 ): Promise<void> {
   const key = noteStorageKey(noteId);
@@ -642,6 +645,7 @@ export async function updateNote(
     ...(patch.body !== undefined ? { body: patch.body } : {}),
     ...(patch.anchor !== undefined ? { anchor: patch.anchor } : {}),
     ...(patch.isExpanded !== undefined ? { isExpanded: patch.isExpanded } : {}),
+    ...(patch.createdAt !== undefined ? { createdAt: patch.createdAt } : {}),
   };
   await storageService.sync.setMany({ [key]: next });
 }

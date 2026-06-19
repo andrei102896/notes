@@ -13,6 +13,7 @@ import {
   formatStateFromSelection,
   isRichTextEmpty,
 } from "@/lib/richTextFormat";
+import { sanitizeNoteHtml } from "@/lib/sanitizeNoteHtml";
 
 export type RichTextBodyEditorHandle = {
   applyFormat: (command: "bold" | "italic" | "underline") => void;
@@ -44,8 +45,9 @@ export const RichTextBodyEditor = forwardRef<
     if (!editor) {
       return;
     }
-    if (editor.innerHTML !== value) {
-      editor.innerHTML = value;
+    const safe = sanitizeNoteHtml(value);
+    if (editor.innerHTML !== safe) {
+      editor.innerHTML = safe;
     }
   }, [value]);
 
@@ -54,7 +56,7 @@ export const RichTextBodyEditor = forwardRef<
     if (!editor) {
       return;
     }
-    onChange(editor.innerHTML);
+    onChange(sanitizeNoteHtml(editor.innerHTML));
   }, [onChange]);
 
   const queryFormatState = useCallback(() => {
@@ -114,7 +116,7 @@ export const RichTextBodyEditor = forwardRef<
       pendingEnterFormatRef.current = nextState;
       editor.focus();
       doc.execCommand(command);
-      onChange(editor.innerHTML);
+      onChange(sanitizeNoteHtml(editor.innerHTML));
       if (onFormatStateChange) {
         onFormatStateChange(nextState);
       }
@@ -180,6 +182,25 @@ export const RichTextBodyEditor = forwardRef<
           onInput={() => {
             onInteract();
             emitValue();
+          }}
+          onPaste={(event) => {
+            if (isReadOnly) {
+              return;
+            }
+            const data = event.clipboardData;
+            const doc = editorRef.current?.ownerDocument;
+            if (!data || !doc) {
+              return;
+            }
+            // Never let raw clipboard markup reach the live DOM: sanitize HTML to
+            // the B/I/U subset, or insert plain text verbatim. onInput then emits.
+            event.preventDefault();
+            const html = data.getData("text/html");
+            if (html) {
+              doc.execCommand("insertHTML", false, sanitizeNoteHtml(html));
+            } else {
+              doc.execCommand("insertText", false, data.getData("text/plain"));
+            }
           }}
           onBeforeInput={(event) => {
             const native = event.nativeEvent as InputEvent;

@@ -45,6 +45,19 @@ function scrollTriggerFullyIntoView(
   }
 }
 
+/**
+ * Pin a trigger to the TOP of the strip (just under the '+'), so the tabs for a
+ * clicked A–Z letter "cue up" from the top (AIR-2 / doc 4_NN_AI), even when the
+ * tab is already visible mid-strip. `offsetTop` is the pre-transform layout box,
+ * so the rotated triggers still align to a `snap-start` point.
+ */
+function scrollTriggerToTop(
+  container: HTMLDivElement,
+  trigger: HTMLElement,
+): void {
+  container.scrollTo({ top: trigger.offsetTop, behavior: "smooth" });
+}
+
 type SubjectTabStripProps = {
   tabs: SubjectTabStripItem[];
   activeSubjectTabId: string | null;
@@ -117,7 +130,7 @@ export const SubjectTabStrip = forwardRef<
         );
         const target = triggers[idx];
         if (target !== undefined) {
-          scrollTriggerFullyIntoView(root, target);
+          scrollTriggerToTop(root, target);
         }
       },
       scrollToTab(id: string) {
@@ -274,6 +287,15 @@ export const SubjectTabStrip = forwardRef<
             </TabsList>
           </div>
         </Tabs>
+
+        {/* Bottom spacer = 1 air-cell. The strip has 26 cells; the '+' takes 1, leaving 25
+            for the scroll viewport, but tabs are 3 cells each. Reserving this last cell makes
+            the scroll viewport 24 cells (8×3), so the bottom of the scroll range lands on a
+            snap point and the last subject tab rests aligned with the A–Z box lines. */}
+        <div
+          aria-hidden
+          className="nn-dashboard-content-frosted h-[var(--air-cell)] w-full shrink-0"
+        />
       </div>
     </>
   );

@@ -49,6 +49,37 @@ export function cloneNoteListLayout(layout: NNNoteListLayout): NNNoteListLayout 
 }
 
 /**
+ * Collapses a multi-group layout into a single ordered stack. Each former group
+ * break (every group after the first) becomes a leading gap on that group's first
+ * note, so prior visual separations survive as gaps. The note list now uses one
+ * stack with per-note gaps for separation (doc 3_NN_NOTES); "sections" are gone.
+ */
+export function flattenToSingleStack(
+  layout: NNNoteListLayout,
+): NNNoteListLayout {
+  if (layout.groups.length <= 1) {
+    return layout;
+  }
+  const gapBeforePxByNoteId = { ...layout.gapBeforePxByNoteId };
+  const noteIds: string[] = [];
+  layout.groups.forEach((group, groupIndex) => {
+    const firstId = group.noteIds[0];
+    if (
+      groupIndex > 0 &&
+      firstId !== undefined &&
+      gapBeforePxByNoteId[firstId] === undefined
+    ) {
+      gapBeforePxByNoteId[firstId] = NN_COLLAPSED_NOTE_HEADER_PX;
+    }
+    noteIds.push(...group.noteIds);
+  });
+  return {
+    groups: [{ id: layout.groups[0]?.id ?? "default", noteIds }],
+    gapBeforePxByNoteId,
+  };
+}
+
+/**
  * Ensures each visible note appears exactly once; drops stale ids; appends new notes in sync order.
  */
 export function resolveNoteListLayout(
@@ -94,11 +125,23 @@ export function resolveNoteListLayout(
   if (next.groups.length === 0) {
     return buildDefaultNoteListLayout(visibleNoteIdsInSyncOrder);
   }
-  return next;
+  return flattenToSingleStack(next);
 }
 
 export function flattenLayoutNoteIds(layout: NNNoteListLayout): string[] {
   return layout.groups.flatMap((g) => g.noteIds);
+}
+
+/**
+ * Separates a note from the stack by giving it a leading gap equal to one
+ * collapsed note — doc 3_NN_NOTES: Ctrl/Cmd+drag "creating a space equivalent to
+ * the note height when collapsed". Idempotent; mutate a cloned layout.
+ */
+export function separateNoteWithGap(
+  layout: NNNoteListLayout,
+  noteId: string,
+): void {
+  layout.gapBeforePxByNoteId[noteId] = NN_COLLAPSED_NOTE_HEADER_PX;
 }
 
 export function findNotePlacement(

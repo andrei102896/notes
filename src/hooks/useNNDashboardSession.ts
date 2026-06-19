@@ -84,7 +84,7 @@ export function useNNDashboardSession(): {
   addNote: () => Promise<string | null>;
   updateNote: (
     noteId: string,
-    patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded">>,
+    patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt">>,
   ) => Promise<void>;
   deleteNote: (noteId: string) => Promise<void>;
   deleteAllNotesInSubjectTab: (subjectTabId: string) => Promise<void>;
@@ -203,7 +203,7 @@ export function useNNDashboardSession(): {
   const updateNote = useCallback(
     async (
       noteId: string,
-      patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded">>,
+      patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt">>,
     ) => {
       await persistUpdateNote(noteId, patch);
       setSync(migrateNNSyncPayload(await getNNSync()));

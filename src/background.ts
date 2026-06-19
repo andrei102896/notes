@@ -2,11 +2,7 @@ import {
   getExtPayClient,
   isExtPayConfigured,
 } from "@/lib/extpay";
-import {
-  setPendingAnchorForNewTab,
-  setPendingOverlayForNewTab,
-} from "@/lib/pendingNavigation";
-import type { ScrollBookmark } from "@/types/bookmark";
+import { setPendingOverlayForNewTab } from "@/lib/pendingNavigation";
 
 if (isExtPayConfigured) {
   getExtPayClient().startBackground();
@@ -27,11 +23,6 @@ if (isExtPayConfigured) {
   }
 }
 
-type OpenScrollBookmarkMessage = {
-  type: "OPEN_SCROLL_BOOKMARK";
-  payload: ScrollBookmark;
-};
-
 type OpenUrlInNewTabMessage = {
   type: "OPEN_URL_IN_NEW_TAB";
   payload: {
@@ -39,16 +30,6 @@ type OpenUrlInNewTabMessage = {
     openOverlay?: boolean;
   };
 };
-
-function isOpenScrollBookmarkMessage(
-  message: unknown,
-): message is OpenScrollBookmarkMessage {
-  if (typeof message !== "object" || message === null) {
-    return false;
-  }
-  const m = message as Record<string, unknown>;
-  return m.type === "OPEN_SCROLL_BOOKMARK";
-}
 
 function isOpenUrlInNewTabMessage(
   message: unknown,
@@ -132,35 +113,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (!isOpenScrollBookmarkMessage(message)) {
-    return false;
-  }
-
-  const bookmark = message.payload;
-  if (!bookmark?.url) {
-    sendResponse({ ok: false, error: "Bookmark invalid." });
-    return true;
-  }
-
-  chrome.tabs.create({ url: bookmark.url }, (tab) => {
-    if (chrome.runtime.lastError || !tab?.id) {
-      sendResponse({
-        ok: false,
-        error: chrome.runtime.lastError?.message ?? "Could not open tab.",
-      });
-      return;
-    }
-
-    setPendingAnchorForNewTab(bookmark.url, {
-      scrollY: Number(bookmark.scrollY ?? 0),
-      scrollX: 0,
-      pageX: 0,
-      pageY: 0,
-      elementSelector: "",
-    });
-    sendResponse({ ok: true });
-  });
-
-  return true;
+  return false;
 });
 

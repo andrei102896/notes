@@ -280,3 +280,62 @@ conțin simultan layout (permis) și trial wiring (interzis).
 
 *Fișiere create în această evaluare: `AGENTS.md`, `ASSESSMENT_BRIEF_RO.md`. Niciun alt
 fișier nu a fost modificat; nicio comandă git nu a fost rulată.*
+
+---
+
+## 8. Actualizare 2026-06-18 (Sprint 1) — ce s-a făcut, ce a rămas
+
+Lucrări livrate după evaluarea de bază (commit-uri „Sprint 1"). `typecheck`/`lint`/`build`
+trec curat. Maparea pe planul de remediere din §7:
+
+**Rezolvat / livrat:**
+
+- **#2 dimensionare responsive — NUCLEUL livrat.** `content.ts` calculează acum o lățime de
+  panou proporțională cu viewport-ul (`panelWidth = viewportWidth × 686/REFERENCE_VIEWPORT`,
+  cu clamp) și setează un „buton" de font-rădăcină pe iframe
+  (`rootFontPx = panelWidth/686 × 16`), resincronizate la fiecare `visualViewport.resize` —
+  deci lungimile rem scalează cu panoul. Grilă `--air-cell: calc(100vh/26)` pentru bara A–Z,
+  „+", tab-uri (3 celule) și cele două bare de header (1 celulă fiecare). Cauza principală din
+  §3 (panou fără logică de lățime, ~758px constant) e **eliminată**. RĂMÂNE: constantele px
+  care nu „călăresc" knob-ul, migrarea `gapBeforePxByNoteId` din storage, matricea completă de
+  QA (1366×768 / 1920@100-150% / HiDPI@200% / font Chrome mărit).
+- **#3 sanitizare HTML — COMPLET.** `src/lib/sanitizeNoteHtml.ts` (allowlist pe DOMParser),
+  aplicată la render/emit/format/paste în `RichTextBodyEditor.tsx`. Vectorul XSS stocat e închis.
+- **#5 persistare per-URL — pare LEGATĂ** (de confirmat la runtime): `pageSession`/
+  `patchSession` sunt folosite acum în `App.tsx` + `useNNDashboardSession` (la bază aveau zero
+  apelanți).
+- **#6 identitate — COMPLET.** `name`/`description` din manifest, numele din `package.json` și
+  **README-ul rescris** descriu acum „Notes for Net"; cod mort starter șters
+  (`OPEN_SCROLL_BOOKMARK`, `types/bookmark.ts`). (A rămas doar numele intern al elementului-host
+  `#nn-scroll-bookmarks-overlay-host` — funcțional, intern, neredenumit ca să nu rupă stilarea
+  scoped pe acel ID; redenumire opțională, low-priority.)
+- **#9 permisiuni — parțial.** Reduse la `storage`/`scripting`/`unlimitedStorage`
+  (`tabs`+`activeTab` eliminate); `<all_urls>` păstrat. RĂMÂNE: font auto-găzduit (încă Google
+  Fonts la runtime) + scoaterea react-query nefolosit din bundle.
+- **#1 — doar documentația.** `VITE_TRIAL_MODE` e documentat acum în `.env.example`; rebuild-ul
+  plătit real (ID ExtPay + trial prod) rămâne sarcină de configurare a omului — cod OFF-LIMITS.
+- **Fidelitate design (această sesiune):** header refăcut după `css.txt` (umbră, fundal gri nav,
+  borduri albe 3px, DELETE TAB + NN ca o unitate lipită, înălțimi uniforme de 1 celulă, gutter
+  alb dreapta ca logo-ul să nu intre sub scrollbar-ul browser-ului), feedback vizual A–Z (litera
+  activă se evidențiază — repară §4.2), aliniere prin snap a ultimului tab subiect la baza
+  derulării, DnD note cu un singur model de separare + fix „cursor-stick", overflow la modalul de
+  ștergere, a11y dialoguri, re-injectare content script în dev, suprimarea erorilor `npm run dev`.
+
+**Deschis (rămas de făcut):**
+
+- **#1** rebuild plătit corect (om / configurare).
+- **#2** coada de dimensionare (constante px rămase, migrare gap-uri persistate, QA pe rezoluții).
+- **#4** grupul „This Tab Notes" (Min/Max/Delete) — semantică/etichetare de clarificat.
+- **#7** funcționalitate de design lipsă: **câmp „price"** în header-ul notei (zero cod).
+  (Reordonarea tab-urilor prin drag — §4.3 #3 — **nu a fost cerută niciodată**; nu e un gol de
+  urmărit, scoasă din scope.)
+- **#8** debounce la scrierile per-tastă + eliminarea dublei re-citiri complete.
+- **#9** font auto-găzduit + scoaterea react-query din bundle.
+- **#10** plasă minimă de teste + logging la erori de storage.
+
+**Stadiu față de design/docs:** comportamentele de bază (tab-uri, note, rich text,
+LINK/ANCHOR/COPY/PASTE, DnD, persistență, A–Z) sunt implementate și acum aliniate vizual la
+`css.txt` / `docs/`. Singurul gol de design rămas este **câmpul „price"**; restul listei de mai sus este remediere
+de calitate (#1, coada lui #2, #4, #8–#10), nu fidelitate de design.
+
+*Modificat în această sesiune: cod sursă (commit-urile „Sprint 1") + acest addendum + `AGENTS.md` §10.*

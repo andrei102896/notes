@@ -96,10 +96,13 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
+          "z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
           contained
-            ? "absolute top-[50%] left-[50%]"
-            : "fixed top-[50%] left-[50%]",
+            ? // Cap to the content area (panel minus the two w-10 tab columns minus a
+              // 1rem margin) so dialogs centered over the content can't overflow the
+              // panel's right edge on narrow viewports (where sm:max-w-lg is inactive).
+              "absolute top-[50%] left-[50%] max-w-[calc(100%-var(--spacing)*10*2-2rem)]"
+            : "fixed top-[50%] left-[50%] max-w-[calc(100%-2rem)]",
           className,
         )}
         {...props}

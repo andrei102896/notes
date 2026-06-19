@@ -1,18 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
-  closestCorners,
+  closestCenter,
   DndContext,
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
-  pointerWithin,
-  useDroppable,
   useSensor,
   useSensors,
   type CollisionDetection,
   type DragEndEvent,
-  type DragOverEvent,
   type DragStartEvent,
   type Modifier,
 } from "@dnd-kit/core";
@@ -28,55 +25,17 @@ import { CSS } from "@dnd-kit/utilities";
 import { noteUrlMatchesBrowserTab } from "@/lib/nnDashboardNotes";
 import {
   cloneNoteListLayout,
-  findNotePlacement,
   flattenLayoutNoteIds,
   NN_COLLAPSED_NOTE_HEADER_PX,
   pruneEmptyNoteGroups,
+  separateNoteWithGap,
 } from "@/lib/nnNoteLayout";
-import { cn } from "@/lib/utils";
 import { Note } from "@/overlay/Note";
 import type {
   NNCopiedNote,
   NNNoteListLayout,
   NNSyncNote,
 } from "@/types/nnData";
-
-/** Single droppable at list tail — creates a new group with the dragged note. */
-const NEW_SECTION_DROP_ID = "nn-new-section-tail";
-
-const pointerFirstCollision: CollisionDetection = (args) => {
-  // Keep drop target in sync with actual mouse position when overlay is offset.
-  const pointerCollisions = pointerWithin(args);
-  if (pointerCollisions.length > 0) {
-    return pointerCollisions;
-  }
-  return closestCorners(args);
-};
-
-function isNewSectionDropId(id: string): boolean {
-  return id === NEW_SECTION_DROP_ID;
-}
-
-function moveNoteToNewGroupAtListEnd(
-  layout: NNNoteListLayout,
-  activeId: string,
-): void {
-  const from = findNotePlacement(layout, activeId);
-  if (!from) {
-    return;
-  }
-  const fromGroup = layout.groups[from.groupIndex];
-  if (!fromGroup) {
-    return;
-  }
-  const [removed] = fromGroup.noteIds.splice(from.indexInGroup, 1);
-  pruneEmptyNoteGroups(layout);
-  layout.groups.push({
-    id: crypto.randomUUID(),
-    noteIds: [removed],
-  });
-}
-
 
 type NotesListProps = {
   notesById: Map<string, NNSyncNote>;
@@ -155,7 +114,17 @@ function SortableNoteRow({
     disabled: isReadOnly,
   });
 
-  // Active dragged note: show a drop-zone placeholder at the destination position
+  // Reserve the note's real height while dragging so the list doesn't reflow at
+  // drag start — a reflow desyncs the drag-overlay offset and jolts the top item.
+  const contentRef = useRef<HTMLDivElement>(null);
+  const lastContentHeightRef = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    if (!isDragging && contentRef.current) {
+      lastContentHeightRef.current = contentRef.current.offsetHeight;
+    }
+  });
+
+  // Active dragged note: show a same-height drop-zone placeholder (no reflow).
   if (isDragging) {
     return (
       <div
@@ -173,7 +142,9 @@ function SortableNoteRow({
           />
         ) : null}
         <div
-          style={{ height: `${NN_COLLAPSED_NOTE_HEADER_PX / 16}rem` }}
+          style={{
+            height: `${lastContentHeightRef.current ?? NN_COLLAPSED_NOTE_HEADER_PX}px`,
+          }}
           className="rounded border-2 border-dashed border-primary/60 bg-primary/10"
         />
       </div>
@@ -208,46 +179,28 @@ function SortableNoteRow({
           aria-hidden
         />
       ) : null}
-      <Note
-        note={note}
-        activeSubjectTabId={activeSubjectTabId}
-        expanded={isExpanded}
-        isActive={isActive}
-        isSelected={isSelected}
-        matchesCurrentPage={matchesCurrentPage}
-        isReadOnly={isReadOnly}
-        onActivate={onActivateNote}
-        onSetExpanded={onSetNoteExpanded}
-        onUpdateNote={onUpdateNote}
-        onHighlightNote={onHighlightNote}
-        onValidityChange={onValidityChange}
-        onRequestDelete={onRequestDelete}
-        copiedNote={copiedNote}
-        onCopyNote={onCopyNote}
-        sortableHandleProps={
-          isReadOnly ? undefined : { ...attributes, ...listeners }
-        }
-      />
-    </div>
-  );
-}
-
-function NewSectionDropTarget() {
-  const { setNodeRef, isOver } = useDroppable({
-    id: NEW_SECTION_DROP_ID,
-    data: { type: "new-section" },
-  });
-  return (
-    <div
-      ref={setNodeRef}
-      className={cn(
-        "h-10 py-2 box-border flex items-center justify-center rounded border border-dashed px-2 text-center font-medium uppercase leading-tight tracking-wide transition-colors",
-        isOver
-          ? "border-accent bg-accent/15 text-foreground"
-          : "border-muted-foreground/35 text-muted-foreground",
-      )}
-    >
-      Drop to create section
+      <div ref={contentRef}>
+        <Note
+          note={note}
+          activeSubjectTabId={activeSubjectTabId}
+          expanded={isExpanded}
+          isActive={isActive}
+          isSelected={isSelected}
+          matchesCurrentPage={matchesCurrentPage}
+          isReadOnly={isReadOnly}
+          onActivate={onActivateNote}
+          onSetExpanded={onSetNoteExpanded}
+          onUpdateNote={onUpdateNote}
+          onHighlightNote={onHighlightNote}
+          onValidityChange={onValidityChange}
+          onRequestDelete={onRequestDelete}
+          copiedNote={copiedNote}
+          onCopyNote={onCopyNote}
+          sortableHandleProps={
+            isReadOnly ? undefined : { ...attributes, ...listeners }
+          }
+        />
+      </div>
     </div>
   );
 }
@@ -273,7 +226,6 @@ export function NotesList({
   const [layout, setLayout] = useState(noteLayout);
   const layoutRef = useRef(noteLayout);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [dragSeparation, setDragSeparation] = useState(false);
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(
     new Set(),
   );
@@ -281,11 +233,20 @@ export function NotesList({
   const listContainerRef = useRef<HTMLDivElement>(null);
   /** Ordered list of all selected note IDs at the moment drag starts (saved for drop). */
   const multiDragOrderRef = useRef<string[]>([]);
+  /** True when the current single-note drag began with Ctrl/Cmd held (separation, doc 3 line 88). */
+  const separateOnDropRef = useRef(false);
   const dragOverlayDeltaRef = useRef<{ x: number; y: number } | null>(null);
   const dragInitialTopLeftRef = useRef<{ left: number; top: number } | null>(
     null,
   );
 
+  /**
+   * dnd-kit's measured overlay start position is offset from the real row (the
+   * sticky header + the scroll container inside the iframe), leaving the dragged
+   * card ~30px above the cursor. Capture the row's true top-left at drag start and
+   * shift the overlay by the difference so it stays stuck to the cursor. Modifiers
+   * on <DragOverlay> affect only the overlay visual, NOT collision detection.
+   */
   const normalizeOverlayViewportOffset: Modifier = ({
     draggingNodeRect,
     transform,
@@ -304,6 +265,28 @@ export function NotesList({
       x: transform.x + dragOverlayDeltaRef.current.x,
       y: transform.y + dragOverlayDeltaRef.current.y,
     };
+  };
+
+  /**
+   * Closest-center collision, but with the collision rect shifted by the same
+   * offset applied to the overlay — so the drop indicator tracks the *visible*
+   * card and opens at a symmetric point whether dragging up or down (otherwise
+   * dnd-kit's raw, ~30px-offset rect makes it open too early one way, too late the
+   * other). closestCenter (not pointerWithin) avoids oscillating with the strategy.
+   */
+  const cursorAlignedCollision: CollisionDetection = (args) => {
+    const delta = dragOverlayDeltaRef.current;
+    if (!delta) {
+      return closestCenter(args);
+    }
+    return closestCenter({
+      ...args,
+      collisionRect: {
+        ...args.collisionRect,
+        top: args.collisionRect.top + delta.y,
+        bottom: args.collisionRect.bottom + delta.y,
+      },
+    });
   };
 
   useEffect(() => {
@@ -378,18 +361,26 @@ export function NotesList({
       `[data-note-id="${id}"]`,
     );
     const domRect = activeRowEl?.getBoundingClientRect();
-    const measuredRect = domRect
-      ? { left: domRect.left, top: domRect.top }
-      : null;
     const initialRect = event.active.rect.current.initial;
-    dragInitialTopLeftRef.current =
-      measuredRect ??
-      (initialRect ? { left: initialRect.left, top: initialRect.top } : null);
+    dragInitialTopLeftRef.current = domRect
+      ? { left: domRect.left, top: domRect.top }
+      : initialRect
+        ? { left: initialRect.left, top: initialRect.top }
+        : null;
     dragOverlayDeltaRef.current = null;
     setActiveId(id);
-    setDragSeparation(true);
 
     const isMulti = selectedNoteIds.size > 1 && selectedNoteIds.has(id);
+
+    // Ctrl/Cmd held at drag start → separate this single note with a leading gap
+    // on drop (doc 3 line 88). Multi-select drags keep their existing behavior.
+    const activator = event.activatorEvent as {
+      ctrlKey?: boolean;
+      metaKey?: boolean;
+    };
+    separateOnDropRef.current =
+      !isMulti && Boolean(activator.ctrlKey || activator.metaKey);
+
     if (isMulti) {
       // Save ordered list of selected notes for drop handling
       const flatIds = flattenLayoutNoteIds(layoutRef.current);
@@ -410,57 +401,10 @@ export function NotesList({
     }
   }
 
-  function handleDragOver(event: DragOverEvent) {
-    const { active, over } = event;
-    if (!over) {
-      return;
-    }
-    const activeNoteId = String(active.id);
-    const overId = String(over.id);
-    if (activeNoteId === overId) {
-      return;
-    }
-    if (isNewSectionDropId(overId)) {
-      return;
-    }
-
-    setLayout((prev) => {
-      const from = findNotePlacement(prev, activeNoteId);
-      const to = findNotePlacement(prev, overId);
-      if (!from || !to) {
-        return prev;
-      }
-
-      const next = cloneNoteListLayout(prev);
-
-      if (from.groupIndex === to.groupIndex) {
-        const g = next.groups[from.groupIndex];
-        if (from.indexInGroup === to.indexInGroup) {
-          return prev;
-        }
-        g.noteIds = arrayMove(g.noteIds, from.indexInGroup, to.indexInGroup);
-      } else {
-        const fromG = next.groups[from.groupIndex];
-        const toG = next.groups[to.groupIndex];
-        const [moved] = fromG.noteIds.splice(from.indexInGroup, 1);
-        const overIdx = toG.noteIds.indexOf(overId);
-        if (overIdx === -1) {
-          fromG.noteIds.splice(from.indexInGroup, 0, moved);
-          return prev;
-        }
-        toG.noteIds.splice(overIdx, 0, moved);
-        pruneEmptyNoteGroups(next);
-      }
-      layoutRef.current = next;
-      return next;
-    });
-  }
-
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     dragInitialTopLeftRef.current = null;
     dragOverlayDeltaRef.current = null;
-    setDragSeparation(false);
     setActiveId(null);
 
     const activeNoteId = String(active.id);
@@ -470,69 +414,51 @@ export function NotesList({
     setSelectedNoteIds(new Set());
     lastClickedNoteRef.current = null;
 
+    const shouldSeparate = separateOnDropRef.current;
+    separateOnDropRef.current = false;
+
     if (!over) {
+      // Dropped outside the list — restore the pre-drag layout (a multi-drag
+      // lifted the other selected notes out in handleDragStart).
       layoutRef.current = noteLayout;
       setLayout(noteLayout);
       return;
     }
 
     const overId = String(over.id);
-
-    if (isNewSectionDropId(overId)) {
-      const next = cloneNoteListLayout(layoutRef.current);
-      if (isMultiDrag) {
-        // Non-active selected notes already removed from layout in handleDragStart;
-        // just move the active note out and create a new group with all selected.
-        for (const g of next.groups) {
-          g.noteIds = g.noteIds.filter((id) => id !== activeNoteId);
-        }
-        pruneEmptyNoteGroups(next);
-        next.groups.push({
-          id: crypto.randomUUID(),
-          noteIds: multiDragOrderRef.current,
-        });
-      } else {
-        moveNoteToNewGroupAtListEnd(next, activeNoteId);
-      }
-      pruneEmptyNoteGroups(next);
-      layoutRef.current = next;
-      setLayout(next);
-      void onCommitNoteLayout(next);
+    const next = cloneNoteListLayout(layoutRef.current);
+    const group = next.groups[0];
+    if (!group) {
       return;
     }
+    const ids = group.noteIds;
 
     if (isMultiDrag) {
-      // Non-active selected notes were removed from layout in handleDragStart.
-      // The active note has been moved to the destination via handleDragOver.
-      // Replace it with the full ordered block.
-      const SENTINEL = "__nn_multi_sentinel__";
-      const next = cloneNoteListLayout(layoutRef.current);
-
-      outer: for (const g of next.groups) {
-        for (let i = 0; i < g.noteIds.length; i++) {
-          if (g.noteIds[i] === activeNoteId) {
-            g.noteIds[i] = SENTINEL;
-            break outer;
-          }
-        }
+      // The other selected notes were lifted out in handleDragStart; drop the whole
+      // ordered block where the active note lands.
+      const block = multiDragOrderRef.current;
+      const activeIndex = ids.indexOf(activeNoteId);
+      const withoutActive = ids.filter((nid) => nid !== activeNoteId);
+      const overIndex =
+        overId === activeNoteId ? activeIndex : withoutActive.indexOf(overId);
+      const insertAt = overIndex === -1 ? withoutActive.length : overIndex;
+      group.noteIds = [
+        ...withoutActive.slice(0, insertAt),
+        ...block,
+        ...withoutActive.slice(insertAt),
+      ];
+    } else {
+      // Reorder only on drop; verticalListSortingStrategy showed the live gap.
+      const from = ids.indexOf(activeNoteId);
+      const to = ids.indexOf(overId);
+      if (from !== -1 && to !== -1 && from !== to) {
+        group.noteIds = arrayMove(ids, from, to);
       }
-
-      for (const g of next.groups) {
-        const si = g.noteIds.indexOf(SENTINEL);
-        if (si !== -1) {
-          g.noteIds.splice(si, 1, ...multiDragOrderRef.current);
-          break;
-        }
+      if (shouldSeparate) {
+        separateNoteWithGap(next, activeNoteId);
       }
-
-      pruneEmptyNoteGroups(next);
-      layoutRef.current = next;
-      setLayout(next);
-      void onCommitNoteLayout(next);
-      return;
     }
 
-    const next = cloneNoteListLayout(layoutRef.current);
     pruneEmptyNoteGroups(next);
     layoutRef.current = next;
     setLayout(next);
@@ -542,7 +468,7 @@ export function NotesList({
   function handleDragCancel() {
     dragInitialTopLeftRef.current = null;
     dragOverlayDeltaRef.current = null;
-    setDragSeparation(false);
+    separateOnDropRef.current = false;
     setActiveId(null);
     layoutRef.current = noteLayout;
     setLayout(noteLayout);
@@ -563,71 +489,64 @@ export function NotesList({
         .filter((n): n is NNSyncNote => n !== undefined)
     : [];
 
+  // Single flat stack (the layout is always one group now — see flattenToSingleStack).
+  const stackNoteIds = layout.groups[0]?.noteIds ?? [];
+  const stackGroupId = layout.groups[0]?.id ?? "default";
+
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={pointerFirstCollision}
+      collisionDetection={cursorAlignedCollision}
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
       <div
         ref={listContainerRef}
-        className="m-0 flex flex-col gap-11 p-0"
+        className="m-0 flex flex-col gap-3 p-0"
         onMouseDown={() => {
           setSelectedNoteIds(new Set());
           lastClickedNoteRef.current = null;
         }}
       >
-        {layout.groups.map((group) => (
-          <div key={group.id} className="flex flex-col gap-3">
-            <SortableContext
-              id={group.id}
-              items={group.noteIds}
-              strategy={verticalListSortingStrategy}
-            >
-              {group.noteIds.map((nid) => {
-                const note = notesById.get(nid);
-                if (!note) {
-                  return null;
-                }
-                const matchesCurrentPage =
-                  browserTabUrlKey !== null &&
-                  noteUrlMatchesBrowserTab(note.url, browserTabUrlKey);
-                return (
-                  <SortableNoteRow
-                    key={note.id}
-                    note={note}
-                    groupId={group.id}
-                    gapBeforePx={layout.gapBeforePxByNoteId[note.id] ?? 0}
-                    activeSubjectTabId={activeSubjectTabId}
-                    isActive={activeNoteId === note.id}
-                    isSelected={selectedNoteIds.has(note.id)}
-                    isExpanded={isNoteExpanded(note.id)}
-                    matchesCurrentPage={matchesCurrentPage}
-                    isReadOnly={isReadOnly}
-                    onActivateNote={onActivateNote}
-                    onSelectNote={handleSelectNote}
-                    onSetNoteExpanded={onSetNoteExpanded}
-                    onUpdateNote={onUpdateNote}
-                    onHighlightNote={onHighlightNote}
-                    onValidityChange={onValidityChange}
-                    onRequestDelete={onRequestDelete}
-                    copiedNote={copiedNote}
-                    onCopyNote={onCopyNote}
-                  />
-                );
-              })}
-            </SortableContext>
-          </div>
-        ))}
-        {!isReadOnly &&
-        activeId !== null &&
-        notesById.has(activeId) &&
-        dragSeparation ? (
-          <NewSectionDropTarget />
-        ) : null}
+        <SortableContext
+          id={stackGroupId}
+          items={stackNoteIds}
+          strategy={verticalListSortingStrategy}
+        >
+          {stackNoteIds.map((nid) => {
+            const note = notesById.get(nid);
+            if (!note) {
+              return null;
+            }
+            const matchesCurrentPage =
+              browserTabUrlKey !== null &&
+              noteUrlMatchesBrowserTab(note.url, browserTabUrlKey);
+            return (
+              <SortableNoteRow
+                key={note.id}
+                note={note}
+                groupId={stackGroupId}
+                gapBeforePx={layout.gapBeforePxByNoteId[note.id] ?? 0}
+                activeSubjectTabId={activeSubjectTabId}
+                isActive={activeNoteId === note.id}
+                isSelected={selectedNoteIds.has(note.id)}
+                isExpanded={isNoteExpanded(note.id)}
+                matchesCurrentPage={matchesCurrentPage}
+                isReadOnly={isReadOnly}
+                onActivateNote={onActivateNote}
+                onSelectNote={handleSelectNote}
+                onSetNoteExpanded={onSetNoteExpanded}
+                onUpdateNote={onUpdateNote}
+                onHighlightNote={onHighlightNote}
+                onValidityChange={onValidityChange}
+                onRequestDelete={onRequestDelete}
+                copiedNote={copiedNote}
+                onCopyNote={onCopyNote}
+              />
+            );
+          })}
+        </SortableContext>
       </div>
       <DragOverlay
         dropAnimation={null}

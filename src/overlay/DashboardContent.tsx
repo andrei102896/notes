@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
@@ -33,23 +40,49 @@ type DashboardContentProps = {
   isReadOnly?: boolean;
 };
 
-export function DashboardContent({
-  notes,
-  browserTabUrlKey,
-  activeSubjectTabId,
-  activeNoteId,
-  showSubjectTabInstruction,
-  onUpdateNote,
-  onHighlightNote,
-  onHasInvalidUrlDraftChange,
-  isNoteExpanded,
-  onSetNoteExpanded,
-  onDeleteNote,
-  onActivateNote,
-  resolvedNoteListLayout,
-  onCommitNoteListLayout,
-  isReadOnly = false,
-}: DashboardContentProps): React.ReactElement {
+export type DashboardContentHandle = {
+  /** Scroll the note list to the very top (DASHBOARD/NOTES-BEHAVIOR: reveal new note). */
+  scrollNotesToTop: () => void;
+};
+
+export const DashboardContent = forwardRef<
+  DashboardContentHandle,
+  DashboardContentProps
+>(function DashboardContent(
+  {
+    notes,
+    browserTabUrlKey,
+    activeSubjectTabId,
+    activeNoteId,
+    showSubjectTabInstruction,
+    onUpdateNote,
+    onHighlightNote,
+    onHasInvalidUrlDraftChange,
+    isNoteExpanded,
+    onSetNoteExpanded,
+    onDeleteNote,
+    onActivateNote,
+    resolvedNoteListLayout,
+    onCommitNoteListLayout,
+    isReadOnly = false,
+  },
+  ref,
+) {
+  const notesScrollRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollNotesToTop() {
+        // Defer one frame so the just-added (prepended) note is committed first.
+        requestAnimationFrame(() => {
+          notesScrollRef.current?.scrollTo({ top: 0 });
+        });
+      },
+    }),
+    [],
+  );
+
   const [invalidUrlByNoteId, setInvalidUrlByNoteId] = useState<
     Record<string, boolean>
   >({});
@@ -103,13 +136,9 @@ export function DashboardContent({
         aria-label="Dashboard content"
       >
         <div className="flex min-h-0 flex-1 items-center justify-center p-6">
-          <div className="flex flex-col items-center gap-4 rounded bg-white px-12 py-8 text-center shadow-sm">
+          <div className="flex flex-col items-center rounded bg-white px-12 py-8 text-center shadow-sm">
             <p className="text-base font-medium text-foreground">
-              Select a subject tab to view, edit or add notes to.
-            </p>
-            <p className="text-sm font-semibold text-muted-foreground">OR</p>
-            <p className="text-base font-medium text-foreground">
-              Create a new subject tab to add notes to.
+              Select or create a subject tab to view, edit or add notes to.
             </p>
           </div>
         </div>
@@ -122,7 +151,7 @@ export function DashboardContent({
       className="nn-dashboard-content-frosted flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
       aria-label="Dashboard content"
     >
-      <div className="min-h-0 flex-1 overflow-auto py-6 px-4">
+      <div ref={notesScrollRef} className="min-h-0 flex-1 overflow-auto py-6 px-4">
         {notes.length > 0 ? (
           <NotesList
             notesById={notesById}
@@ -158,6 +187,7 @@ export function DashboardContent({
                 heading: note.heading,
                 body: note.body,
                 url: note.url,
+                createdAt: note.createdAt,
                 anchor: note.anchor ?? null,
               };
               setCopiedNote(snapshot);
@@ -185,4 +215,4 @@ export function DashboardContent({
       />
     </section>
   );
-}
+});

@@ -32,7 +32,9 @@ type NoteProps = {
   onSetExpanded: (noteId: string, expanded: boolean) => void;
   onUpdateNote: (
     noteId: string,
-    patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor">>,
+    patch: Partial<
+      Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "createdAt">
+    >,
   ) => void | Promise<void>;
   onHighlightNote: (noteId: string | null) => void;
   onValidityChange: (noteId: string, isInvalid: boolean) => void;
@@ -197,6 +199,7 @@ export function Note({
                       heading: copiedNote.heading,
                       body: copiedNote.body,
                       url: copiedNote.url,
+                      createdAt: copiedNote.createdAt,
                       anchor: copiedNote.anchor,
                     });
                   }

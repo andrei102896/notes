@@ -113,6 +113,12 @@ export function claimPendingOverlay(tabWin: Window): Promise<boolean> {
   const fromSession = tabWin.sessionStorage.getItem(PENDING_OVERLAY_SESSION_KEY);
   if (fromSession !== null) {
     tabWin.sessionStorage.removeItem(PENDING_OVERLAY_SESSION_KEY);
+    // Also drop the storage-backed twin (set alongside the session flag by
+    // markOverlayReopenOnNextNavigation) so a leftover key can't reopen NN on a
+    // later tab that visits this same URL.
+    void chrome.storage.local.remove(
+      pendingOverlayStorageKeysForUrl(tabWin.location.href),
+    );
     return Promise.resolve(true);
   }
   return new Promise((resolve) => {

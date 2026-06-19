@@ -55,7 +55,44 @@ function suppressRadixCrossRealmDialogWarnings(): void {
   };
 }
 
+/**
+ * Dev-only: CRXJS's HMR client (vendor/crx-client-port.js) keeps posting to the
+ * runtime port from content scripts orphaned by an extension reload, flooding the
+ * page console with "Extension context invalidated". This is harmless dev noise
+ * (absent from production builds); swallow only that message so real errors stay
+ * visible. Existing orphaned tabs clear on the next page reload.
+ */
+function suppressExtensionContextInvalidatedDevErrors(): void {
+  const matches = (text: unknown): boolean =>
+    typeof text === "string" && text.includes("Extension context invalidated");
+
+  window.addEventListener(
+    "error",
+    (event) => {
+      const errorMessage =
+        event.error instanceof Error ? event.error.message : undefined;
+      if (matches(event.message) || matches(errorMessage)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    },
+    true,
+  );
+
+  window.addEventListener("unhandledrejection", (event) => {
+    const reason: unknown = event.reason;
+    const message = reason instanceof Error ? reason.message : reason;
+    if (matches(message)) {
+      event.preventDefault();
+    }
+  });
+}
+
 suppressRadixCrossRealmDialogWarnings();
+
+if (import.meta.env.DEV) {
+  suppressExtensionContextInvalidatedDevErrors();
+}
 
 registerContentPanelHost();
 

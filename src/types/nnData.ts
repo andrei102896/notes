@@ -64,6 +64,8 @@ export type NNCopiedNote = {
   heading: string;
   body: string;
   url: string;
+  /** Creation date of the copied note — pasted note reproduces it (doc 3_NN_NOTES). */
+  createdAt: number;
   anchor: NNAnchorPosition | null;
 };
 

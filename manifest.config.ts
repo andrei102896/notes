@@ -4,9 +4,9 @@ export default defineManifest({
   manifest_version: 3,
   name: "Notes for Net",
   description:
-    "Save bookmarks with exact scroll position and restore it later.",
+    "Save and notate any webpage as sticky notes filed under subject tabs, with one-click links and exact-position anchors.",
   version: "1.0.0",
-  permissions: ["storage", "tabs", "activeTab", "scripting", "unlimitedStorage"],
+  permissions: ["storage", "scripting", "unlimitedStorage"],
   host_permissions: ["<all_urls>"],
   icons: {
     16: "src/assets/icons/extension-icon.png",

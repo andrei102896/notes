@@ -1,5 +1,4 @@
 import { LEGACY_NN_SYNC_DATA_KEY } from "@/lib/nnSyncKeys";
-import type { ScrollBookmark } from "@/types/bookmark";
 import type {
   NNCopiedNote,
   NNNoteIndex,
@@ -18,7 +17,6 @@ type PendingSyncMergeState = {
 };
 
 type SyncStorageSchema = {
-  scrollBookmarks: ScrollBookmark[];
   /** @deprecated Migrated to sharded keys — kept for one-time legacy read. */
   [LEGACY_NN_SYNC_DATA_KEY]?: NNSyncPayload;
   nnSyncMeta: NNSyncMeta;
