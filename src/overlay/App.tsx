@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNNDashboardSession } from "@/hooks/useNNDashboardSession";
-import type { AirLetter } from "@/lib/airSubjectTabs";
+import { firstSubjectTabLetter, type AirLetter } from "@/lib/airSubjectTabs";
 import {
   getExtPayClient,
   isExtPayConfigured,
@@ -244,19 +244,13 @@ export function App(): React.ReactElement {
         onSelectTab={(id) => {
           if (pageSession.activeSubjectTabId === id) {
             patchSession({ activeSubjectTabId: null });
+            setActiveAirLetter(null);
             return;
           }
           patchSession({ activeSubjectTabId: id });
-          // A–Z: drop the highlighted letter if the chosen tab doesn't begin
-          // with it (doc 4_NN_AI).
-          if (activeAirLetter !== null) {
-            const selected = subjectTabsForDisplay.find((t) => t.id === id);
-            const firstLetter =
-              selected?.name.trim().charAt(0).toUpperCase() ?? "";
-            if (firstLetter !== activeAirLetter) {
-              setActiveAirLetter(null);
-            }
-          }
+          // A–Z: highlight the letter the chosen tab begins with (doc 4_NN_AI).
+          const selected = subjectTabsForDisplay.find((t) => t.id === id);
+          setActiveAirLetter(firstSubjectTabLetter(selected?.name ?? ""));
         }}
         onCreateTab={async (name) => {
           if (isReadOnly) {

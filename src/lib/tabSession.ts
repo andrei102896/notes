@@ -66,15 +66,19 @@ function isTabSessionState(value: unknown): value is TabSessionState {
   );
 }
 
-/** Reads this tab's session from the background; resolves to defaults on any failure. */
-export function getTabSession(): Promise<TabSessionState> {
+/**
+ * Reads this tab's session from the background. Resolves to `null` when the read fails
+ * (no response / malformed reply / invalidated context) so callers can distinguish a
+ * failed read from a definitive closed session; a valid reply resolves to that state.
+ */
+export function getTabSession(): Promise<TabSessionState | null> {
   return new Promise((resolve) => {
     try {
       chrome.runtime.sendMessage(
         { type: "GET_TAB_SESSION" } satisfies GetTabSessionMessage,
         (response: unknown) => {
           if (chrome.runtime.lastError || !isTabSessionState(response)) {
-            resolve({ ...DEFAULT_TAB_SESSION });
+            resolve(null);
             return;
           }
           resolve(response);
@@ -82,7 +86,7 @@ export function getTabSession(): Promise<TabSessionState> {
       );
     } catch {
       // Extension context invalidated (dev reload of an orphaned content script).
-      resolve({ ...DEFAULT_TAB_SESSION });
+      resolve(null);
     }
   });
 }

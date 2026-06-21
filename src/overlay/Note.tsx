@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Columns4, Minus, Square } from "lucide-react";
 
@@ -68,6 +68,26 @@ export function Note({
     italic: false,
     underline: false,
   });
+
+  // The heading runs on a local draft: persisting goes through an async storage
+  // round-trip, and letting the controlled value lag would reset the caret to the
+  // end mid-edit. Adopt external heading changes (paste, switching notes) only
+  // while the field isn't focused, so typing is never clobbered.
+  const headingFocusedRef = useRef(false);
+  const [headingFocused, setHeadingFocused] = useState(false);
+  const [headingDraft, setHeadingDraft] = useState(note.heading);
+  useEffect(() => {
+    if (!headingFocusedRef.current) {
+      setHeadingDraft(note.heading);
+    }
+  }, [note.heading]);
+
+  // The header is the drag handle only while the title isn't focused. Clicking the title
+  // focuses it (a stationary click never starts a drag), after which a mouse-drag selects
+  // text instead of moving the note. Move/reorder works from the header when not editing.
+  const headerHandleProps =
+    sortableHandleProps && !headingFocused ? sortableHandleProps : undefined;
+
   return (
     <Card
       onMouseDown={() => onActivate(note.id)}
@@ -84,20 +104,21 @@ export function Note({
         <div
           className={cn(
             "flex h-10 items-stretch",
-            sortableHandleProps ? "cursor-grab active:cursor-grabbing" : "",
+            headerHandleProps ? "cursor-grab active:cursor-grabbing" : "",
           )}
-          {...sortableHandleProps}
+          {...headerHandleProps}
         >
           <Input
             type="text"
             aria-label="Note heading"
             data-note-title
-            value={note.heading}
+            value={headingDraft}
             readOnly={isReadOnly}
             onChange={(event) => {
               if (isReadOnly) {
                 return;
               }
+              setHeadingDraft(event.target.value);
               onActivate(note.id);
               onHighlightNote(note.id);
               void onUpdateNote(note.id, { heading: event.target.value });
@@ -112,9 +133,16 @@ export function Note({
                 event.stopPropagation();
               }
             }}
-            onFocus={() => onActivate(note.id)}
-            placeholder="Note heading..."
-            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-bold text-white outline-none placeholder:text-white/80 text-shadow-lg cursor-pointer"
+            onFocus={() => {
+              headingFocusedRef.current = true;
+              setHeadingFocused(true);
+              onActivate(note.id);
+            }}
+            onBlur={() => {
+              headingFocusedRef.current = false;
+              setHeadingFocused(false);
+            }}
+            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-bold text-white outline-none cursor-pointer"
           />
           <div className="flex shrink-0 items-stretch">
             <CollapsibleTrigger asChild>

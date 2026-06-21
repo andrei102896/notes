@@ -82,7 +82,7 @@ export function useNNDashboardSession(): {
         return;
       }
       setSync(initialSync);
-      const restored = tabSession.activeSubjectTabId;
+      const restored = tabSession?.activeSubjectTabId ?? null;
       const canRestore =
         restored !== null &&
         initialSync.subjectTabs.some((tab) => tab.id === restored);

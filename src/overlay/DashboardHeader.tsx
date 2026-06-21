@@ -104,11 +104,15 @@ export function DashboardHeader({
           </Button>
         </ButtonGroup>
 
+        {/* Gray filler extends the "This Tab Notes" bar to absorb the row's horizontal
+            slack, so the header background never shows between the macro group and
+            Delete Tab at any panel width (css.txt nav bar is one contiguous strip). */}
+        <div aria-hidden className="flex-1 self-stretch bg-muted" />
+
         {/* DELETE TAB + NN form one unit: each keeps its 3px white border and they
             sit flush, so the abutting borders read as a white divider between them
-            and a white surround around the pair (css.txt BOX_DELETE TAB + BOX_NN).
-            ml-auto pins the pair to the right edge so no gray slack trails the NN box. */}
-        <div className="ml-auto flex items-stretch">
+            and a white surround around the pair (css.txt BOX_DELETE TAB + BOX_NN). */}
+        <div className="flex items-stretch">
           <Button
             variant="default"
             size="sm"

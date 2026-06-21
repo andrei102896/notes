@@ -112,6 +112,38 @@ const BASE_ROOT_FONT_PX = 16;
 
 const OVERLAY_SHELL_ID = "nn-scroll-bookmarks-overlay-shell";
 
+const LOADING_VEIL_ID = "nn-overlay-loading-veil";
+/** Cold-restore blur window: ~1s hold + fade. No page loads faster, so it always covers the load-in. */
+const LOADING_VEIL_HOLD_MS = 1000;
+const LOADING_VEIL_FADE_MS = 300;
+
+/**
+ * Synchronously-readable mirror of the per-tab open flag, in the page's
+ * `sessionStorage` (tab-scoped, per-origin, survives same-origin navigation). A paint
+ * hint only — the background tab session stays authoritative (see `initTabSessionOverlay`).
+ */
+const OPEN_HINT_SESSION_KEY = "__nn_open";
+
+function writeOpenHint(open: boolean): void {
+  try {
+    if (open) {
+      window.sessionStorage.setItem(OPEN_HINT_SESSION_KEY, "1");
+    } else {
+      window.sessionStorage.removeItem(OPEN_HINT_SESSION_KEY);
+    }
+  } catch {
+    // sessionStorage can throw (sandboxed/partitioned contexts, storage disabled).
+  }
+}
+
+function readOpenHint(): boolean {
+  try {
+    return window.sessionStorage.getItem(OPEN_HINT_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 const PENDING_ANCHOR_SCROLL_DELAY_MS = 200;
 /** Upper bound when `scrollend` is missing or smooth scroll is still running. */
 const PENDING_ANCHOR_SCROLL_SETTLE_MS = 1500;
@@ -200,8 +232,84 @@ function consumePendingAnchor(anchor: unknown): void {
 /** Wait for any in-progress anchor scroll to finish, then show overlay. */
 function showOverlayWhenReady(): void {
   void anchorScrollDonePromise.then(() => {
-    showOverlay();
+    try {
+      // Cross-origin nav has no synchronous open-hint (sessionStorage is per-origin), so the
+      // panel restores via this async path and its content streams in just after. Frost it
+      // briefly so the load-in reads as one smooth reveal instead of an empty→filled jump.
+      const isColdRestore = !overlayShellSlideOpen;
+      showOverlay({ animate: false });
+      if (isColdRestore) {
+        showLoadingVeil();
+      }
+    } catch {
+      // One page's mount failure must not surface as an unhandled rejection.
+    }
   });
+}
+
+/**
+ * Briefly frosts/blurs the panel while a cold restore streams its content in. Cosmetic and
+ * pointer-transparent, and self-clears via the animation engine, so it can never strand the
+ * panel behind a cover.
+ */
+function showLoadingVeil(): void {
+  const shell = document.getElementById(OVERLAY_SHELL_ID);
+  if (!shell) {
+    return;
+  }
+  removeLoadingVeil();
+
+  const veil = document.createElement("div");
+  veil.id = LOADING_VEIL_ID;
+  veil.setAttribute("aria-hidden", "true");
+  // pointer-events:none is the hard guarantee that the panel stays clickable even if this
+  // element ever lingers — clicks hit-test straight through to the iframe beneath it.
+  veil.style.cssText = [
+    "position:absolute",
+    "inset:0",
+    "z-index:1",
+    "background:rgba(248,248,248,0.45)",
+    "backdrop-filter:blur(8px)",
+    "-webkit-backdrop-filter:blur(8px)",
+    "pointer-events:none",
+  ].join(";");
+  shell.appendChild(veil);
+
+  const total = LOADING_VEIL_HOLD_MS + LOADING_VEIL_FADE_MS;
+  try {
+    // Drive the hold+fade on the animation engine with fill:forwards, so the veil settles at
+    // opacity 0 (fully invisible, blur and all) even if its cleanup is starved by a
+    // background-throttled timer. It can never end up stuck covering the panel.
+    const animation = veil.animate(
+      [
+        { opacity: 1, offset: 0 },
+        { opacity: 1, offset: LOADING_VEIL_HOLD_MS / total },
+        { opacity: 0, offset: 1 },
+      ],
+      { duration: total, easing: "ease-out", fill: "forwards" },
+    );
+    loadingVeilAnimation = animation;
+    animation.onfinish = () => removeLoadingVeil();
+  } catch {
+    // Web Animations unavailable — remove on a plain timer (still pointer-transparent).
+    loadingVeilTimer = window.setTimeout(removeLoadingVeil, total);
+  }
+}
+
+function removeLoadingVeil(): void {
+  if (loadingVeilTimer !== null) {
+    window.clearTimeout(loadingVeilTimer);
+    loadingVeilTimer = null;
+  }
+  if (loadingVeilAnimation !== null) {
+    try {
+      loadingVeilAnimation.cancel();
+    } catch {
+      // Already finished/detached.
+    }
+    loadingVeilAnimation = null;
+  }
+  document.getElementById(LOADING_VEIL_ID)?.remove();
 }
 
 function initPendingAnchorScroll(): void {
@@ -254,32 +362,24 @@ function initPendingOverlayOpen(): void {
 }
 
 /**
- * Per-tab-session restore: if NN was open in this tab before navigating, reopen it
- * on the new page (docs/1_NN_DASHBOARD — open-state persists for the tab session).
+ * Per-tab-session restore from the authoritative background session: reopen NN if it
+ * was open before navigating (docs/1_NN_DASHBOARD — open-state persists for the tab
+ * session), or close it if the synchronous hint opened it but the session says closed
+ * (a stale hint, e.g. after Chrome restored sessionStorage on a browser restart while
+ * the per-tab session reset).
  */
 function initTabSessionOverlay(): void {
   void getTabSession().then((session) => {
-    if (session.open) showOverlayWhenReady();
+    // Read failed (null) — trust the synchronous hint paint, change nothing.
+    if (session === null) {
+      return;
+    }
+    if (session.open) {
+      showOverlayWhenReady();
+    } else if (readOpenHint()) {
+      hideOverlay({ animate: false });
+    }
   });
-}
-
-function initPendingNavigationState(): void {
-  // Anchor first — creates the deferred promise that overlay-open waits on.
-  initPendingAnchorScroll();
-  initPendingOverlayOpen();
-  initTabSessionOverlay();
-}
-
-// A prior, now-orphaned content script (e.g. left after an extension update that
-// re-injected this script into an already-open tab) may have an overlay shell still
-// in the DOM whose React root is dead. Remove it so this fresh instance owns the
-// overlay. No-op on a normal page load, where no shell exists yet.
-document.getElementById(OVERLAY_SHELL_ID)?.remove();
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initPendingNavigationState);
-} else {
-  initPendingNavigationState();
 }
 
 type RuntimeMessage =
@@ -290,10 +390,16 @@ type OverlayVisibilityEventDetail = {
   visible: boolean;
 };
 
+/** How often to check the extension is still installed (removes a stranded overlay). */
+const EXTENSION_CONTEXT_POLL_MS = 1500;
+
 let overlayRoot: Root | null = null;
 let hideOverlayTimer: number | null = null;
 let overlayViewportListenersAttached = false;
 let overlayShellSlideOpen = false;
+let contextWatchTimer: number | null = null;
+let loadingVeilTimer: number | null = null;
+let loadingVeilAnimation: Animation | null = null;
 
 function isRuntimeMessage(value: unknown): value is RuntimeMessage {
   if (typeof value !== "object" || value === null) {
@@ -344,7 +450,55 @@ window.addEventListener(
   },
 );
 
+/**
+ * A content script (and the DOM it injected) keeps running after the extension is
+ * uninstalled, disabled, or updated — Chrome only clears it on the next page load. When the
+ * context dies, `chrome.runtime.id` becomes undefined and the runtime APIs throw; treat that
+ * as "extension gone".
+ */
+function isExtensionContextValid(): boolean {
+  try {
+    return Boolean(chrome.runtime?.id);
+  } catch {
+    return false;
+  }
+}
+
+/** Removes the overlay and stops all timers when the extension is no longer there. */
+function teardownOrphanedOverlay(): void {
+  if (contextWatchTimer !== null) {
+    window.clearInterval(contextWatchTimer);
+    contextWatchTimer = null;
+  }
+  if (hideOverlayTimer !== null) {
+    window.clearTimeout(hideOverlayTimer);
+    hideOverlayTimer = null;
+  }
+  removeLoadingVeil();
+  try {
+    overlayRoot?.unmount();
+  } catch {
+    // Unmount cleanups may touch the now-dead extension APIs — ignore.
+  }
+  overlayRoot = null;
+  overlayShellSlideOpen = false;
+  document.getElementById(OVERLAY_SHELL_ID)?.remove();
+}
+
+/** Polls for extension-context loss while the overlay is mounted (idempotent). */
+function startExtensionContextWatch(): void {
+  if (contextWatchTimer !== null) {
+    return;
+  }
+  contextWatchTimer = window.setInterval(() => {
+    if (!isExtensionContextValid()) {
+      teardownOrphanedOverlay();
+    }
+  }, EXTENSION_CONTEXT_POLL_MS);
+}
+
 function ensureOverlayMounted(): HTMLDivElement {
+  startExtensionContextWatch();
   const existing = document.getElementById(OVERLAY_SHELL_ID);
   if (existing instanceof HTMLDivElement) {
     syncOverlayViewportMetrics(existing);
@@ -509,7 +663,15 @@ function attachOverlayViewportListeners(): void {
   overlayViewportListenersAttached = true;
 }
 
-function showOverlay(): void {
+/**
+ * `animate: false` reveals the panel already in place (no slide), used when
+ * restoring an open overlay across a navigation so it never appears to reopen.
+ * `persist: false` skips writing the open-state; used by the startup hint paint,
+ * which is a best-effort render and must not overwrite the authoritative session.
+ */
+function showOverlay(
+  { animate = true, persist = true }: { animate?: boolean; persist?: boolean } = {},
+): void {
   const shell = ensureOverlayMounted();
   if (hideOverlayTimer !== null) {
     window.clearTimeout(hideOverlayTimer);
@@ -519,16 +681,31 @@ function showOverlay(): void {
   overlayShellSlideOpen = true;
   shell.style.visibility = "visible";
   shell.style.pointerEvents = "auto";
-  shell.style.transform = "translateX(100%)";
   shell.setAttribute("aria-hidden", "false");
-  window.requestAnimationFrame(() => {
-    shell.style.transform = "translateX(0)";
-  });
-  // Persist open-state so it survives navigation within this tab session.
-  patchTabSession({ open: true });
+
+  if (animate) {
+    shell.style.transform = "translateX(100%)";
+    window.requestAnimationFrame(() => {
+      shell.style.transform = "translateX(0)";
+    });
+  } else {
+    withoutTransition(shell, () => {
+      shell.style.transform = "translateX(0)";
+    });
+  }
+
+  if (persist) {
+    patchTabSession({ open: true });
+    writeOpenHint(true);
+  }
 }
 
-function hideOverlay(): void {
+/**
+ * `animate: false` hides the panel instantly (no slide), used to correct a stale
+ * open hint when the authoritative tab session says the overlay should be closed.
+ */
+function hideOverlay({ animate = true }: { animate?: boolean } = {}): void {
+  removeLoadingVeil();
   const shell = document.getElementById(OVERLAY_SHELL_ID);
   if (!shell) {
     overlayShellSlideOpen = false;
@@ -536,19 +713,39 @@ function hideOverlay(): void {
   }
   if (hideOverlayTimer !== null) {
     window.clearTimeout(hideOverlayTimer);
+    hideOverlayTimer = null;
   }
 
   overlayShellSlideOpen = false;
-  shell.style.transform = "translateX(100%)";
-  // Persist closed-state so navigation within this tab session does not reopen it.
   patchTabSession({ open: false });
+  writeOpenHint(false);
 
+  if (!animate) {
+    withoutTransition(shell, () => {
+      shell.style.transform = "translateX(100%)";
+    });
+    shell.style.visibility = "hidden";
+    shell.style.pointerEvents = "none";
+    shell.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  shell.style.transform = "translateX(100%)";
   hideOverlayTimer = window.setTimeout(() => {
     shell.style.visibility = "hidden";
     shell.style.pointerEvents = "none";
     shell.setAttribute("aria-hidden", "true");
     hideOverlayTimer = null;
   }, 320);
+}
+
+/** Applies a transform with the CSS transition suppressed (no animation). */
+function withoutTransition(el: HTMLElement, apply: () => void): void {
+  const previous = el.style.transition;
+  el.style.transition = "none";
+  apply();
+  void el.offsetWidth;
+  el.style.transition = previous;
 }
 
 function toggleOverlay(): void {
@@ -574,4 +771,35 @@ function restoreScroll(targetY: number): void {
       window.clearInterval(timer);
     }
   }, intervalMs);
+}
+
+// Startup runs last, after the module-level state and the TOGGLE_OVERLAY listener are
+// in place, so a same-tab restore cannot run before its state exists and a failed early
+// paint cannot stop the toolbar toggle from working.
+
+// A prior, now-orphaned content script (e.g. left after an extension update that
+// re-injected this script into an already-open tab) may have an overlay shell still
+// in the DOM whose React root is dead. Remove it so this fresh instance owns the
+// overlay. No-op on a normal page load, where no shell exists yet.
+document.getElementById(OVERLAY_SHELL_ID)?.remove();
+
+// Restore a still-open overlay before the page paints, from the synchronous hint. The
+// authoritative async restores below still run if this best-effort paint throws.
+try {
+  if (readOpenHint()) {
+    showOverlay({ animate: false, persist: false });
+  }
+} catch {
+  /* best-effort early paint */
+}
+
+initPendingOverlayOpen();
+initTabSessionOverlay();
+
+// Anchor scroll needs layout, so it stays on DOMContentLoaded; it owns the deferred
+// promise the overlay-open paths await.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPendingAnchorScroll);
+} else {
+  initPendingAnchorScroll();
 }

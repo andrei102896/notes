@@ -70,11 +70,11 @@ export function SubjectTabAddDialog({
         Add subject tab
       </label>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-stretch gap-3">
         <Input
           id={fieldId}
           ref={inputRef}
-          className="w-44 min-w-0 border-white bg-note-field"
+          className="h-auto w-44 min-w-0 border-white bg-note-field"
           value={draft}
           maxLength={SUBJECT_TAB_NAME_MAX_LEN}
           placeholder="Name"

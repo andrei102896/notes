@@ -29,7 +29,10 @@ export default defineManifest({
     {
       matches: ["<all_urls>"],
       js: ["src/content.ts"],
-      run_at: "document_idle",
+      // document_start so a tab-session restore can paint the overlay before the
+      // page itself paints — the overlay must not visibly close across same-tab
+      // navigation (docs/1_NN_DASHBOARD — temporary persistence).
+      run_at: "document_start",
     },
     {
       matches: ["https://extensionpay.com/*"],
