@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fjalla+One&family=Inter:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fjalla+One&family=Inter:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
@@ -95,11 +95,12 @@ body {
   font-family: "Fjalla One", sans-serif;
 }
 
-/* Note body: Fjalla One 18px, standard black (doc 3_NN_NOTES). Bold/italic render via
-   font synthesis since Fjalla One is single-weight. */
+/* Note body: a readable multi-weight font (Inter), NOT single-weight Fjalla One — so the
+   spec's "standard black body" reads as standard (not pre-bolded) and the bold/italic/underline
+   accents (doc 3_NN_NOTES) render for real. The rest of the UI keeps Fjalla One. */
 #nn-scroll-bookmarks-overlay-host [data-note-body],
 #nn-scroll-bookmarks-overlay-host [data-note-body] * {
-  font-family: "Fjalla One", sans-serif;
+  font-family: var(--font-ui);
   font-weight: 400;
 }
 #nn-scroll-bookmarks-overlay-host [data-note-body] {
@@ -119,12 +120,17 @@ body {
   line-height: 1;
 }
 
-#nn-scroll-bookmarks-overlay-host [data-note-body] b,
-#nn-scroll-bookmarks-overlay-host [data-note-body] strong {
+#nn-scroll-bookmarks-overlay-host [data-note-body] :is(b, strong) {
   font-weight: 700;
 }
+#nn-scroll-bookmarks-overlay-host [data-note-body] :is(i, em) {
+  font-style: italic;
+}
+#nn-scroll-bookmarks-overlay-host [data-note-body] u {
+  text-decoration: underline;
+}
 
-/* Nested italic/underline inside bold must inherit weight (the * rule above sets 400 on all nodes). */
+/* Nested italic/underline inside bold keep the bold weight (the * rule above forces 400). */
 #nn-scroll-bookmarks-overlay-host [data-note-body] :is(i, em, u) {
   font-weight: inherit;
 }

@@ -56,11 +56,15 @@ export function DashboardHeader({
       <div className="relative z-[1] flex h-[var(--air-cell)] shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2 shadow-[0px_9px_10.3px_rgba(0,0,0,0.52)]">
         <BrandLockup />
       </div>
-      <div className="flex h-[var(--air-cell)] items-stretch justify-start bg-air-box">
+      {/* One white frame wraps the whole button strip: bg-background shows as a 3px surround
+          (padding) and as 3px dividers between the blocks (gap), and no button carries a border
+          of its own — so Add Note, the nav bar, Delete Tab and NN all sit inside one frame
+          (design header), the nav bar included. */}
+      <div className="flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
         <Button
           variant="default"
           size="sm"
-          className="shrink-0 h-full border-[3px] border-background whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
+          className="shrink-0 h-full whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
           disabled={!canAddNote}
           aria-disabled={!canAddNote}
           onClick={() => {
@@ -72,8 +76,10 @@ export function DashboardHeader({
           Add Note
         </Button>
 
-        <ButtonGroup className="items-stretch gap-0.5 bg-muted [&_button]:h-full [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
-          <ButtonGroupText className="nn-tab-notes-ribbon whitespace-nowrap rounded-none bg-ribbon pr-4 text-navribbon text-accent-foreground">
+        {/* Nav bar fills the slack (flex-1 → basis 0, overriding the group's w-fit); the
+            Min/Max/Delete buttons grow equally so the slack reads as distance between them. */}
+        <ButtonGroup className="flex-1 items-stretch gap-0.5 bg-muted [&_button]:h-full [&_button]:flex-1 [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
+          <ButtonGroupText className="nn-tab-notes-ribbon shrink-0 whitespace-nowrap rounded-none bg-ribbon pr-4 text-navribbon text-accent-foreground">
             This Tab Notes
           </ButtonGroupText>
           <Button
@@ -104,55 +110,35 @@ export function DashboardHeader({
           </Button>
         </ButtonGroup>
 
-        {/* Gray filler extends the "This Tab Notes" bar to absorb the row's horizontal
-            slack, so the header background never shows between the macro group and
-            Delete Tab at any panel width (css.txt nav bar is one contiguous strip). */}
-        <div aria-hidden className="flex-1 self-stretch bg-muted" />
+        <Button
+          variant="default"
+          size="sm"
+          className="shrink-0 h-full whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
+          disabled={!canDeleteSubjectTab}
+          aria-disabled={!canDeleteSubjectTab}
+          onClick={() => {
+            if (canDeleteSubjectTab) {
+              setDeleteConfirmOpen(true);
+            }
+          }}
+        >
+          Delete Tab
+        </Button>
 
-        {/* DELETE TAB + NN form one unit: each keeps its 3px white border and they
-            sit flush, so the abutting borders read as a white divider between them
-            and a white surround around the pair (css.txt BOX_DELETE TAB + BOX_NN). */}
-        <div className="flex items-stretch">
-          <Button
-            variant="default"
-            size="sm"
-            className="shrink-0 h-full border-[3px] border-background whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
-            disabled={!canDeleteSubjectTab}
-            aria-disabled={!canDeleteSubjectTab}
-            onClick={() => {
-              if (canDeleteSubjectTab) {
-                setDeleteConfirmOpen(true);
-              }
-            }}
+        {isOnTrial || isReadOnly ? (
+          <button
+            type="button"
+            className="flex h-full shrink-0 cursor-pointer items-center bg-[#FF3131] px-2 leading-none [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]"
+            onClick={() => onTrialBannerOpenChange?.(true)}
+            aria-label="Open trial info"
           >
-            Delete Tab
-          </Button>
-
-          {isOnTrial || isReadOnly ? (
-            <button
-              type="button"
-              className="flex h-full cursor-pointer items-center border-[3px] border-background bg-[#FF3131] px-2 leading-none [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]"
-              onClick={() => onTrialBannerOpenChange?.(true)}
-              aria-label="Open trial info"
-            >
-              <BrandLogo />
-            </button>
-          ) : (
-            <div className="flex h-full items-center border-[3px] border-background bg-accent px-2 [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]">
-              <BrandLogo />
-            </div>
-          )}
-        </div>
-
-        {/* Right-edge gutter. The panel hugs the browser's right edge, where the host
-            scrollbar paints over the panel and would clip the NN box. Width is the host
-            scrollbar measured in content.ts (--nn-scrollbar-gutter), so it self-corrects
-            per screen/zoom instead of a fixed guess; 18px fallback before first sync.
-            Solid white per design feedback ("white, not gray"). */}
-        <div
-          aria-hidden
-          className="w-[var(--nn-scrollbar-gutter,18px)] shrink-0 bg-background"
-        />
+            <BrandLogo />
+          </button>
+        ) : (
+          <div className="flex h-full shrink-0 items-center bg-accent px-2 [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]">
+            <BrandLogo />
+          </div>
+        )}
       </div>
 
       <SubjectTabDeleteConfirmDialog
