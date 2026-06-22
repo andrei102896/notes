@@ -53,6 +53,7 @@ export function AlphabetIndexRollout({
               "flex h-[var(--air-cell)] w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden border-b border-l border-border text-center font-normal outline-none",
               "text-air-letter leading-none",
               "bg-air-box text-accent-foreground",
+              // Blue only for the selected subject's letter; matching letters get a hover cue.
               hasMatch && "hover:bg-accent",
               isActive && "bg-accent",
             )}

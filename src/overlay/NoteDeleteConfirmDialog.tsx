@@ -28,10 +28,10 @@ export function NoteDeleteConfirmDialog({
       </p>
       <div className="flex justify-center gap-3">
         <ModalCancelButton onClick={() => onOpenChange(false)}>
-          Cancel
+          No
         </ModalCancelButton>
         <ModalOkButton destructive onClick={() => void onConfirm()}>
-          OK
+          Yes
         </ModalOkButton>
       </div>
     </NnModalFrame>

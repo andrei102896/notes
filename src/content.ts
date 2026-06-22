@@ -1,8 +1,4 @@
-import React from "react";
-
-import { createRoot, type Root } from "react-dom/client";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { Root } from "react-dom/client";
 
 import {
   PENDING_ANCHOR_SESSION_KEY,
@@ -16,8 +12,7 @@ import {
   registerContentPanelHost,
   scrollToAnchorInPage,
 } from "@/messaging/contentPanelBridge";
-import { App } from "@/overlay/App";
-import overlayCss from "@/overlay/styles.css?inline";
+import { mountOverlayApp } from "@/overlay/mountOverlayApp";
 
 /**
  * Radix's a11y check reads the host doc, not our iframe dialogs — false positive.
@@ -117,11 +112,7 @@ const LOADING_VEIL_ID = "nn-overlay-loading-veil";
 const LOADING_VEIL_HOLD_MS = 1000;
 const LOADING_VEIL_FADE_MS = 300;
 
-/**
- * Synchronously-readable mirror of the per-tab open flag, in the page's
- * `sessionStorage` (tab-scoped, per-origin, survives same-origin navigation). A paint
- * hint only — the background tab session stays authoritative (see `initTabSessionOverlay`).
- */
+/** Sync paint-hint mirror of the open flag (per-origin sessionStorage); the background session stays authoritative. */
 const OPEN_HINT_SESSION_KEY = "__nn_open";
 
 function writeOpenHint(open: boolean): void {
@@ -233,9 +224,7 @@ function consumePendingAnchor(anchor: unknown): void {
 function showOverlayWhenReady(): void {
   void anchorScrollDonePromise.then(() => {
     try {
-      // Cross-origin nav has no synchronous open-hint (sessionStorage is per-origin), so the
-      // panel restores via this async path and its content streams in just after. Frost it
-      // briefly so the load-in reads as one smooth reveal instead of an empty→filled jump.
+      // Cross-origin nav has no sync open-hint, so frost the async restore into one smooth reveal.
       const isColdRestore = !overlayShellSlideOpen;
       showOverlay({ animate: false });
       if (isColdRestore) {
@@ -247,11 +236,7 @@ function showOverlayWhenReady(): void {
   });
 }
 
-/**
- * Briefly frosts/blurs the panel while a cold restore streams its content in. Cosmetic and
- * pointer-transparent, and self-clears via the animation engine, so it can never strand the
- * panel behind a cover.
- */
+/** Pointer-transparent, self-clearing frost over a cold restore; can never strand the panel. */
 function showLoadingVeil(): void {
   const shell = document.getElementById(OVERLAY_SHELL_ID);
   if (!shell) {
@@ -262,8 +247,7 @@ function showLoadingVeil(): void {
   const veil = document.createElement("div");
   veil.id = LOADING_VEIL_ID;
   veil.setAttribute("aria-hidden", "true");
-  // pointer-events:none is the hard guarantee that the panel stays clickable even if this
-  // element ever lingers — clicks hit-test straight through to the iframe beneath it.
+  // pointer-events:none guarantees the panel stays clickable even if the veil ever lingers.
   veil.style.cssText = [
     "position:absolute",
     "inset:0",
@@ -277,9 +261,7 @@ function showLoadingVeil(): void {
 
   const total = LOADING_VEIL_HOLD_MS + LOADING_VEIL_FADE_MS;
   try {
-    // Drive the hold+fade on the animation engine with fill:forwards, so the veil settles at
-    // opacity 0 (fully invisible, blur and all) even if its cleanup is starved by a
-    // background-throttled timer. It can never end up stuck covering the panel.
+    // fill:forwards settles the veil at opacity 0 even if cleanup is starved, so it never sticks.
     const animation = veil.animate(
       [
         { opacity: 1, offset: 0 },
@@ -361,13 +343,7 @@ function initPendingOverlayOpen(): void {
   });
 }
 
-/**
- * Per-tab-session restore from the authoritative background session: reopen NN if it
- * was open before navigating (docs/1_NN_DASHBOARD — open-state persists for the tab
- * session), or close it if the synchronous hint opened it but the session says closed
- * (a stale hint, e.g. after Chrome restored sessionStorage on a browser restart while
- * the per-tab session reset).
- */
+/** Authoritative restore: reopen NN if the tab session was open, else correct a stale open-hint (docs/1_NN_DASHBOARD). */
 function initTabSessionOverlay(): void {
   void getTabSession().then((session) => {
     // Read failed (null) — trust the synchronous hint paint, change nothing.
@@ -450,12 +426,7 @@ window.addEventListener(
   },
 );
 
-/**
- * A content script (and the DOM it injected) keeps running after the extension is
- * uninstalled, disabled, or updated — Chrome only clears it on the next page load. When the
- * context dies, `chrome.runtime.id` becomes undefined and the runtime APIs throw; treat that
- * as "extension gone".
- */
+/** After uninstall/disable/update the script is orphaned and `chrome.runtime.id` goes undefined — "extension gone". */
 function isExtensionContextValid(): boolean {
   try {
     return Boolean(chrome.runtime?.id);
@@ -528,27 +499,23 @@ function ensureOverlayMounted(): HTMLDivElement {
   ].join(";");
   shell.appendChild(frame);
 
-  const iframeRoot = mountOverlayInFrame(frame);
+  const { doc: iframeDoc, appRoot } = mountOverlayInFrame(frame);
   // Iframe document now exists — set the root font-size knob before the first React paint.
   syncOverlayViewportMetrics(shell);
-  overlayRoot = createRoot(iframeRoot);
-  const queryClient = new QueryClient();
-  overlayRoot.render(
-    React.createElement(
-      React.StrictMode,
-      null,
-      React.createElement(
-        QueryClientProvider,
-        { client: queryClient },
-        React.createElement(App),
-      ),
-    ),
-  );
+  // Mount React synchronously (eager, statically imported). A lazy dynamic import() was tried and
+  // reverted: a content-script import() can fail on strict-CSP sites (e.g. tesla.com), which left a
+  // visible but empty, click-blocking shell. Reliability on <all_urls> beats the bundle-size win.
+  overlayRoot = mountOverlayApp(iframeDoc, appRoot);
 
   return shell;
 }
 
-function mountOverlayInFrame(frame: HTMLIFrameElement): HTMLElement {
+// Builds the iframe's document skeleton + app-root div synchronously (so the shell can paint at
+// document_start). The stylesheet is injected later by mountOverlayApp, alongside the React mount.
+function mountOverlayInFrame(frame: HTMLIFrameElement): {
+  doc: Document;
+  appRoot: HTMLElement;
+} {
   const doc = frame.contentDocument;
   if (doc === null) {
     throw new Error("Notes for Net: overlay iframe has no document");
@@ -559,10 +526,6 @@ function mountOverlayInFrame(frame: HTMLIFrameElement): HTMLElement {
     '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body></body></html>',
   );
   doc.close();
-
-  const styleEl = doc.createElement("style");
-  styleEl.textContent = overlayCss;
-  doc.head.appendChild(styleEl);
 
   doc.documentElement.style.height = "100%";
   doc.documentElement.style.background = "transparent";
@@ -580,7 +543,7 @@ function mountOverlayInFrame(frame: HTMLIFrameElement): HTMLElement {
   appRoot.id = "nn-overlay-app-root";
   appRoot.style.height = "100%";
   doc.body.appendChild(appRoot);
-  return appRoot;
+  return { doc, appRoot };
 }
 
 function configureOverlayShell(shell: HTMLDivElement): void {
@@ -663,12 +626,7 @@ function attachOverlayViewportListeners(): void {
   overlayViewportListenersAttached = true;
 }
 
-/**
- * `animate: false` reveals the panel already in place (no slide), used when
- * restoring an open overlay across a navigation so it never appears to reopen.
- * `persist: false` skips writing the open-state; used by the startup hint paint,
- * which is a best-effort render and must not overwrite the authoritative session.
- */
+/** `animate:false` restores in-place (no reopen slide); `persist:false` is the best-effort hint paint that must not overwrite the session. */
 function showOverlay(
   { animate = true, persist = true }: { animate?: boolean; persist?: boolean } = {},
 ): void {
@@ -700,10 +658,7 @@ function showOverlay(
   }
 }
 
-/**
- * `animate: false` hides the panel instantly (no slide), used to correct a stale
- * open hint when the authoritative tab session says the overlay should be closed.
- */
+/** `animate:false` hides instantly to correct a stale open-hint when the session says closed. */
 function hideOverlay({ animate = true }: { animate?: boolean } = {}): void {
   removeLoadingVeil();
   const shell = document.getElementById(OVERLAY_SHELL_ID);
@@ -773,18 +728,12 @@ function restoreScroll(targetY: number): void {
   }, intervalMs);
 }
 
-// Startup runs last, after the module-level state and the TOGGLE_OVERLAY listener are
-// in place, so a same-tab restore cannot run before its state exists and a failed early
-// paint cannot stop the toolbar toggle from working.
+// Startup runs last so a restore can't precede its state and a failed early paint can't break the toggle.
 
-// A prior, now-orphaned content script (e.g. left after an extension update that
-// re-injected this script into an already-open tab) may have an overlay shell still
-// in the DOM whose React root is dead. Remove it so this fresh instance owns the
-// overlay. No-op on a normal page load, where no shell exists yet.
+// Drop any orphaned shell from a prior (re-injected) script so this instance owns the overlay.
 document.getElementById(OVERLAY_SHELL_ID)?.remove();
 
-// Restore a still-open overlay before the page paints, from the synchronous hint. The
-// authoritative async restores below still run if this best-effort paint throws.
+// Best-effort: paint a still-open overlay from the sync hint before the page paints; async restores below still run.
 try {
   if (readOpenHint()) {
     showOverlay({ animate: false, persist: false });
@@ -796,8 +745,7 @@ try {
 initPendingOverlayOpen();
 initTabSessionOverlay();
 
-// Anchor scroll needs layout, so it stays on DOMContentLoaded; it owns the deferred
-// promise the overlay-open paths await.
+// Anchor scroll needs layout, so it waits for DOMContentLoaded and owns the promise overlay-open awaits.
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initPendingAnchorScroll);
 } else {

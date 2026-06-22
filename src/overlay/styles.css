@@ -61,7 +61,7 @@ body {
   --radius-md: calc(0.5rem - 2px);
   --radius-lg: 0.5rem;
   --text-shadow-lg: 0 0 6px #000000;
-  --shadow-air: 0 4px 4.5px 4px rgba(0, 0, 0, 0.25); /* A–Z shadow (Figma "AI SHADOW") */
+  --shadow-air: -4px 0 5px 0 rgba(0, 0, 0, 0.25); /* A–Z shadow, cast to the LEFT (doc 4 / Figma "AI SHADOW") */
   --border-color-muted: #666666;
 }
 
@@ -95,9 +95,7 @@ body {
   font-family: "Fjalla One", sans-serif;
 }
 
-/* Note body: a readable multi-weight font (Inter), NOT single-weight Fjalla One — so the
-   spec's "standard black body" reads as standard (not pre-bolded) and the bold/italic/underline
-   accents (doc 3_NN_NOTES) render for real. The rest of the UI keeps Fjalla One. */
+/* Note body uses multi-weight Inter (not single-weight Fjalla) so the B/I/U accents render for real. */
 #nn-scroll-bookmarks-overlay-host [data-note-body],
 #nn-scroll-bookmarks-overlay-host [data-note-body] * {
   font-family: var(--font-ui);
@@ -105,11 +103,10 @@ body {
 }
 #nn-scroll-bookmarks-overlay-host [data-note-body] {
   font-size: var(--text-note-body);
-  color: #000000;
+  color: #464646;
 }
 
-/* Note title: 23px (Figma BOX_TITLE text). Set here (ID-scoped, beats Input's md:text-sm)
-   rather than via a text-* utility, which twMerge conflates with the white color class. */
+/* Note title 23px, set ID-scoped (beats Input's md:text-sm) since a text-* utility collides with the color class. */
 #nn-scroll-bookmarks-overlay-host [data-note-title] {
   font-size: var(--text-note-title);
 }

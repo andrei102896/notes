@@ -360,7 +360,10 @@ function withLayoutInMeta(meta: NNSyncMeta, layoutKey: string): NNSyncMeta {
   return { ...meta, layoutIndex: [...meta.layoutIndex, layoutKey] };
 }
 
-function removeNoteIdFromIndex(index: NNNoteIndex, noteId: string): NNNoteIndex {
+function removeNoteIdFromIndex(
+  index: NNNoteIndex,
+  noteId: string,
+): NNNoteIndex {
   const nextBySubjectTab: Record<string, string[]> = {};
   for (const [tabId, ids] of Object.entries(index.bySubjectTab)) {
     const filtered = ids.filter((id) => id !== noteId);
@@ -443,9 +446,7 @@ async function pruneNotesFromAllLayouts(noteIds: string[]): Promise<void> {
   }
 
   if (emptyLayoutKeys.length > 0) {
-    await storageService.sync.removeMany(
-      emptyLayoutKeys.map(layoutStorageKey),
-    );
+    await storageService.sync.removeMany(emptyLayoutKeys.map(layoutStorageKey));
     await setMeta({
       ...meta,
       layoutIndex: meta.layoutIndex.filter(
@@ -733,33 +734,8 @@ export async function getNNSync(): Promise<NNSyncPayload> {
   return {
     subjectTabs: meta.subjectTabs,
     notes,
-    noteLayouts:
-      Object.keys(noteLayouts).length > 0 ? noteLayouts : undefined,
+    noteLayouts: Object.keys(noteLayouts).length > 0 ? noteLayouts : undefined,
   };
-}
-
-/** Writes a full payload to sharded local keys (used for migration / bulk replace). */
-export async function setNNSync(payload: NNSyncPayload): Promise<void> {
-  const normalized = migrateNNSyncPayload(payload);
-  const meta = await getMeta();
-  const index = await getIndex();
-
-  const nextNoteIds = new Set(normalized.notes.map((n) => n.id));
-  const staleNoteKeys = index.noteIds
-    .filter((id) => !nextNoteIds.has(id))
-    .map(noteStorageKey);
-
-  const nextLayoutKeys = new Set(Object.keys(normalized.noteLayouts ?? {}));
-  const staleLayoutKeys = meta.layoutIndex
-    .filter((key) => !nextLayoutKeys.has(key))
-    .map(layoutStorageKey);
-
-  await writeShardedFromPayload(normalized);
-
-  const keysToRemove = [...staleNoteKeys, ...staleLayoutKeys];
-  if (keysToRemove.length > 0) {
-    await storageService.sync.removeMany(keysToRemove);
-  }
 }
 
 export function subscribeNNSync(

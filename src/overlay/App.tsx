@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNNDashboardSession } from "@/hooks/useNNDashboardSession";
-import { firstSubjectTabLetter, type AirLetter } from "@/lib/airSubjectTabs";
+import { firstSubjectTabLetter } from "@/lib/airSubjectTabs";
 import {
   getExtPayClient,
   isExtPayConfigured,
@@ -77,7 +77,11 @@ export function App(): React.ReactElement {
   const [hasInvalidUrlDraft, setHasInvalidUrlDraft] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [, setHighlightedNoteId] = useState<string | null>(null);
-  const [activeAirLetter, setActiveAirLetter] = useState<AirLetter | null>(null);
+  // Rail highlight follows the SELECTED subject — derived, so it survives remount and clears on deselect.
+  const activeAirLetter = firstSubjectTabLetter(
+    subjectTabsForDisplay.find((t) => t.id === pageSession.activeSubjectTabId)
+      ?.name ?? "",
+  );
   const [trialBannerOpen, setTrialBannerOpen] = useState(false);
   const [trialBannerLoaded, setTrialBannerLoaded] = useState(false);
   const [isUserPaid, setIsUserPaid] = useState(false);
@@ -209,6 +213,14 @@ export function App(): React.ReactElement {
     getExtPayClient().openPaymentPage();
   }, []);
 
+  // Restore an existing purchase after reinstall — ExtPay matches the account by Stripe email.
+  const openLoginPage = useCallback(() => {
+    if (!isExtPayConfigured) {
+      return;
+    }
+    getExtPayClient().openLoginPage();
+  }, []);
+
   return (
     <main
       id="nn-scroll-bookmarks-overlay-host"
@@ -220,18 +232,13 @@ export function App(): React.ReactElement {
         trialDaysLeft={trialDaysLeft}
         trialUnit={TRIAL_UNIT}
         onBuy={openPaymentPage}
+        onLogin={openLoginPage}
       />
       <AlphabetIndexRollout
         tabs={subjectTabsForDisplay}
         activeLetter={activeAirLetter}
         onLetterSelect={(letter) => {
-          setActiveAirLetter((current) => {
-            const next = current === letter ? null : letter;
-            if (next !== null) {
-              subjectTabStripRef.current?.scrollToFirstLetter(letter);
-            }
-            return next;
-          });
+          subjectTabStripRef.current?.scrollToFirstLetter(letter);
         }}
         className="animate-in duration-200"
       />
@@ -244,13 +251,9 @@ export function App(): React.ReactElement {
         onSelectTab={(id) => {
           if (pageSession.activeSubjectTabId === id) {
             patchSession({ activeSubjectTabId: null });
-            setActiveAirLetter(null);
             return;
           }
           patchSession({ activeSubjectTabId: id });
-          // A–Z: highlight the letter the chosen tab begins with (doc 4_NN_AI).
-          const selected = subjectTabsForDisplay.find((t) => t.id === id);
-          setActiveAirLetter(firstSubjectTabLetter(selected?.name ?? ""));
         }}
         onCreateTab={async (name) => {
           if (isReadOnly) {
@@ -259,10 +262,6 @@ export function App(): React.ReactElement {
           const id = await addSubjectTab(name);
           if (id !== null) {
             patchSession({ activeSubjectTabId: id });
-            const firstLetter = name.trim().charAt(0).toUpperCase();
-            setActiveAirLetter(
-              /^[A-Z]$/.test(firstLetter) ? (firstLetter as AirLetter) : null,
-            );
             subjectTabStripRef.current?.scrollToTab(id);
           }
         }}

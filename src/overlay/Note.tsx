@@ -24,7 +24,6 @@ type NoteProps = {
   activeSubjectTabId: string | null;
   expanded: boolean;
   isActive: boolean;
-  isSelected?: boolean;
   matchesCurrentPage: boolean;
   /** Trial-ended unpaid mode: heading/body/url frozen, delete hidden. */
   isReadOnly?: boolean;
@@ -48,7 +47,6 @@ export function Note({
   note,
   activeSubjectTabId,
   expanded,
-  isSelected,
   matchesCurrentPage,
   isReadOnly = false,
   onActivate,
@@ -69,10 +67,7 @@ export function Note({
     underline: false,
   });
 
-  // The heading runs on a local draft: persisting goes through an async storage
-  // round-trip, and letting the controlled value lag would reset the caret to the
-  // end mid-edit. Adopt external heading changes (paste, switching notes) only
-  // while the field isn't focused, so typing is never clobbered.
+  // Heading runs on a local draft (async persist would reset the caret); adopt external changes only while unfocused.
   const headingFocusedRef = useRef(false);
   const [headingFocused, setHeadingFocused] = useState(false);
   const [headingDraft, setHeadingDraft] = useState(note.heading);
@@ -82,9 +77,7 @@ export function Note({
     }
   }, [note.heading]);
 
-  // The header is the drag handle only while the title isn't focused. Clicking the title
-  // focuses it (a stationary click never starts a drag), after which a mouse-drag selects
-  // text instead of moving the note. Move/reorder works from the header when not editing.
+  // Header is the drag handle only while the title is unfocused, so a focused title can drag-select text.
   const headerHandleProps =
     sortableHandleProps && !headingFocused ? sortableHandleProps : undefined;
 
@@ -93,7 +86,6 @@ export function Note({
       onMouseDown={() => onActivate(note.id)}
       className={cn(
         "border-[6px] bg-note p-0",
-        isSelected && "ring-2 ring-primary ring-offset-2",
         matchesCurrentPage ? "border-accent" : "border-border",
       )}
     >
@@ -131,6 +123,18 @@ export function Note({
               }
               if (event.key === " ") {
                 event.stopPropagation();
+              }
+            }}
+            onMouseDown={(event) => {
+              // Don't focus on press — let a clear drag (>activation distance) move the note. A clean
+              // click (no drag) focuses via onClick below, so click+drag never starts title editing.
+              if (!headingFocused && !isReadOnly) {
+                event.preventDefault();
+              }
+            }}
+            onClick={(event) => {
+              if (!headingFocused && !isReadOnly) {
+                event.currentTarget.focus();
               }
             }}
             onFocus={() => {
@@ -175,7 +179,7 @@ export function Note({
                 onActivate(note.id);
                 onRequestDelete(note.id);
               }}
-              className="rounded-none border-0 bg-muted-foreground p-0 text-white hover:bg-note-action/90 hover:text-white"
+              className="rounded-none border-0 bg-muted-foreground p-0 text-white hover:bg-muted-foreground"
             >
               <Columns4 />
             </Button>

@@ -9,7 +9,7 @@ Notes live under **subject tabs** (folders) and are organized per page:
   with an **A–Z index rail** to jump between them.
 - **Note cards** — a title, a rich-text body (bold / italic / underline), and an
   auto-filled URL and creation date. Each note can be minimized, maximized, deleted, and
-  reordered by drag.
+  reordered by drag — drag a note with **Cmd/Ctrl** held to split it into a new section.
 - **LINK / ANCHOR / COPY / PASTE** — open the note's saved URL, drop an anchor on the page
   to scroll back to later, and copy/paste notes between tabs.
 - A **free trial → purchase** flow (ExtensionPay) behind the logo button, top-right.

@@ -13,6 +13,8 @@ export type TabSessionState = {
   open: boolean;
   /** Selected subject tab (folder), or null for the default current-page view. */
   activeSubjectTabId: string | null;
+  /** Last notes-list scroll offset (px), restored after a same-tab navigation; absent until set. */
+  notesScrollTop?: number;
 };
 
 export const DEFAULT_TAB_SESSION: TabSessionState = {

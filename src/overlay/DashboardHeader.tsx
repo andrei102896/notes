@@ -56,10 +56,7 @@ export function DashboardHeader({
       <div className="relative z-[1] flex h-[var(--air-cell)] shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2 shadow-[0px_9px_10.3px_rgba(0,0,0,0.52)]">
         <BrandLockup />
       </div>
-      {/* One white frame wraps the whole button strip: bg-background shows as a 3px surround
-          (padding) and as 3px dividers between the blocks (gap), and no button carries a border
-          of its own — so Add Note, the nav bar, Delete Tab and NN all sit inside one frame
-          (design header), the nav bar included. */}
+      {/* One white frame around the whole strip: bg-background is the 3px surround (padding) and dividers (gap); no button has its own border. */}
       <div className="flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
         <Button
           variant="default"
@@ -76,8 +73,7 @@ export function DashboardHeader({
           Add Note
         </Button>
 
-        {/* Nav bar fills the slack (flex-1 → basis 0, overriding the group's w-fit); the
-            Min/Max/Delete buttons grow equally so the slack reads as distance between them. */}
+        {/* Nav bar fills the slack (flex-1 → basis 0 beats w-fit); Min/Max/Delete grow equally so the gap reads as distance between them. */}
         <ButtonGroup className="flex-1 items-stretch gap-0.5 bg-muted [&_button]:h-full [&_button]:flex-1 [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
           <ButtonGroupText className="nn-tab-notes-ribbon shrink-0 whitespace-nowrap rounded-none bg-ribbon pr-4 text-navribbon text-accent-foreground">
             This Tab Notes

@@ -35,14 +35,15 @@ export function BrandLockup(): React.ReactElement {
           <BrandLogo />
         </span>
         <div className="flex items-center justify-center px-2">
-          {/* nudge down 1px — Inter caps sit above the optical center */}
-          <span className="relative top-px font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground">
+          {/* Nudge down ~0.11em: with leading-none, Inter caps sit above the optical center.
+              em-based (not px) so it stays centered at every font size / panel scale. */}
+          <span className="relative top-[0.11em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground">
             Notes for Net
           </span>
         </div>
       </div>
       <div className="flex items-center justify-center bg-chrome-ext px-1 py-1">
-        <span className="relative top-px font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
+        <span className="relative top-[0.11em] font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
           Chrome Extension
         </span>
       </div>

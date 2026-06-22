@@ -154,8 +154,7 @@ export const RichTextBodyEditor = forwardRef<
     <div className="border-b bg-background">
       <div className="relative">
         {showPlaceholder ? (
-          // Inline font-family so it matches the note body (Inter); inline is needed to beat
-          // the ID-scoped global Fjalla One rule, which a utility class can't outrank.
+          // Inline font-family (beats the ID-scoped global Fjalla rule) so the placeholder matches the Inter body.
           <p
             className="pointer-events-none absolute top-3 left-3 m-0 text-sm text-muted-foreground"
             style={{ fontFamily: "var(--font-ui)" }}

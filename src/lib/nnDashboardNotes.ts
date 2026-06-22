@@ -49,29 +49,6 @@ export function noteUrlMatchesBrowserTab(
 }
 
 /**
- * Highlight rule for NOTES-CORE-6:
- * - exact URL match first
- * - stretch goal fallback: same domain (ignoring leading "www.")
- */
-export function noteShouldHighlightForBrowserTab(
-  noteUrl: string,
-  browserTabUrlKey: string,
-): boolean {
-  if (noteUrlMatchesBrowserTab(noteUrl, browserTabUrlKey)) {
-    return true;
-  }
-
-  const trimmed = noteUrl.trim();
-  if (!trimmed) {
-    return false;
-  }
-  const noteHost = parseUrlLike(trimmed)?.hostname.replace(/^www\./i, "") ?? "";
-  const browserHost =
-    parseUrlLike(browserTabUrlKey)?.hostname.replace(/^www\./i, "") ?? "";
-  return noteHost.length > 0 && noteHost === browserHost;
-}
-
-/**
  * Notes belonging to one subject tab (folder).
  */
 export function notesInSubjectTab(
@@ -88,9 +65,7 @@ export function filterNotesByThisTabUrl(
   notes: NNSyncNote[],
   browserTabUrlKey: string,
 ): NNSyncNote[] {
-  return notes.filter((n) =>
-    noteUrlMatchesBrowserTab(n.url, browserTabUrlKey),
-  );
+  return notes.filter((n) => noteUrlMatchesBrowserTab(n.url, browserTabUrlKey));
 }
 
 /**

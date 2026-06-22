@@ -1,20 +1,7 @@
 import React from "react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-function NNLogoForBanner(): React.ReactElement {
-  return (
-    <svg width="62" height="34" viewBox="0 0 62 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="62" height="34" fill="#5F5C5C"/>
-      <path d="M50.9556 26.8984V19.0063C50.9556 15.9378 51.0422 13.7177 51.2604 11.3871L51.1288 11.3579C49.6431 13.3602 47.676 15.4697 45.6224 17.524L36.2684 26.8952H32.4243V8.4292H36.0087V16.1556C36.0087 19.0323 35.9221 21.2816 35.5689 23.7455L35.6554 23.7747C37.0545 21.8829 38.7584 19.9391 40.9437 17.7743L50.3877 8.4292H54.54V26.8984H50.9556Z" fill="white"/>
-      <path d="M8.26172 26.8985V8.54956H12.4417L21.9515 17.8329C24.1541 19.9848 25.8684 21.9155 27.2779 23.7943L27.3679 23.7683C27.0147 21.3174 26.9281 19.0844 26.9281 16.2272V8.54956H30.5367V26.8985H26.6649L17.2451 17.5859C15.1742 15.5446 13.1967 13.448 11.7006 11.4587L11.569 11.4847C11.7872 13.7991 11.8772 16.0029 11.8772 19.0551V26.8953H8.26172V26.8985Z" fill="white"/>
-    </svg>
-  );
-}
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { BrandLockup } from "@/overlay/BrandLockup";
 
 export type PaywallDialogProps = {
   open: boolean;
@@ -22,6 +9,7 @@ export type PaywallDialogProps = {
   trialDaysLeft: number | null;
   trialUnit?: "days" | "minutes";
   onBuy: () => void;
+  onLogin: () => void;
 };
 
 export function PaywallDialog({
@@ -30,23 +18,24 @@ export function PaywallDialog({
   trialDaysLeft,
   trialUnit = "days",
   onBuy,
+  onLogin,
 }: PaywallDialogProps): React.ReactElement {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="top-10 left-20 translate-x-0 translate-y-0 h-11 max-w-none sm:max-w-none w-[calc(100%-5rem)] p-0 rounded-none border-none flex flex-row items-center bg-[#D9D9D9] gap-0"
+        className="top-[4.25rem] right-0 left-0 h-[2.3125rem] w-auto max-w-none translate-x-0 translate-y-0 flex flex-row items-stretch gap-0 overflow-hidden rounded-none border-none bg-[#d9d9d9] p-0 sm:max-w-none"
       >
         <DialogTitle className="sr-only">Notes for Net trial status</DialogTitle>
-        <div className="pl-2">
-          <NNLogoForBanner />
+
+        {/* Same brand header used everywhere else in the app. */}
+        <div className="flex shrink-0 items-center gap-2 pl-2">
+          <BrandLockup />
         </div>
-        <div className="flex flex-1 items-center justify-between px-4">
-          <span className="text-2xl uppercase leading-none text-[#6C6C6C]">
-            N O T E S &nbsp; F O R &nbsp; N E T
-          </span>
-          <span className="text-base uppercase leading-none text-[#646464]">
+
+        <div className="flex flex-1 items-center justify-end px-4">
+          <span className="text-[1rem] uppercase leading-none text-[#646464]">
             {trialDaysLeft !== null
               ? trialUnit === "minutes"
                 ? `TRIAL PERIOD: ${trialDaysLeft}-MINUTE${trialDaysLeft === 1 ? "" : "S"} LEFT`
@@ -54,8 +43,25 @@ export function PaywallDialog({
               : "TRIAL ENDED"}
           </span>
         </div>
+
+        {/* Restore a prior purchase on a fresh install — opens the ExtPay login page. */}
         <button
-          className="flex h-full w-13.5 cursor-pointer items-center justify-center bg-[#FF0404]"
+          className="flex h-full shrink-0 cursor-pointer items-center justify-center px-3"
+          onClick={() => {
+            onLogin();
+            onOpenChange(false);
+          }}
+          aria-label="Log in to restore purchase"
+          type="button"
+        >
+          <span className="text-[1rem] uppercase leading-none text-[#646464] underline">
+            Log in
+          </span>
+        </button>
+
+        {/* BUY — full-height accent button. Functionality unchanged. */}
+        <button
+          className="flex h-full shrink-0 cursor-pointer items-center justify-center bg-accent px-3.5"
           onClick={() => {
             onBuy();
             onOpenChange(false);
@@ -63,8 +69,16 @@ export function PaywallDialog({
           aria-label="Buy now"
           type="button"
         >
-          <span className="text-2xl uppercase leading-none text-white">BUY</span>
+          <span className="text-[1.625rem] uppercase leading-none text-white">
+            BUY
+          </span>
         </button>
+
+        <div className="flex h-full shrink-0 items-center justify-center pr-3 pl-2">
+          <span className="text-[1.5rem] uppercase leading-none text-[#585858]">
+            $5
+          </span>
+        </div>
       </DialogContent>
     </Dialog>
   );

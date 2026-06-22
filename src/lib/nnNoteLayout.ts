@@ -1,8 +1,5 @@
 import type { NNNoteListGroup, NNNoteListLayout } from "@/types/nnData";
 
-/** Matches collapsed header row (`h-10` at default 16px rem) — drag-placeholder height. */
-export const NN_COLLAPSED_NOTE_HEADER_PX = 40;
-
 export function noteListLayoutKey(input: {
   activeSubjectTabId: string | null;
   browserTabUrlKey: string | null;
@@ -16,7 +13,9 @@ export function noteListLayoutKey(input: {
   return null;
 }
 
-export function buildDefaultNoteListLayout(noteIds: string[]): NNNoteListLayout {
+export function buildDefaultNoteListLayout(
+  noteIds: string[],
+): NNNoteListLayout {
   if (noteIds.length === 0) {
     return { groups: [], gapBeforePxByNoteId: {} };
   }
@@ -38,7 +37,9 @@ export function pruneEmptyNoteGroups(layout: NNNoteListLayout): void {
   layout.groups = layout.groups.filter((g) => g.noteIds.length > 0);
 }
 
-export function cloneNoteListLayout(layout: NNNoteListLayout): NNNoteListLayout {
+export function cloneNoteListLayout(
+  layout: NNNoteListLayout,
+): NNNoteListLayout {
   return {
     groups: layout.groups.map((g) => ({
       id: g.id,
@@ -265,17 +266,4 @@ export function resolveNoteListLayout(
 
 export function flattenLayoutNoteIds(layout: NNNoteListLayout): string[] {
   return layout.groups.flatMap((g) => g.noteIds);
-}
-
-export function findNotePlacement(
-  layout: NNNoteListLayout,
-  noteId: string,
-): { groupIndex: number; indexInGroup: number } | null {
-  for (let gi = 0; gi < layout.groups.length; gi++) {
-    const ni = layout.groups[gi].noteIds.indexOf(noteId);
-    if (ni !== -1) {
-      return { groupIndex: gi, indexInGroup: ni };
-    }
-  }
-  return null;
 }

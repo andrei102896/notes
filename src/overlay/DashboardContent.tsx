@@ -2,12 +2,14 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
+import { getTabSession, patchTabSession } from "@/lib/tabSession";
 import { ModalBrandBar } from "@/overlay/NnModalFrame";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
 import { NotesList } from "@/overlay/NotesList";
@@ -84,6 +86,65 @@ export const DashboardContent = forwardRef<
     [],
   );
 
+  // Notes-list scroll restore across navigation: apply the saved offset once when notes first render, never again.
+  const [restoreScrollTop, setRestoreScrollTop] = useState<number | null>(null);
+  const didRestoreScrollRef = useRef(false);
+  const scrollSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getTabSession().then((session) => {
+      if (
+        !cancelled &&
+        session &&
+        typeof session.notesScrollTop === "number" &&
+        session.notesScrollTop > 0
+      ) {
+        setRestoreScrollTop(session.notesScrollTop);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (didRestoreScrollRef.current || restoreScrollTop === null) {
+      return;
+    }
+    const el = notesScrollRef.current;
+    if (!el || notes.length === 0) {
+      return;
+    }
+    el.scrollTop = restoreScrollTop;
+    didRestoreScrollRef.current = true;
+  }, [restoreScrollTop, notes]);
+
+  useEffect(
+    () => () => {
+      if (scrollSaveTimerRef.current) {
+        clearTimeout(scrollSaveTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  // Debounced so a scroll burst sends one patch.
+  function handleNotesScroll(): void {
+    const el = notesScrollRef.current;
+    if (!el) {
+      return;
+    }
+    const top = el.scrollTop;
+    if (scrollSaveTimerRef.current) {
+      clearTimeout(scrollSaveTimerRef.current);
+    }
+    scrollSaveTimerRef.current = setTimeout(() => {
+      patchTabSession({ notesScrollTop: top });
+      scrollSaveTimerRef.current = null;
+    }, 200);
+  }
+
   const [invalidUrlByNoteId, setInvalidUrlByNoteId] = useState<
     Record<string, boolean>
   >({});
@@ -139,6 +200,7 @@ export const DashboardContent = forwardRef<
         <div className="flex min-h-0 flex-1 items-center justify-center p-4">
           <div className="flex w-full flex-col">
             <ModalBrandBar />
+            {/* Figma layout (source of truth): two instructions split by an accent OR — not the single sentence in docs/1_NN_DASHBOARD.txt. Don't collapse. */}
             <div className="flex flex-col gap-6 border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-navmin uppercase leading-tight text-modal-foreground">
               <p>Select a subject tab to view, edit or add notes to</p>
               <p className="text-accent">or</p>
@@ -155,7 +217,11 @@ export const DashboardContent = forwardRef<
       className="nn-dashboard-content-frosted flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
       aria-label="Dashboard content"
     >
-      <div ref={notesScrollRef} className="min-h-0 flex-1 overflow-auto py-4 px-6">
+      <div
+        ref={notesScrollRef}
+        onScroll={handleNotesScroll}
+        className="min-h-0 flex-1 overflow-auto py-4 px-6"
+      >
         {notes.length > 0 ? (
           <NotesList
             notesById={notesById}
