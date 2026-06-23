@@ -28,10 +28,7 @@ function comparableUrlKey(value: string): string | null {
     : hostAndPath;
 }
 
-/**
- * True when the note’s stored URL refers to the same page as the current browser tab
- * (NOTES-CORE-6 exact match; normalized via {@link sessionUrlKey}).
- */
+/** True when the note's stored URL refers to the same page as the current browser tab (NOTES-CORE-6 exact match; normalized via {@link sessionUrlKey}). */
 export function noteUrlMatchesBrowserTab(
   noteUrl: string,
   browserTabUrlKey: string,
@@ -48,9 +45,6 @@ export function noteUrlMatchesBrowserTab(
   return noteKey === browserKey;
 }
 
-/**
- * Notes belonging to one subject tab (folder).
- */
 export function notesInSubjectTab(
   notes: NNSyncNote[],
   subjectTabId: string,
@@ -58,9 +52,7 @@ export function notesInSubjectTab(
   return notes.filter((n) => n.subjectTabId === subjectTabId);
 }
 
-/**
- * Notes whose stored URL matches the host tab (default view when no subject tab is selected).
- */
+/** Notes whose stored URL matches the host tab (default view when no subject tab is selected). */
 export function filterNotesByThisTabUrl(
   notes: NNSyncNote[],
   browserTabUrlKey: string,
@@ -68,10 +60,7 @@ export function filterNotesByThisTabUrl(
   return notes.filter((n) => noteUrlMatchesBrowserTab(n.url, browserTabUrlKey));
 }
 
-/**
- * List content: **no subject tab** → notes for this browser URL (any folder). **Subject tab
- * selected** → all notes in that folder.
- */
+/** List content: no subject tab → notes for this browser URL (any folder); subject tab selected → all notes in that folder. */
 export function visibleNotesForDashboard(input: {
   notes: NNSyncNote[];
   activeSubjectTabId: string | null;

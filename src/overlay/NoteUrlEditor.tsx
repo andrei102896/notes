@@ -88,11 +88,7 @@ type NoteUrlEditorProps = {
   onInteract: () => void;
   formatState?: FormatState;
   onApplyFormat?: (command: "bold" | "italic" | "underline") => void;
-  /**
-   * Trial-ended unpaid mode: URL frozen, anchor cannot be re-picked (but the
-   * existing anchor can still be navigated), Paste hidden, B/I/U disabled.
-   * LINK + COPY + ANCHOR (navigate to existing) remain enabled.
-   */
+  /** Trial-ended unpaid mode: URL frozen, anchor not re-pickable (existing still navigable), Paste hidden, B/I/U off; LINK/COPY/ANCHOR-navigate stay on. */
   isReadOnly?: boolean;
 };
 
@@ -280,8 +276,7 @@ export function NoteUrlEditor({
             }
             disabled={isReadOnly && !anchor}
             onMouseDown={(event) => {
-              // Prevent row-level selection handlers from treating anchor clicks
-              // as note-selection gestures (notably Cmd/Ctrl+click).
+              // Stop row-level selection handlers treating anchor clicks (notably Cmd/Ctrl+click) as note-selection gestures.
               event.stopPropagation();
             }}
             onClick={async (event) => {

@@ -1,12 +1,4 @@
-/**
- * Per-tab-session state: panel open-state + selected subject that follow a single
- * browser tab across navigation and are cleared only when the tab closes
- * (docs/1_NN_DASHBOARD ATTRIBUTES.txt — "single browser tab session").
- *
- * The state lives in `chrome.storage.session`, owned by the background worker and
- * keyed by `tabId` (the worker is the only context that can read `sender.tab.id`).
- * Content script + the React overlay reach it through the message helpers below.
- */
+/** Per-tab-session state (open-state + selected subject) following one browser tab until it closes; lives in chrome.storage.session keyed by tabId, owned by the background worker (only context that can read sender.tab.id) and reached via the message helpers below. */
 
 export type TabSessionState = {
   /** NN is maximized (visible) in this tab. */
@@ -68,11 +60,7 @@ function isTabSessionState(value: unknown): value is TabSessionState {
   );
 }
 
-/**
- * Reads this tab's session from the background. Resolves to `null` when the read fails
- * (no response / malformed reply / invalidated context) so callers can distinguish a
- * failed read from a definitive closed session; a valid reply resolves to that state.
- */
+/** Reads this tab's session from the background; resolves to null on read failure (no/malformed reply, invalidated context) so callers distinguish a failed read from a definitive closed session. */
 export function getTabSession(): Promise<TabSessionState | null> {
   return new Promise((resolve) => {
     try {

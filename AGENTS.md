@@ -2,7 +2,7 @@
 
 Governance + context for ALL agent work on this repo. **Read fully before touching any file.**
 The 2026-06-11 baseline assessment lives in `ASSESSMENT_BRIEF_RO.md` (Romanian, full history); this
-file reflects current state as of 2026-06-21. Treat any documented behavior as unverified until
+file reflects current state as of 2026-06-23. Treat any documented behavior as unverified until
 traced in code.
 
 ---
@@ -60,7 +60,7 @@ src/lib/
   tabSession.ts      Per-tab session type {open, activeSubjectTabId, notesScrollTop?} + GET/SET message helpers
   sanitizeNoteHtml.ts  Allowlist DOMParser sanitizer for note-body HTML
   airSubjectTabs.ts  A–Z helpers     nnDashboardNotes.ts URL match + visibility     pendingNavigation.ts cross-nav anchor/overlay keys
-  subjectTabName.ts 9-char clamp     sessionUrlKey.ts / nnSyncKeys.ts / browsingContextWindow.ts / utils.ts (cn)
+  subjectTabName.ts 8-char clamp     sessionUrlKey.ts / nnSyncKeys.ts / browsingContextWindow.ts / utils.ts (cn)
   extpay.ts          ExtPay singleton — OFF-LIMITS (§7)
 src/overlay/         React UI inside the panel iframe
   App.tsx            Root composition + trial/billing gating (§7 lines OFF-LIMITS)
@@ -69,7 +69,7 @@ src/overlay/         React UI inside the panel iframe
   NotesList.tsx      Static-list dnd (single note only — no multi-drag): flat column, useDraggable, section groups, frozen-snapshot cursor hit-test. The list NEVER reflows during a drag — the grabbed note dims in place and a faithful clone rides the cursor via DragOverlay (portaled to the iframe <body> so the frosted container's backdrop-filter doesn't offset its fixed positioning). Snapshot includes ALL visible rows (incl. the dimmed source) in list-container px (rows scroll together → no scroll offset); plain reorder hit-tests this for a visual slot, mapped back to a dragged-excluded `base` index for placement. Plain reorder shows one thin high-contrast line (#111 + white ring) hugging a row edge (last-of-A vs first-of-B via boundarySide). Cmd/Ctrl = NEW SECTION, ALWAYS appended below all notes (never between sections): a dashed item-sized placeholder box + "create a new section" label + line, pinned under the last note + a 4rem gap; cursor Y ignored. Commit on drop via applyDropPlacement. (~490 lines)
   Note.tsx           Note card; header = drag handle only while title unfocused. Title edits on a CLEAN click (≤4px = PointerSensor distance), not on mousedown (preventDefault'd then focused in onClick) so click+drag moves instead of editing.  NoteUrlEditor.tsx URL row + LINK/ANCHOR/COPY/PASTE
   RichTextBodyEditor.tsx contentEditable + execCommand B/I/U, sanitized; body font = Inter
-  SubjectTabStrip.tsx Rotated strip + click-vs-dblclick     AlphabetIndexRollout.tsx A–Z rail (SELECTED subject's letter = blue, derived from activeSubjectTabId; matching letters hover-cue)
+  SubjectTabStrip.tsx Rotated strip + click-vs-dblclick; wheel-scroll is free, then `scrollend` snaps to the nearest full 3-cell tab (never rests mid-tab)     AlphabetIndexRollout.tsx A–Z rail (SELECTED subject's letter = blue, derived from activeSubjectTabId; matching letters hover-cue)
   BrandLockup.tsx    Shared NN logo/wordmark     NnModalFrame.tsx shared dialog shell + Cancel/OK buttons
   SubjectTab*Dialog.tsx / NoteDeleteConfirmDialog.tsx dialogs (deletes use NO/YES)     PaywallDialog.tsx full-width trial bar (BrandLockup + BUY + $5); wiring OFF-LIMITS (§7)
   styles.css         Tailwind 4 @theme + iframe-injected styles (?inline import)
@@ -91,6 +91,12 @@ Build & load:
 3. `npm run build` → `dist/`
 4. chrome://extensions → Developer mode → Load unpacked → pick the **`dist/`** folder; reload open tabs.
 5. Click the toolbar icon on an http/https page to toggle (silently no-ops on chrome://, Web Store, etc.).
+
+**Iterating:** `npm run dev` (CRXJS) is the live workflow — load `dist/` unpacked once and edits
+hot-reload the extension + open tabs. `npm run build` is the static/production build (and correctness
+gate). **Cross-machine testing (e.g. Windows): `npm run pack`** = build + zip `dist/` →
+`nn-extension-dist.zip` (gitignored). The dev `dist/` is wired to the localhost dev server and will
+NOT run off-machine — always `pack` (a production build) for another machine, then refresh the test tab.
 
 Gates: `npm run typecheck`, `npm run lint` (husky pre-commit runs both). No test script/framework.
 
@@ -172,6 +178,8 @@ trial (`nn_trial_started_at` in `chrome.storage.local`) deliberately resets on u
 - **B/I/U via deprecated `document.execCommand`**, body persisted as `innerHTML`. It now passes
   through `sanitizeNoteHtml.ts` on render/emit/paste (the prior stored-XSS hole is closed) — keep
   that sanitizer in the path for any body-HTML change. Body font is Inter (Fjalla One has no real bold).
+  The prop→DOM `value` sync is **focus-gated** (adopts external `value` only while unfocused) so the
+  async-persist round-trip can't reset `innerHTML` / jump the caret mid-type.
 - **The messaging "protocol" is in-memory** (shared realm; function calls, not postMessage).
   background↔content runtime messages are ad-hoc typed per file.
 - **Sections are layout groups; `gapBeforePxByNoteId` is legacy-only** — deserialized and migrated by
@@ -195,4 +203,6 @@ several unused exports (`setNNSync`, `findNotePlacement`, `noteShouldHighlightFo
 - React function components, forwardRef where needed, props drilled (no context); shadcn primitives in
   `components/ui/`. Path alias `@/` → `src/`. Tailwind 4 utilities + `@theme` tokens in `styles.css`;
   one-off CSS only for host-page-level concerns.
-- Comments: one line where possible, describe what/why — never narrate the change you just made; sparse.
+- Comments: **max one line each** (no multi-line blocks); describe what/why only and **delete
+  self-explanatory ones** (anything that merely restates the code); never narrate the change you just
+  made; sparse.

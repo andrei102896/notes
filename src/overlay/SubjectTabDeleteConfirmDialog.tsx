@@ -12,9 +12,7 @@ export type SubjectTabDeleteConfirmDialogProps = {
   onConfirm: () => void | Promise<void>;
 };
 
-/**
- * SUBJECT-TABS-3 — delete subject tab: confirm before removing tab and its notes.
- */
+/** SUBJECT-TABS-3 — delete subject tab: confirm before removing tab and its notes. */
 export function SubjectTabDeleteConfirmDialog({
   open,
   onOpenChange,

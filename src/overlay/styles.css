@@ -22,7 +22,7 @@ body {
   --text-navlabel: 1.4375rem; /* 23px — ADD NOTE / DELETE TAB (Figma) */
   --text-navmin: 1.3125rem; /* 21px — MIN MAX DELETE (Figma) */
   --text-navribbon: 1.125rem; /* 18px — THIS TAB NOTES (Figma) */
-  --text-add-glyph: 3.5rem; /* 56px — "+" add-tab glyph (Figma 55.77px) */
+  --text-add-glyph: 3.25rem; /* 52px — "+" add-tab glyph (2× the A–Z index letter) */
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 47.4% 11.2%);
   --color-dashboard-frosted: hsl(0 0% 78%);

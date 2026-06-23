@@ -17,9 +17,7 @@ export type SubjectTabAddDialogProps = {
   onConfirm: (name: string) => void | Promise<void>;
 };
 
-/**
- * New subject tab: empty name field, OK / Cancel, empty submit blocked (same flow as rename modal).
- */
+/** New subject tab: empty name field, OK / Cancel, empty submit blocked (same flow as rename modal). */
 export function SubjectTabAddDialog({
   open,
   onOpenChange,

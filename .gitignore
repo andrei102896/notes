@@ -33,3 +33,4 @@ coverage/
 
 # Optional manual packaging artifacts
 *.crx
+*.zip

@@ -22,11 +22,7 @@ export function BrandLogo(): React.ReactElement {
   );
 }
 
-/**
- * The "NN · NOTES FOR NET · CHROME EXTENSION" brand cluster. Shared by the dashboard header
- * top row and the modal header bar. Renders only the cluster — each caller wraps it in its
- * own bar container (the dashboard rides `--air-cell`; modals use a fixed-shadow bar).
- */
+/** Brand cluster shared by the header top row and modal header bar; renders only the cluster, each caller wraps it in its own bar. */
 export function BrandLockup(): React.ReactElement {
   return (
     <>
@@ -35,8 +31,7 @@ export function BrandLockup(): React.ReactElement {
           <BrandLogo />
         </span>
         <div className="flex items-center justify-center px-2">
-          {/* Nudge down ~0.11em: with leading-none, Inter caps sit above the optical center.
-              em-based (not px) so it stays centered at every font size / panel scale. */}
+          {/* Nudge down ~0.11em (em-based, not px) to optically center Inter caps under leading-none at every scale. */}
           <span className="relative top-[0.11em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground">
             Notes for Net
           </span>

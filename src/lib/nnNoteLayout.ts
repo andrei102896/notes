@@ -30,9 +30,7 @@ export function buildDefaultNoteListLayout(
   };
 }
 
-/**
- * Drops section buckets with no notes (preserves order of non-empty groups).
- */
+/** Drops empty section buckets, preserving the order of non-empty groups. */
 export function pruneEmptyNoteGroups(layout: NNNoteListLayout): void {
   layout.groups = layout.groups.filter((g) => g.noteIds.length > 0);
 }
@@ -54,13 +52,7 @@ function sectionId(headNoteId: string): string {
   return `sec-${headNoteId}`;
 }
 
-/**
- * Migration: turn legacy per-note separation gaps into real section groups. Within each
- * group, every note (after the first) carrying a `gapBeforePx` starts a new section, then
- * `gapBeforePxByNoteId` is cleared — sections now carry the separation, not per-note gaps.
- * Deterministic ids keep it idempotent (safe to run on every resolve until a commit clears
- * the gaps). No-op when there are no gaps.
- */
+/** Migrates legacy per-note separation gaps into section groups (a gap-carrying note after the first starts a new section) and clears `gapBeforePxByNoteId`; deterministic ids make it idempotent and safe to run on every resolve. No-op with no gaps. */
 export function splitGroupsAtSeparationGaps(
   layout: NNNoteListLayout,
 ): NNNoteListLayout {
@@ -93,30 +85,13 @@ export function splitGroupsAtSeparationGaps(
   return { groups, gapBeforePxByNoteId: {} };
 }
 
-/**
- * Where a dragged block lands, resolved from drag geometry. All indices reference the
- * BASE layout (the dragged notes already removed), so applying a placement to that base
- * yields exactly the committed result.
- *
- * - `into-group` — insert the block inside an existing section at `indexInGroup`.
- * - `new-group` — insert the block as its own new section at the `groupIndex` slot
- *   (between two sections, or at either end).
- * - `split-group` — the block becomes a new section inside `groupIndex`, splitting it into
- *   a head (before `indexInGroup`) and a tail (from `indexInGroup`).
- */
+/** Where a dragged block lands; all indices reference the BASE layout (dragged notes already removed) so applying a placement reproduces the committed result. into-group: insert at `indexInGroup`; new-group: insert as its own section at the `groupIndex` slot; split-group: split `groupIndex` at `indexInGroup` and insert the block between the head and tail. */
 export type NoteDropPlacement =
   | { kind: "into-group"; groupIndex: number; indexInGroup: number }
   | { kind: "new-group"; groupIndex: number }
   | { kind: "split-group"; groupIndex: number; indexInGroup: number };
 
-/**
- * Maps a flat insertion index (0..N over the base's flattened notes) to a placement.
- *
- * `boundarySide` only matters when `flatIndex` lands on a section boundary in JOIN mode:
- * "above" appends to the section above, "below" prepends to the section below — the caller
- * sets it from the midpoint of the inter-section gap (NOTES-BEHAVIOR-2: one boundary, one
- * decision). It's ignored inside a section and in new-section mode. Pure.
- */
+/** Maps a flat insertion index (0..N over the base's flattened notes) to a placement; `boundarySide` only matters at a section boundary in JOIN mode ("above" appends to the section above, "below" prepends to the one below, set from the inter-section gap midpoint per NOTES-BEHAVIOR-2) and is ignored inside a section and in new-section mode. Pure. */
 export function resolveDropPlacement(
   base: NNNoteListLayout,
   flatIndex: number,
@@ -136,7 +111,7 @@ export function resolveDropPlacement(
     if (k < offset + size) {
       const indexInGroup = k - offset;
       if (indexInGroup === 0) {
-        // Leading edge of group gi. For gi>0 this is also the boundary with gi-1.
+        // Leading edge of group gi; for gi>0 this is also the boundary with gi-1.
         if (asNewSection) {
           return { kind: "new-group", groupIndex: gi };
         }
@@ -169,11 +144,7 @@ export function resolveDropPlacement(
   };
 }
 
-/**
- * Inserts `ids` into a clone of `base` at `placement`. New section ids derive from their
- * head note (unique per layout, so no churn across re-previews). Pure — does not mutate
- * `base`. The result is exactly what gets committed, so preview and drop never disagree.
- */
+/** Inserts `ids` into a clone of `base` at `placement` (pure, no mutation); new section ids derive from the head note so previews don't churn and preview matches the committed drop. */
 export function applyDropPlacement(
   base: NNNoteListLayout,
   placement: NoteDropPlacement,
@@ -214,9 +185,7 @@ export function applyDropPlacement(
   return next;
 }
 
-/**
- * Ensures each visible note appears exactly once; drops stale ids; appends new notes in sync order.
- */
+/** Ensures each visible note appears exactly once; drops stale ids; appends new notes in sync order. */
 export function resolveNoteListLayout(
   visibleNoteIdsInSyncOrder: string[],
   stored: NNNoteListLayout | undefined,
@@ -260,7 +229,7 @@ export function resolveNoteListLayout(
   if (next.groups.length === 0) {
     return buildDefaultNoteListLayout(visibleNoteIdsInSyncOrder);
   }
-  // Sections are groups. Migrate any legacy per-note gaps into section groups.
+  // Migrate any legacy per-note gaps into section groups.
   return splitGroupsAtSeparationGaps(next);
 }
 

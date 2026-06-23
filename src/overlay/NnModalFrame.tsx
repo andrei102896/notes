@@ -9,11 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { BrandLockup } from "@/overlay/BrandLockup";
 
-/**
- * Modal header bar: the NN brand lockup on the gray header band (Figma HEADER BOX —
- * #686868 / --color-air-box, drop shadow). Shared by the modal frame and the inline
- * empty-state panel so both match the dashboard's top header.
- */
+/** Modal header bar: NN brand lockup on the gray header band (Figma HEADER BOX); shared by the modal frame and the inline empty-state panel. */
 export function ModalBrandBar(): React.ReactElement {
   return (
     <div className="flex shrink-0 items-center justify-center gap-2 border-x border-t border-accent bg-air-box px-2 py-1.5 shadow-[0px_4px_6.5px_rgba(0,0,0,0.25)]">
@@ -32,11 +28,7 @@ type NnModalFrameProps = {
   children: React.ReactNode;
 };
 
-/**
- * Shared modal shell (Figma MODAL BG): dark #3C3C3C panel, 7px accent border, NN brand
- * header bar, then a padded body. Reuses the base Dialog primitive; non-modal + portaled
- * into the overlay host like the dialogs it replaces. No close (X) — actions use CANCEL.
- */
+/** Shared modal shell (Figma MODAL BG): 7px accent border, brand header, padded body; portaled into the overlay host, no close (X) — actions use CANCEL. */
 export function NnModalFrame({
   open,
   onOpenChange,
@@ -56,8 +48,7 @@ export function NnModalFrame({
         <DialogTitle className="sr-only">{title}</DialogTitle>
         <DialogDescription className="sr-only">{title}</DialogDescription>
         <ModalBrandBar />
-        {/* No border under the header (its shadow separates it); thick 7px frame on the
-            content's sides + bottom only. */}
+        {/* No top border (header shadow separates it); 7px frame on sides + bottom only. */}
         <div className="flex flex-col gap-4 border-x-[7px] border-b-[7px] border-accent bg-modal px-6 py-5">
           {children}
         </div>

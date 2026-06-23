@@ -241,9 +241,7 @@ function cancelAnchorPick(requestId: string): void {
   });
 }
 
-/**
- * Registers the content-side dispatcher. Call once from the content script entry.
- */
+/** Registers the content-side dispatcher; call once from the content script entry. */
 export function registerContentPanelHost(): () => void {
   return subscribePanelToContentRequests((message) => {
     if (!isPanelToContentMessage(message)) {
@@ -302,9 +300,7 @@ export type ContentPanelClient = {
   ) => Promise<{ elementFound: boolean }>;
 };
 
-/**
- * Panel-side API. Only works after {@link registerContentPanelHost} runs (content script).
- */
+/** Panel-side API; only works after {@link registerContentPanelHost} runs (content script). */
 export function getContentPanelClient(): ContentPanelClient {
   function waitForResponse<R>(
     requestId: string,

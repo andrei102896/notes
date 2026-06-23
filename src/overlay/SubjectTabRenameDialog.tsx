@@ -18,9 +18,7 @@ export type SubjectTabRenameDialogProps = {
   onConfirm: (name: string) => void | Promise<void>;
 };
 
-/**
- * SUBJECT-TABS-2 — double-click rename: pre-filled name, OK / Escape+Cancel, empty blocked.
- */
+/** SUBJECT-TABS-2 — double-click rename: pre-filled name, OK / Escape+Cancel, empty blocked. */
 export function SubjectTabRenameDialog({
   open,
   onOpenChange,

@@ -496,9 +496,7 @@ export async function ensureNNSyncInitialized(): Promise<NNSyncPayload> {
   return getNNSync();
 }
 
-/**
- * Adds a subject tab folder. Empty / whitespace-only names are ignored (returns null).
- */
+/** Adds a subject tab folder; empty / whitespace-only names are ignored (returns null). */
 export async function addSubjectTab(
   name: string,
 ): Promise<NNSubjectTab | null> {
@@ -516,9 +514,7 @@ export async function addSubjectTab(
   return newTab;
 }
 
-/**
- * Renames an existing subject tab. Empty / whitespace-only names are ignored (no-op).
- */
+/** Renames an existing subject tab; empty / whitespace-only names are ignored (no-op). */
 export async function renameSubjectTab(
   subjectTabId: string,
   name: string,
@@ -537,9 +533,7 @@ export async function renameSubjectTab(
   await setMeta({ ...meta, subjectTabs: nextTabs });
 }
 
-/**
- * Removes a subject tab and all notes that belong to it.
- */
+/** Removes a subject tab and all notes that belong to it. */
 export async function deleteSubjectTab(subjectTabId: string): Promise<void> {
   const meta = await getMeta();
   const index = await getIndex();
@@ -573,9 +567,7 @@ export async function deleteSubjectTab(subjectTabId: string): Promise<void> {
   }
 }
 
-/**
- * Creates a new note at the top of the global note list, expanded by default.
- */
+/** Creates a new note at the top of the global note list, expanded by default. */
 export async function addNote(input: {
   subjectTabId: string;
   url: string;
@@ -609,9 +601,7 @@ export async function addNote(input: {
   return newNote;
 }
 
-/**
- * Updates editable note fields. Unknown note id is a no-op.
- */
+/** Updates editable note fields; unknown note id is a no-op. */
 export async function updateNote(
   noteId: string,
   patch: Partial<
@@ -640,9 +630,7 @@ export async function updateNote(
   await storageService.sync.setMany({ [key]: next });
 }
 
-/**
- * Sets `isExpanded` on a batch of notes in a single write.
- */
+/** Sets `isExpanded` on a batch of notes in a single write. */
 export async function setNotesExpanded(
   noteIds: string[],
   expanded: boolean,
@@ -660,9 +648,7 @@ export async function setNotesExpanded(
   }
 }
 
-/**
- * Deletes one note by id. Unknown note id is a no-op.
- */
+/** Deletes one note by id; unknown note id is a no-op. */
 export async function deleteNote(noteId: string): Promise<void> {
   const index = await getIndex();
   if (!index.noteIds.includes(noteId)) {
@@ -674,10 +660,7 @@ export async function deleteNote(noteId: string): Promise<void> {
   await pruneNoteFromAllLayouts(noteId);
 }
 
-/**
- * Reorders a subset of notes (identified by `newOrderedIds`) within the global index,
- * preserving the relative positions of notes not in the subset.
- */
+/** Reorders the subset in `newOrderedIds` within the global index, preserving the relative positions of notes not in the subset. */
 export async function reorderNotes(newOrderedIds: string[]): Promise<void> {
   const index = await getIndex();
   const notes = await loadAllNotesInIndexOrder(index);
@@ -685,9 +668,7 @@ export async function reorderNotes(newOrderedIds: string[]): Promise<void> {
   await setIndex({ ...index, noteIds: reordered.map((n) => n.id) });
 }
 
-/**
- * Persists section layout + gap metadata and matches global note order to the flattened layout.
- */
+/** Persists section layout + gap metadata and matches global note order to the flattened layout. */
 export async function commitNoteListLayout(
   layoutKey: string,
   layout: NNNoteListLayout,

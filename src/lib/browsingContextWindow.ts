@@ -1,7 +1,4 @@
-/**
- * When the dashboard runs inside a same-origin `about:blank` iframe, `window` is
- * the iframe; the tab URL and navigation live on `window.top`.
- */
+/** In the same-origin `about:blank` iframe, `window` is the iframe; tab URL/navigation live on `window.top`. */
 export function browsingContextWindowForTabUrl(): Window {
   try {
     const topWin = window.top;

@@ -136,11 +136,7 @@ export function App(): React.ReactElement {
     }
   }, []);
 
-  /**
-   * Read-only mode kicks in once local 7-day trial is over and the user has
-   * not paid yet. Trial persistence is intentionally local only (extension
-   * storage), so uninstall/reinstall resets the trial as requested.
-   */
+  // Read-only once the local 7-day trial ends unpaid; trial is local-only storage, so reinstall resets it (intentional).
   const isReadOnly = isExtPayConfigured && !isUserPaid && !isOnActiveTrial;
 
   useEffect(() => {
@@ -254,6 +250,8 @@ export function App(): React.ReactElement {
             return;
           }
           patchSession({ activeSubjectTabId: id });
+          // Bring a partially-hidden tab fully into view on select (no-op if already visible).
+          subjectTabStripRef.current?.scrollToTab(id);
         }}
         onCreateTab={async (name) => {
           if (isReadOnly) {

@@ -90,7 +90,6 @@ class StorageService {
     return area.get(keys) as Promise<Record<string, unknown>>;
   }
 
-  /** Batch write for dynamic sync keys. */
   async setMany(
     namespace: StorageNamespace,
     items: Record<string, unknown>,
@@ -102,7 +101,6 @@ class StorageService {
     await area.set(items);
   }
 
-  /** Batch remove for dynamic sync keys. */
   async removeMany(namespace: StorageNamespace, keys: string[]): Promise<void> {
     if (keys.length === 0) {
       return;

@@ -45,12 +45,7 @@ function scrollTriggerFullyIntoView(
   }
 }
 
-/**
- * Pin a trigger to the TOP of the strip (just under the '+'), so the tabs for a
- * clicked A–Z letter "cue up" from the top (AIR-2 / doc 4_NN_AI), even when the
- * tab is already visible mid-strip. `offsetTop` is the pre-transform layout box,
- * so the rotated triggers still align to a `snap-start` point.
- */
+/** Pin a trigger to the TOP of the strip so a clicked A–Z letter's tabs "cue up" from the top (AIR-2); offsetTop is the pre-transform box so rotated triggers still align to snap-start. */
 function scrollTriggerToTop(
   container: HTMLDivElement,
   trigger: HTMLElement,
@@ -69,18 +64,11 @@ type SubjectTabStripProps = {
     subjectTabId: string,
     name: string,
   ) => void | Promise<void>;
-  /**
-   * Trial-ended unpaid mode: disables tab creation and rename. Tab selection
-   * still works so the user can browse existing subjects.
-   */
+  /** Trial-ended unpaid mode: disables tab creation/rename; selection still works to browse. */
   isReadOnly?: boolean;
 };
 
-/**
- * Vertical subject tab column: fixed width, uppercase labels rotated 90° clockwise,
- * bright blue active state, dark inactive panels, white hairline borders (SUBJECT-TABS-5).
- * Built on shadcn Tabs (Radix) for triggers + semantics; note list stays in {@link DashboardContent}.
- */
+/** Vertical subject tab column (SUBJECT-TABS-5): labels rotated 90° cw, built on shadcn Tabs (Radix); note list stays in {@link DashboardContent}. */
 export const SubjectTabStrip = forwardRef<
   SubjectTabStripHandle,
   SubjectTabStripProps
@@ -178,6 +166,38 @@ export const SubjectTabStrip = forwardRef<
     clearPendingDeselect();
   }, [activeSubjectTabId]);
 
+  // On scrollend, snap to the nearest 3-cell tab boundary (doc 2: never rest mid-tab); ends clamp to 0/maxScroll so the first/last tab is fully revealed and A–Z-aligned.
+  useEffect(() => {
+    const el = tabsScrollAreaRef.current;
+    if (el === null) {
+      return;
+    }
+    const onScrollEnd = () => {
+      const first = el.querySelector<HTMLElement>('[data-slot="tabs-trigger"]');
+      if (first === null) {
+        return;
+      }
+      const tabHeight = first.getBoundingClientRect().height;
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      if (tabHeight <= 0 || maxScroll <= 0) {
+        return;
+      }
+      let target: number;
+      if (el.scrollTop < tabHeight / 2) {
+        target = 0;
+      } else if (maxScroll - el.scrollTop < tabHeight / 2) {
+        target = maxScroll;
+      } else {
+        target = Math.round(el.scrollTop / tabHeight) * tabHeight;
+      }
+      if (Math.abs(target - el.scrollTop) > 1) {
+        el.scrollTo({ top: target, behavior: "smooth" });
+      }
+    };
+    el.addEventListener("scrollend", onScrollEnd);
+    return () => el.removeEventListener("scrollend", onScrollEnd);
+  }, []);
+
   return (
     <>
       <SubjectTabAddDialog
@@ -242,7 +262,7 @@ export const SubjectTabStrip = forwardRef<
         >
           <div
             ref={tabsScrollAreaRef}
-            className="mx-auto flex min-h-0 min-w-10 flex-1 snap-y snap-mandatory flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
+            className="mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
           >
             <TabsList>
               {sortedTabs.map((tab) => (
@@ -279,7 +299,8 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 snap-start justify-start leading-tight rotate-90 translate-x-[2.5rem] origin-top-left"
+                  /* first:border-l-0 clears the line above the first subject; -translate-y-px lifts the top-edge line by 1px onto the A–Z cell's bottom border. */
+                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 snap-start justify-start leading-tight rotate-90 translate-x-[2.5rem] -translate-y-px origin-top-left first:border-l-0"
                 >
                   {tab.name.toUpperCase()}
                 </TabsTrigger>
@@ -288,14 +309,11 @@ export const SubjectTabStrip = forwardRef<
           </div>
         </Tabs>
 
-        {/* Bottom spacer = 1 air-cell. The strip has 26 cells; the '+' takes 1, leaving 25
-            for the scroll viewport, but tabs are 3 cells each. Reserving this last cell makes
-            the scroll viewport 24 cells (8×3), so the bottom of the scroll range lands on a
-            snap point and the last subject tab rests aligned with the A–Z box lines. */}
-        <div
+        {/* Bottom spacer (1 air-cell): scroll viewport = 24 cells (8×3) so the last tab aligns with the A–Z box rows. */}
+        {/* <div
           aria-hidden
           className="nn-dashboard-content-frosted h-[var(--air-cell)] w-full shrink-0"
-        />
+        /> */}
       </div>
     </>
   );

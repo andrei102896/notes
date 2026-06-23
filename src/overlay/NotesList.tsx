@@ -27,10 +27,8 @@ import type {
   NNSyncNote,
 } from "@/types/nnData";
 
-/** Section separation between groups — roughly a full collapsed-note slot (Figma "space equivalent
-    to a collapse note", doc 3_NN_NOTES). */
+/** Section gap ≈ a collapsed-note slot (Figma "space equivalent to a collapse note", doc 3_NN_NOTES). */
 const SECTION_GAP_CLASS = "mt-[4rem]";
-/** Spacing between notes inside the same section. */
 const NOTE_GAP_CLASS = "mt-4";
 
 /** Drop hysteresis (px): cursor must clear a row midpoint by this to switch slots — tolerance, no flicker. */
@@ -44,14 +42,13 @@ type DropIndicator = {
   top: number;
   /** Inset the line — marks "first of the section below". */
   indent: boolean;
-  /** Cmd/Ctrl: render a dashed item-sized placeholder box (new section) instead of a bare line. */
+  /** Cmd/Ctrl: dashed item-sized placeholder box (new section) instead of a bare line. */
   isSection: boolean;
-  /** Placeholder height for the new-section box (px); 0 for the plain reorder line. */
+  /** New-section box height (px); 0 for the plain reorder line. */
   boxHeight: number;
   label: string | null;
 };
 
-/** Flat render unit: a note id plus the leading-margin class for its position. */
 type FlatEntry = { noteId: string; marginClass: string };
 
 /** Walks the layout into flat render order, tagging each note's leading margin. */
@@ -158,8 +155,7 @@ function DraggableNoteRow({
     disabled: isReadOnly,
   });
 
-  // The row never moves during a drag; while it's the active note it dims in place and the
-  // DragOverlay renders the clone that follows the cursor. setNodeRef applies no transform.
+  // Row never moves during a drag: active note dims in place, the DragOverlay clone follows the cursor (no transform).
   return (
     <div
       ref={setNodeRef}
@@ -238,9 +234,7 @@ export function NotesList({
   /** Section gap (SECTION_GAP_CLASS = 4rem) in px, captured at drag start — positions the new-section placeholder. */
   const sectionGapPxRef = useRef(0);
 
-  // Reads every visible row's vertical extent in list-container px, once at drag start — including
-  // the dragged note (it stays in place, dimmed), so the insertion line tracks the cursor across
-  // it. The list never reflows during a drag, so this stays valid.
+  // Freezes every visible row's extent (incl. the dimmed dragged note) at drag start; list never reflows mid-drag, so it stays valid.
   const takeSnapshot = useCallback(() => {
     const container = listContainerRef.current;
     if (!container) {
@@ -264,8 +258,7 @@ export function NotesList({
     snapshotRef.current = rows;
   }, []);
 
-  // Resolves the drop slot from the frozen snapshot by hit-testing the cursor, stores the reorder
-  // for commit, and positions the insertion line. The live list never reorders (drop-only).
+  // Hit-tests the cursor against the frozen snapshot to resolve the drop slot, stores the reorder for commit, positions the line; list reorders on drop only.
   const applyPreview = useCallback((probeY: number) => {
     const base = baseLayoutRef.current;
     const snap = snapshotRef.current;
@@ -273,12 +266,10 @@ export function NotesList({
     if (!base || !snap || id === null) {
       return;
     }
-    // Cmd/Ctrl: a new section is always appended BELOW all existing notes (never between sections).
-    // The placeholder is pinned under the last visible note + a section gap; cursor Y is ignored.
+    // Cmd/Ctrl: new section always appended BELOW all notes (never between); placeholder pinned under last note + a gap, cursor Y ignored.
     if (separateOnDropRef.current) {
       lastFlatIndexRef.current = null;
-      // Sole item of the last section already IS its own bottom section — a new one would be
-      // identical (its emptied group is pruned), so it's a no-op: no placeholder, no change.
+      // Sole item of the last section already is its own bottom section — a new one is identical (no-op).
       const groups = layoutRef.current.groups;
       const last = groups[groups.length - 1];
       if (last && last.noteIds.length === 1 && last.noteIds[0] === id) {
@@ -315,8 +306,7 @@ export function NotesList({
       return;
     }
 
-    // Plain reorder: hit-test among ALL visible rows (incl. the dimmed dragged note) so the line
-    // follows the cursor even past the dragged note.
+    // Plain reorder: hit-test among ALL visible rows (incl. the dimmed dragged note) so the line follows the cursor past it.
     let visualIndex = 0;
     while (visualIndex < snap.length && snap[visualIndex].mid < y) {
       visualIndex++;
@@ -390,14 +380,11 @@ export function NotesList({
   }, [noteLayout]);
 
   useEffect(() => {
-    // ownerDocument is the iframe's document — its <body> is outside the frosted container, so the
-    // DragOverlay's fixed positioning resolves against the iframe viewport (no offset).
+    // Iframe <body> is outside the frosted container, so the DragOverlay's fixed positioning resolves against the iframe viewport (no offset).
     setOverlayHost(listContainerRef.current?.ownerDocument.body ?? null);
   }, []);
 
-  // "New section" mode tracks the LIVE Ctrl/Cmd state during a drag, so it engages whether the
-  // modifier was held at drag start or pressed (or released) mid-drag. Key events catch a
-  // stationary press; pointermove (capture, to beat dnd-kit) covers the moving case.
+  // "New section" tracks LIVE Ctrl/Cmd during the drag: key events catch a stationary press; pointermove (capture, to beat dnd-kit) the moving case.
   useEffect(() => {
     if (activeId === null) {
       return;
@@ -448,12 +435,10 @@ export function NotesList({
     lastPointerContentYRef.current = null;
     lastFlatIndexRef.current = null;
 
-    // Ctrl/Cmd held at drag start → this note becomes its own new section on drop. The live
-    // key listener keeps this in sync if toggled mid-drag.
+    // Ctrl/Cmd at drag start → own new section on drop; live key listener keeps this in sync if toggled mid-drag.
     separateOnDropRef.current = Boolean(activator.ctrlKey || activator.metaKey);
 
-    // Base = current layout minus the dragged note. The live preview is rebuilt from this on each
-    // move, so it always equals what gets committed on drop.
+    // Base = current layout minus the dragged note; preview rebuilds from this each move, so it equals what commits on drop.
     draggedSetRef.current = new Set([id]);
     const base = cloneNoteListLayout(layoutRef.current);
     for (const g of base.groups) {
@@ -558,8 +543,7 @@ export function NotesList({
     );
   };
 
-  // The grabbed note's faithful clone that rides the cursor. dnd-kit sizes the overlay wrapper to
-  // the dragged row's measured rect, so the read-only Note fills the column width.
+  // Cursor-riding clone; dnd-kit sizes the overlay wrapper to the dragged row's rect, so the read-only Note fills the column.
   const renderDragClone = (): React.ReactNode => {
     const note = activeId ? notesById.get(activeId) : undefined;
     if (!note) {
@@ -590,8 +574,7 @@ export function NotesList({
     );
   };
 
-  // The list renders in stable order during a drag (no reflow); the active note dims in place and a
-  // single static line marks the resolved drop slot.
+  // Stable render order during a drag (no reflow): active note dims in place, a single static line marks the resolved drop slot.
   const renderRows = (): React.ReactNode => {
     const rows = buildFlatEntries(layout).map(({ noteId, marginClass }) =>
       renderNoteRow(noteId, marginClass, noteId === activeId),
@@ -601,7 +584,7 @@ export function NotesList({
         {rows}
         {indicator &&
           (indicator.isSection ? (
-            // New-section placeholder: a dashed item-sized box (where the note lands) + a line under it.
+            // New-section placeholder: dashed item-sized box (where the note lands) + a line under it.
             <div
               aria-hidden
               className="pointer-events-none absolute right-0 left-0 z-20"
@@ -641,8 +624,7 @@ export function NotesList({
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      {/* Flat column; section separation is each section head's leading margin. Relative so the
-          insertion line positions against it. */}
+      {/* Flat column; section separation is each head's leading margin. Relative so the insertion line positions against it. */}
       <div ref={listContainerRef} className="relative m-0 flex flex-col p-0">
         {renderRows()}
       </div>

@@ -1,19 +1,4 @@
-/**
- * Note-body HTML sanitizer (doc 3_NN_NOTES: the body only supports Bold / Italic
- * / Underline formatting).
- *
- * The contentEditable note body is stored raw and re-injected via `innerHTML`
- * (see {@link file://./../overlay/RichTextBodyEditor.tsx}), and the native paste
- * inserts arbitrary markup — a stored-XSS vector (e.g. a pasted
- * `<img onerror=…>` runs on whichever page later renders the note). We sanitize
- * at every trust boundary (render, save, paste) down to a strict allowlist with
- * NO attributes, so no event handlers, URLs, or inline styles can survive.
- *
- * Implemented with an inert `DOMParser` document — `parseFromString(…, "text/html")`
- * builds a detached tree that never executes scripts or loads resources — plus a
- * tree walk. This avoids bundling a sanitizer library into the content script that
- * is injected on every page, while keeping the audited surface tiny.
- */
+/** Note-body sanitizer: raw HTML re-injected via innerHTML is a stored-XSS vector, so at every trust boundary (render/save/paste) an inert DOMParser tree is walked down to a no-attribute allowlist (B/I/U formatting only). */
 
 /** Formatting tags we keep; everything else is unwrapped to its text. */
 const ALLOWED_TAGS = new Set(["B", "STRONG", "I", "EM", "U", "P", "DIV", "BR"]);

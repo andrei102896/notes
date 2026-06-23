@@ -19,6 +19,8 @@ import {
 } from "@/overlay/RichTextBodyEditor";
 import type { NNCopiedNote, NNSyncNote } from "@/types/nnData";
 
+const NOTE_HEADING_MAX_LEN = 50;
+
 type NoteProps = {
   note: NNSyncNote;
   activeSubjectTabId: string | null;
@@ -104,6 +106,7 @@ export function Note({
             type="text"
             aria-label="Note heading"
             data-note-title
+            maxLength={NOTE_HEADING_MAX_LEN}
             value={headingDraft}
             readOnly={isReadOnly}
             onChange={(event) => {
@@ -126,8 +129,7 @@ export function Note({
               }
             }}
             onMouseDown={(event) => {
-              // Don't focus on press — let a clear drag (>activation distance) move the note. A clean
-              // click (no drag) focuses via onClick below, so click+drag never starts title editing.
+              // Don't focus on press so a drag (>activation distance) moves the note; a clean click focuses via onClick, so click+drag never edits the title.
               if (!headingFocused && !isReadOnly) {
                 event.preventDefault();
               }

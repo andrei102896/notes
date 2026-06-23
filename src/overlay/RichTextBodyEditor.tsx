@@ -42,14 +42,15 @@ export const RichTextBodyEditor = forwardRef<
 
   useEffect(() => {
     const editor = editorRef.current;
-    if (!editor) {
+    // While focused the contentEditable is the source of truth; adopt external values only when unfocused, else innerHTML resets and the caret jumps.
+    if (!editor || isFocused) {
       return;
     }
     const safe = sanitizeNoteHtml(value);
     if (editor.innerHTML !== safe) {
       editor.innerHTML = safe;
     }
-  }, [value]);
+  }, [value, isFocused]);
 
   const emitValue = useCallback(() => {
     const editor = editorRef.current;
@@ -74,8 +75,7 @@ export const RichTextBodyEditor = forwardRef<
       onFormatStateChange({ bold: false, italic: false, underline: false });
       return;
     }
-    // Sticky enter-state is only for caret typing continuation. If user
-    // selects text, toolbar must reflect real formatting of that selection.
+    // Sticky enter-state is only for caret typing continuation; a real selection must reflect its own formatting.
     if (pendingEnterFormatRef.current && range && !range.collapsed) {
       pendingEnterFormatRef.current = null;
     }
@@ -111,8 +111,7 @@ export const RichTextBodyEditor = forwardRef<
         ...baseState,
         [command]: !baseState[command],
       };
-      // After Enter, keep explicit user toggles in the sticky state so
-      // toggling one format does not accidentally clear another one in the UI.
+      // Keep explicit toggles in the post-Enter sticky state so toggling one format doesn't clear another in the UI.
       pendingEnterFormatRef.current = nextState;
       editor.focus();
       doc.execCommand(command);
@@ -196,8 +195,7 @@ export const RichTextBodyEditor = forwardRef<
             if (!data || !doc) {
               return;
             }
-            // Never let raw clipboard markup reach the live DOM: sanitize HTML to
-            // the B/I/U subset, or insert plain text verbatim. onInput then emits.
+            // Never let raw clipboard markup reach the DOM: sanitize HTML to the B/I/U subset, else insert plain text (onInput emits).
             event.preventDefault();
             const html = data.getData("text/html");
             if (html) {
@@ -230,8 +228,7 @@ export const RichTextBodyEditor = forwardRef<
                   pendingEnterFormatRef.current ?? formatStateFromSelection(win, editor);
                 editor.focus();
                 doc.execCommand("insertParagraph");
-                // Prevent inherited inline styles (eg. bold ancestor) from leaking
-                // into the new line when toolbar state says otherwise.
+                // removeFormat stops inherited inline styles (eg. a bold ancestor) leaking into the new line against toolbar state.
                 doc.execCommand("removeFormat");
                 applyTypingStyle(doc, desiredState);
                 pendingEnterFormatRef.current = desiredState;

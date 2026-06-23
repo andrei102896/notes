@@ -1,7 +1,4 @@
-/**
- * Typed, versioned messages between the content-script host and the overlay panel.
- * Bump {@link CONTENT_PANEL_PROTOCOL_VERSION} when changing payloads or semantics.
- */
+/** Versioned content-host ↔ overlay-panel messages; bump {@link CONTENT_PANEL_PROTOCOL_VERSION} on payload/semantics changes. */
 export const CONTENT_PANEL_PROTOCOL_VERSION = 1 as const;
 
 export type ProtocolVersion = typeof CONTENT_PANEL_PROTOCOL_VERSION;

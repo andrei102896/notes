@@ -1,11 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
-/**
- * Register custom @theme text sizes applied as `text-*` utilities so twMerge
- * treats them as font-sizes (else it drops them next to a `text-*` color class).
- * Header tokens are intentionally omitted — the header is left exactly as-is.
- */
+/** Register @theme text sizes as font-sizes so twMerge keeps them next to a `text-*` color; header tokens intentionally omitted. */
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {

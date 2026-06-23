@@ -85,12 +85,7 @@ chrome.action.onClicked.addListener((tab) => {
   });
 });
 
-/**
- * On install/update the previously-injected content scripts in already-open tabs
- * are orphaned (their extension context is invalidated), so the toolbar toggle
- * stops working until the tab is reloaded. Re-inject the page content script into
- * existing http(s) tabs so the toggle keeps working without a manual refresh.
- */
+/** On install/update, open tabs' content scripts are orphaned (toggle dies until reload); re-inject into existing http(s) tabs so the toggle works without a refresh. */
 async function reinjectContentScriptsIntoOpenTabs(): Promise<void> {
   const contentScripts = chrome.runtime.getManifest().content_scripts ?? [];
   for (const script of contentScripts) {

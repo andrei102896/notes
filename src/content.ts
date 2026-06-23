@@ -14,10 +14,7 @@ import {
 } from "@/messaging/contentPanelBridge";
 import { mountOverlayApp } from "@/overlay/mountOverlayApp";
 
-/**
- * Radix's a11y check reads the host doc, not our iframe dialogs — false positive.
- * Filter only those two messages.
- */
+/** Radix's a11y check reads the host doc, not our iframe dialogs — filter only those two false-positive messages. */
 function suppressRadixCrossRealmDialogWarnings(): void {
   const SUPPRESS_FLAG = "__nnRadixDialogWarningsSuppressed";
   const flags = window as unknown as Record<string, boolean>;
@@ -51,13 +48,7 @@ function suppressRadixCrossRealmDialogWarnings(): void {
   };
 }
 
-/**
- * Dev-only: CRXJS's HMR client (vendor/crx-client-port.js) keeps posting to the
- * runtime port from content scripts orphaned by an extension reload, flooding the
- * page console with "Extension context invalidated". This is harmless dev noise
- * (absent from production builds); swallow only that message so real errors stay
- * visible. Existing orphaned tabs clear on the next page reload.
- */
+/** Dev-only: CRXJS HMR client floods orphaned content scripts with harmless "Extension context invalidated"; swallow only that message. */
 function suppressExtensionContextInvalidatedDevErrors(): void {
   const matches = (text: unknown): boolean =>
     typeof text === "string" && text.includes("Extension context invalidated");
@@ -92,13 +83,7 @@ if (import.meta.env.DEV) {
 
 registerContentPanelHost();
 
-/**
- * Panel sizing calibration (the one source of truth). At REFERENCE_VIEWPORT_PX the panel is
- * REFERENCE_PANEL_WIDTH_PX wide and the iframe root font-size is BASE_ROOT_FONT_PX, so every
- * design px renders 1:1. Width scales proportionally with the viewport; the iframe root
- * font-size is the single "knob" the rem-based overlay UI rides. Clamps bind only on very
- * small / very large viewports.
- */
+/** Panel sizing calibration (one source of truth): at REFERENCE_VIEWPORT_PX renders 1:1; width scales proportionally and iframe root font-size is the single knob the rem-based UI rides. */
 const REFERENCE_PANEL_WIDTH_PX = 686;
 const REFERENCE_VIEWPORT_PX = 1920;
 const PANEL_MIN_WIDTH_PX = 480;
@@ -139,14 +124,7 @@ const PENDING_ANCHOR_SCROLL_DELAY_MS = 200;
 /** Upper bound when `scrollend` is missing or smooth scroll is still running. */
 const PENDING_ANCHOR_SCROLL_SETTLE_MS = 1500;
 
-/**
- * Resolves when the current pending anchor scroll finishes (or immediately if
- * there is no pending scroll).  Used by `showOverlayWhenReady` to defer the
- * overlay open until the page has scrolled to position.
- *
- * Created eagerly by `initPendingAnchorScroll` so that `showOverlayWhenReady`
- * called shortly after always waits on the correct promise.
- */
+/** Resolves when the pending anchor scroll finishes; created eagerly by initPendingAnchorScroll so showOverlayWhenReady defers the open until scrolled. */
 let anchorScrollDonePromise: Promise<void> = Promise.resolve();
 let resolveAnchorScrollDone: (() => void) | null = null;
 
@@ -295,8 +273,7 @@ function removeLoadingVeil(): void {
 }
 
 function initPendingAnchorScroll(): void {
-  // Create the promise eagerly BEFORE any async work so that overlay-open
-  // paths that arrive later (background OPEN_OVERLAY message) will wait.
+  // Create the promise before any async work so later overlay-open paths (background OPEN_OVERLAY) wait.
   anchorScrollDonePromise = new Promise<void>((resolve) => {
     resolveAnchorScrollDone = resolve;
   });
@@ -502,16 +479,13 @@ function ensureOverlayMounted(): HTMLDivElement {
   const { doc: iframeDoc, appRoot } = mountOverlayInFrame(frame);
   // Iframe document now exists — set the root font-size knob before the first React paint.
   syncOverlayViewportMetrics(shell);
-  // Mount React synchronously (eager, statically imported). A lazy dynamic import() was tried and
-  // reverted: a content-script import() can fail on strict-CSP sites (e.g. tesla.com), which left a
-  // visible but empty, click-blocking shell. Reliability on <all_urls> beats the bundle-size win.
+  // Mount React synchronously (eager import); lazy import() can fail on strict-CSP sites, leaving a click-blocking empty shell.
   overlayRoot = mountOverlayApp(iframeDoc, appRoot);
 
   return shell;
 }
 
-// Builds the iframe's document skeleton + app-root div synchronously (so the shell can paint at
-// document_start). The stylesheet is injected later by mountOverlayApp, alongside the React mount.
+// Builds the iframe document skeleton + app-root synchronously so the shell paints at document_start; mountOverlayApp injects the stylesheet later.
 function mountOverlayInFrame(frame: HTMLIFrameElement): {
   doc: Document;
   appRoot: HTMLElement;
@@ -578,8 +552,7 @@ function syncOverlayViewportMetrics(shell: HTMLElement): void {
     Math.max(proportionalWidth, PANEL_MIN_WIDTH_PX),
     PANEL_MAX_WIDTH_PX,
   );
-  // Never exceed the viewport (small screens); compute the scale from the width
-  // actually applied so width and font-size stay locked even when a clamp binds.
+  // Never exceed the viewport; scale from the applied width so width and font-size stay locked even when a clamp binds.
   const panelWidth = Math.min(clampedWidth, viewportWidth);
   const rootFontPx = (panelWidth / REFERENCE_PANEL_WIDTH_PX) * BASE_ROOT_FONT_PX;
 
@@ -587,9 +560,7 @@ function syncOverlayViewportMetrics(shell: HTMLElement): void {
   shell.style.height = `${height}px`;
   shell.style.width = `${panelWidth}px`;
 
-  // Measured host scrollbar width — the panel hugs the viewport's right edge, so the
-  // overlay UI must inset by this much to clear the scrollbar (0 for overlay/auto-hiding
-  // scrollbars, where nothing overlaps). +2px safety margin.
+  // Measured host scrollbar width: panel hugs the right edge, so the UI insets by this (+2px margin) to clear it; 0 for overlay scrollbars.
   const scrollbarPx = Math.max(
     0,
     window.innerWidth - document.documentElement.clientWidth,

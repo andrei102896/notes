@@ -1,14 +1,6 @@
 import { useMemo, useState } from "react";
 
-/**
- * Portal target for Radix/shadcn dialogs inside the extension overlay.
- *
- * React runs in the content script realm where global `document` is the **host**
- * page. The dashboard UI lives in an iframe, so we must resolve
- * `#nn-scroll-bookmarks-overlay-host` via the overlay shell, not `document` alone.
- *
- * @see OVERLAY_SHELL_ID in content.ts
- */
+/** Dialog portal target: React's `document` is the host page, so resolve the overlay host via the iframe shell, not `document` (see OVERLAY_SHELL_ID in content.ts). */
 const OVERLAY_SHELL_ID = "nn-scroll-bookmarks-overlay-shell";
 const OVERLAY_HOST_ID = "nn-scroll-bookmarks-overlay-host";
 

@@ -67,9 +67,7 @@ export function useNNDashboardSession(): {
     DEFAULT_PAGE_SESSION(),
   );
 
-  // Mount-only: a hard navigation remounts React, so this runs once per page load
-  // and restores the tab session's selected subject. SPA URL changes keep the same
-  // mount (no reset) — open-state + subject persist for the tab session (docs/1).
+  // Mount-only: runs once per page load (hard nav remounts React, SPA URL changes don't) and restores the tab session's selected subject (docs/1).
   useEffect(() => {
     let cancelled = false;
 
@@ -116,9 +114,7 @@ export function useNNDashboardSession(): {
     [],
   );
 
-  // Cross-tab safety: if the selected subject was deleted in another browser tab,
-  // fall back to the default current-page view instead of leaving a stale id that
-  // renders an empty, instruction-less notes list.
+  // Cross-tab safety: if the selected subject was deleted in another tab, fall back to the default view instead of a stale id rendering an empty, instruction-less list.
   useEffect(() => {
     if (
       pageSession.activeSubjectTabId !== null &&

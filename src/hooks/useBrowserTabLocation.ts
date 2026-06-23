@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 import { browsingContextWindowForTabUrl } from "@/lib/browsingContextWindow";
 import { sessionUrlKey } from "@/lib/sessionUrlKey";
 
-/**
- * Tracks the host page URL for the tab (same window as the overlay).
- * - `browserTabUrlKey` — normalized, for comparing to stored note URLs
- * - `browserTabHref` — raw `location.href` for display strings
- */
+/** Tracks the tab's host URL: `browserTabUrlKey` (normalized, for matching stored notes) and `browserTabHref` (raw href, for display). */
 export function useBrowserTabLocation(): {
   browserTabUrlKey: string | null;
   browserTabHref: string;

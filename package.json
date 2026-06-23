@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "pack": "npm run build && rm -f nn-extension-dist.zip && cd dist && zip -qr ../nn-extension-dist.zip .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

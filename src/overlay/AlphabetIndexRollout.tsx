@@ -15,10 +15,7 @@ type AlphabetIndexRolloutProps = {
   className?: string;
 };
 
-/**
- * AIR (Alphabetical Index Rollout): A–Z column to the left of the subject tab strip (AIR-2).
- * Letters share the column height equally (no vertical scroll). Letters with no matching tabs are inert on click.
- */
+/** AIR (Alphabetical Index Rollout): A–Z column left of the subject tab strip (AIR-2); letters share column height equally (no scroll), letters with no matching tabs are inert on click. */
 export function AlphabetIndexRollout({
   tabs,
   activeLetter,

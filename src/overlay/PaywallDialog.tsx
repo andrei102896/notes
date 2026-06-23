@@ -29,7 +29,6 @@ export function PaywallDialog({
       >
         <DialogTitle className="sr-only">Notes for Net trial status</DialogTitle>
 
-        {/* Same brand header used everywhere else in the app. */}
         <div className="flex shrink-0 items-center gap-2 pl-2">
           <BrandLockup />
         </div>
@@ -59,7 +58,6 @@ export function PaywallDialog({
           </span>
         </button>
 
-        {/* BUY — full-height accent button. Functionality unchanged. */}
         <button
           className="flex h-full shrink-0 cursor-pointer items-center justify-center bg-accent px-3.5"
           onClick={() => {

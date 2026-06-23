@@ -67,11 +67,7 @@ function DialogContent({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
-  /**
-   * Portal target. When omitted, defaults to the extension overlay host when available
-   * (see `useOverlayPortalContainer`); otherwise Radix portals to `document.body`.
-   * When set, overlay + content use `absolute` positioning within that element.
-   */
+  /** Portal target; defaults to the overlay host when available (else `document.body`). When set, overlay + content position `absolute` within it. */
   container?: HTMLElement | null;
 }) {
   const modal = React.useContext(DialogModalContext);
@@ -98,9 +94,7 @@ function DialogContent({
         className={cn(
           "z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
           contained
-            ? // Cap to the content area (panel minus the two w-10 tab columns minus a
-              // 1rem margin) so dialogs centered over the content can't overflow the
-              // panel's right edge on narrow viewports (where sm:max-w-lg is inactive).
+            ? // Cap to the content area (panel minus two w-10 tab columns minus 1rem) so dialogs can't overflow the panel's right edge on narrow viewports.
               "absolute top-[50%] left-[50%] max-w-[calc(100%-var(--spacing)*10*2-2rem)]"
             : "fixed top-[50%] left-[50%] max-w-[calc(100%-2rem)]",
           className,

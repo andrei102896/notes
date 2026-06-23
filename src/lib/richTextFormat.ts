@@ -81,8 +81,7 @@ export function formatStateFromSelection(
   const end = probeFormatAtNode(win, editor, range.endContainer);
   if (range.collapsed) {
     const doc = win.document;
-    // For a collapsed caret, the toolbar should reflect how newly typed text
-    // will be formatted, not only what wrappers exist around the caret node.
+    // Collapsed caret: reflect how newly typed text will format, not just wrappers around the caret node.
     return {
       bold: doc.queryCommandState("bold"),
       italic: doc.queryCommandState("italic"),
