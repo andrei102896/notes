@@ -1,5 +1,7 @@
 import React from "react";
 
+import { IS_WINDOWS } from "@/lib/platform";
+
 /** Brand-cluster NN mark (white NN) — NOT the off-limits payment logo. */
 export function BrandLogo(): React.ReactElement {
   return (
@@ -31,14 +33,20 @@ export function BrandLockup(): React.ReactElement {
           <BrandLogo />
         </span>
         <div className="flex items-center justify-center px-2">
-          {/* Nudge down ~0.11em (em-based, not px) to optically center Inter caps under leading-none at every scale. */}
-          <span className="relative top-[0.11em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground">
+          {/* pt is a layout offset (not relative-top) so caps stay crisp at fractional DPR; 0.22em ≈ the prior ~0.11em downward optical nudge. Windows-only 1px bottom pad offsets DirectWrite's heavier vertical metrics. */}
+          <span
+            className="pt-[0.22em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground"
+            style={{ paddingBottom: IS_WINDOWS ? "1px" : undefined }}
+          >
             Notes for Net
           </span>
         </div>
       </div>
-      <div className="flex items-center justify-center bg-chrome-ext px-1 py-1">
-        <span className="relative top-[0.11em] font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
+      <div
+        className="flex items-center justify-center bg-chrome-ext px-1 py-1"
+        style={{ paddingTop: IS_WINDOWS ? "5px" : "4px" }}
+      >
+        <span className="font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
           Chrome Extension
         </span>
       </div>

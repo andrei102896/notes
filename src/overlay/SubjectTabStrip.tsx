@@ -262,7 +262,8 @@ export const SubjectTabStrip = forwardRef<
         >
           <div
             ref={tabsScrollAreaRef}
-            className="mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
+            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter/scrollToTab. */
+            className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
           >
             <TabsList>
               {sortedTabs.map((tab) => (
@@ -299,8 +300,8 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  /* first:border-l-0 clears the line above the first subject; -translate-y-px lifts the top-edge line by 1px onto the A–Z cell's bottom border. */
-                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 snap-start justify-start leading-tight rotate-90 translate-x-[2.5rem] -translate-y-px origin-top-left first:border-l-0"
+                  /* first:border-l-0 clears the line above the first subject; -translate-y-px lifts the top-edge line by 1px onto the A–Z cell's bottom border. pl-2.5 indents the label start (~10px @ ref, post-rotation = gap at the cell top); pr-1 + tracking-tight keep max-length names from clipping where the renderer runs wide (Windows DirectWrite). */
+                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 snap-start justify-start leading-tight tracking-tight pl-2.5 pr-1 rotate-90 translate-x-[2.5rem] -translate-y-px origin-top-left first:border-l-0"
                 >
                   {tab.name.toUpperCase()}
                 </TabsTrigger>

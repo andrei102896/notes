@@ -552,12 +552,16 @@ function syncOverlayViewportMetrics(shell: HTMLElement): void {
     Math.max(proportionalWidth, PANEL_MIN_WIDTH_PX),
     PANEL_MAX_WIDTH_PX,
   );
-  // Never exceed the viewport; scale from the applied width so width and font-size stay locked even when a clamp binds.
-  const panelWidth = Math.min(clampedWidth, viewportWidth);
+  // Snap geometry to whole device pixels so the iframe layer lands on the physical grid; at fractional DPR (Windows 125% = 1.25) a sub-pixel edge rasterizes the whole overlay blurry.
+  const dpr = window.devicePixelRatio || 1;
+  const snapToDevicePx = (px: number): number => Math.round(px * dpr) / dpr;
+
+  // Never exceed the viewport; scale font-size from the applied width so width and font stay locked even when a clamp binds.
+  const panelWidth = snapToDevicePx(Math.min(clampedWidth, viewportWidth));
   const rootFontPx = (panelWidth / REFERENCE_PANEL_WIDTH_PX) * BASE_ROOT_FONT_PX;
 
-  shell.style.top = `${top}px`;
-  shell.style.height = `${height}px`;
+  shell.style.top = `${snapToDevicePx(top)}px`;
+  shell.style.height = `${snapToDevicePx(height)}px`;
   shell.style.width = `${panelWidth}px`;
 
   // Measured host scrollbar width: panel hugs the right edge, so the UI insets by this (+2px margin) to clear it; 0 for overlay scrollbars.

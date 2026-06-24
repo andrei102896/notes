@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   DndContext,
@@ -132,7 +138,7 @@ type DraggableNoteRowProps = {
   isReadOnly?: boolean;
 };
 
-function DraggableNoteRow({
+const DraggableNoteRow = React.memo(function DraggableNoteRow({
   note,
   marginClass,
   dimmed = false,
@@ -185,7 +191,7 @@ function DraggableNoteRow({
       </div>
     </div>
   );
-}
+});
 
 export function NotesList({
   notesById,
@@ -233,6 +239,8 @@ export function NotesList({
   const [overlayHost, setOverlayHost] = useState<HTMLElement | null>(null);
   /** Section gap (SECTION_GAP_CLASS = 4rem) in px, captured at drag start — positions the new-section placeholder. */
   const sectionGapPxRef = useRef(0);
+  /** List-container top in viewport px, cached at drag start + refreshed on scroll — avoids a forced reflow each move. */
+  const containerTopRef = useRef(0);
 
   // Freezes every visible row's extent (incl. the dimmed dragged note) at drag start; list never reflows mid-drag, so it stays valid.
   const takeSnapshot = useCallback(() => {
@@ -403,13 +411,22 @@ export function NotesList({
         }
       }
     };
+    // Autoscroll moves the list under a stationary pointer; keep the cached top fresh (capture — scroll doesn't bubble).
+    const refreshContainerTop = () => {
+      const c = listContainerRef.current;
+      if (c) {
+        containerTopRef.current = c.getBoundingClientRect().top;
+      }
+    };
     doc.addEventListener("keydown", sync);
     doc.addEventListener("keyup", sync);
     doc.addEventListener("pointermove", sync, true);
+    doc.addEventListener("scroll", refreshContainerTop, true);
     return () => {
       doc.removeEventListener("keydown", sync);
       doc.removeEventListener("keyup", sync);
       doc.removeEventListener("pointermove", sync, true);
+      doc.removeEventListener("scroll", refreshContainerTop, true);
     };
   }, [activeId, applyPreview]);
 
@@ -458,6 +475,8 @@ export function NotesList({
 
     // Dimming the source doesn't change geometry, so the snapshot is valid taken now.
     takeSnapshot();
+    containerTopRef.current =
+      listContainerRef.current?.getBoundingClientRect().top ?? 0;
   }
 
   function handleDragMove(event: DragMoveEvent) {
@@ -470,8 +489,8 @@ export function NotesList({
       return;
     }
     const clientY = startClientY + event.delta.y;
-    // List-container frame: rows and line share it and scroll together, so no scrollTop term.
-    const pointerContentY = clientY - container.getBoundingClientRect().top;
+    // List-container frame: rows and line share it and scroll together, so no scrollTop term. Cached top (refreshed on scroll) avoids a per-move reflow.
+    const pointerContentY = clientY - containerTopRef.current;
     lastPointerContentYRef.current = pointerContentY;
     applyPreview(pointerContentY);
   }
@@ -486,6 +505,7 @@ export function NotesList({
     lastFlatIndexRef.current = null;
     separateOnDropRef.current = false;
     pendingNextRef.current = null;
+    containerTopRef.current = 0;
     setActiveId(null);
     setIndicator(null);
   }
@@ -508,40 +528,58 @@ export function NotesList({
     setLayout(noteLayout);
   }
 
-  const renderNoteRow = (
-    noteId: string,
-    marginClass: string,
-    dimmed = false,
-  ): React.ReactNode => {
-    const note = notesById.get(noteId);
-    if (!note) {
-      return null;
-    }
-    const matchesCurrentPage =
-      browserTabUrlKey !== null &&
-      noteUrlMatchesBrowserTab(note.url, browserTabUrlKey);
-    return (
-      <DraggableNoteRow
-        key={note.id}
-        note={note}
-        marginClass={marginClass}
-        dimmed={dimmed}
-        activeSubjectTabId={activeSubjectTabId}
-        isActive={activeNoteId === note.id}
-        isExpanded={isNoteExpanded(note.id)}
-        matchesCurrentPage={matchesCurrentPage}
-        isReadOnly={isReadOnly}
-        onActivateNote={onActivateNote}
-        onSetNoteExpanded={onSetNoteExpanded}
-        onUpdateNote={onUpdateNote}
-        onHighlightNote={onHighlightNote}
-        onValidityChange={onValidityChange}
-        onRequestDelete={onRequestDelete}
-        copiedNote={copiedNote}
-        onCopyNote={onCopyNote}
-      />
-    );
-  };
+  const renderNoteRow = useCallback(
+    (
+      noteId: string,
+      marginClass: string,
+      dimmed = false,
+    ): React.ReactNode => {
+      const note = notesById.get(noteId);
+      if (!note) {
+        return null;
+      }
+      const matchesCurrentPage =
+        browserTabUrlKey !== null &&
+        noteUrlMatchesBrowserTab(note.url, browserTabUrlKey);
+      return (
+        <DraggableNoteRow
+          key={note.id}
+          note={note}
+          marginClass={marginClass}
+          dimmed={dimmed}
+          activeSubjectTabId={activeSubjectTabId}
+          isActive={activeNoteId === note.id}
+          isExpanded={isNoteExpanded(note.id)}
+          matchesCurrentPage={matchesCurrentPage}
+          isReadOnly={isReadOnly}
+          onActivateNote={onActivateNote}
+          onSetNoteExpanded={onSetNoteExpanded}
+          onUpdateNote={onUpdateNote}
+          onHighlightNote={onHighlightNote}
+          onValidityChange={onValidityChange}
+          onRequestDelete={onRequestDelete}
+          copiedNote={copiedNote}
+          onCopyNote={onCopyNote}
+        />
+      );
+    },
+    [
+      notesById,
+      browserTabUrlKey,
+      activeSubjectTabId,
+      activeNoteId,
+      isNoteExpanded,
+      isReadOnly,
+      onActivateNote,
+      onSetNoteExpanded,
+      onUpdateNote,
+      onHighlightNote,
+      onValidityChange,
+      onRequestDelete,
+      copiedNote,
+      onCopyNote,
+    ],
+  );
 
   // Cursor-riding clone; dnd-kit sizes the overlay wrapper to the dragged row's rect, so the read-only Note fills the column.
   const renderDragClone = (): React.ReactNode => {
@@ -574,47 +612,47 @@ export function NotesList({
     );
   };
 
-  // Stable render order during a drag (no reflow): active note dims in place, a single static line marks the resolved drop slot.
-  const renderRows = (): React.ReactNode => {
-    const rows = buildFlatEntries(layout).map(({ noteId, marginClass }) =>
-      renderNoteRow(noteId, marginClass, noteId === activeId),
-    );
-    return (
-      <>
-        {rows}
-        {indicator &&
-          (indicator.isSection ? (
-            // New-section placeholder: dashed item-sized box (where the note lands) + a line under it.
-            <div
-              aria-hidden
-              className="pointer-events-none absolute right-0 left-0 z-20"
-              style={{ top: indicator.top }}
-            >
-              <div
-                className="relative rounded-md border-2 border-dashed border-muted-foreground/50 bg-muted-foreground/10"
-                style={{ height: indicator.boxHeight }}
-              >
-                {indicator.label && (
-                  <span className="absolute top-1 left-1 rounded bg-[#111111] px-1 text-[0.75rem] font-semibold uppercase leading-none tracking-wide text-white">
-                    {indicator.label}
-                  </span>
-                )}
-              </div>
-              <div className="mt-1 h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
-            </div>
-          ) : (
-            // Plain reorder: one thin high-contrast line (#111 + white ring) at the drop slot.
-            <div
-              aria-hidden
-              className="pointer-events-none absolute right-0 z-20"
-              style={{ top: indicator.top, left: indicator.indent ? "0.75rem" : 0 }}
-            >
-              <div className="-translate-y-1/2 h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
-            </div>
-          ))}
-      </>
-    );
-  };
+  // Memoized so a per-move indicator update reuses the same row elements; React then skips reconciling the rows (and the expensive Note bodies). indicator is intentionally NOT a dep.
+  const rows = useMemo(
+    () =>
+      buildFlatEntries(layout).map(({ noteId, marginClass }) =>
+        renderNoteRow(noteId, marginClass, noteId === activeId),
+      ),
+    [layout, activeId, renderNoteRow],
+  );
+
+  // Drop indicator as a separate sibling so per-move setIndicator re-renders only this, not the rows.
+  const indicatorNode = indicator && (
+    indicator.isSection ? (
+      // New-section placeholder: dashed item-sized box (where the note lands) + a line under it.
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 left-0 z-20"
+        style={{ top: indicator.top }}
+      >
+        <div
+          className="relative rounded-md border-2 border-dashed border-muted-foreground/50 bg-muted-foreground/10"
+          style={{ height: indicator.boxHeight }}
+        >
+          {indicator.label && (
+            <span className="absolute top-1 left-1 rounded bg-[#111111] px-1 text-[0.75rem] font-semibold uppercase leading-none tracking-wide text-white">
+              {indicator.label}
+            </span>
+          )}
+        </div>
+        <div className="mt-1 h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
+      </div>
+    ) : (
+      // Plain reorder: one thin high-contrast line (#111 + white ring) at the drop slot.
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 z-20"
+        style={{ top: indicator.top, left: indicator.indent ? "0.75rem" : 0 }}
+      >
+        <div className="-translate-y-1/2 h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
+      </div>
+    )
+  );
 
   return (
     <DndContext
@@ -626,7 +664,8 @@ export function NotesList({
     >
       {/* Flat column; section separation is each head's leading margin. Relative so the insertion line positions against it. */}
       <div ref={listContainerRef} className="relative m-0 flex flex-col p-0">
-        {renderRows()}
+        {rows}
+        {indicatorNode}
       </div>
       {overlayHost &&
         createPortal(
