@@ -1,8 +1,7 @@
 # AGENTS.md — Notes For Net (NN) Chrome Extension
 
 Governance + context for ALL agent work on this repo. **Read fully before touching any file.**
-The 2026-06-11 baseline assessment lives in `ASSESSMENT_BRIEF_RO.md` (Romanian, full history); this
-file reflects current state as of 2026-06-23. Treat any documented behavior as unverified until
+This file reflects current state as of 2026-06-23. Treat any documented behavior as unverified until
 traced in code.
 
 ---
@@ -20,12 +19,11 @@ edge** of the window, injected into every page (no popup, no side panel — the 
   field exists in the design but has NO code.)
 - A **trial → purchase** flow (ExtensionPay + Stripe) behind the logo button, top-right.
 
-**Provenance:** delivered incomplete by an external agency (Tapptitude, now unavailable), built on
-an older "scroll bookmarks" starter. Product identity has since been corrected (README, manifest,
-`package.json` all say Notes for Net); the only legacy name kept is the internal host element id
-`#nn-scroll-bookmarks-overlay-host` (functional — CSS is scoped to it). The de-facto spec is only
-JSDoc citing an absent tracker (`NOTES-CORE-*`, `SUBJECT-TABS-*`, `AIR-2`, …) plus `docs/*.txt` +
-`NN_DASHBOARD.png` + `css.txt` (the Figma export). Trace before trusting. **Where the Figma export
+**Spec & conventions:** the internal host element id `#nn-scroll-bookmarks-overlay-host` is
+functional — CSS is scoped to it — despite the legacy name; keep it. The de-facto spec is the JSDoc
+in `src/types/nnData.ts` plus `docs/*.txt` + `NN_DASHBOARD.png` + `css.txt` (the Figma export); trace
+before trusting it. JSDoc ticket IDs (`NOTES-CORE-*`, `SUBJECT-TABS-*`, `AIR-2`, …) point at a
+tracker that no longer exists — ignore them as live references. **Where the Figma export
 (`NN_DASHBOARD.png` / `css.txt`) and `docs/*.txt` disagree, Figma wins** — e.g. the first-run empty
 state uses Figma's two-line + accent "OR" layout ("Select a subject tab…" / OR / "Create a new
 subject tab…"), NOT the single sentence in `docs/1_NN_DASHBOARD.txt`.
@@ -188,18 +186,16 @@ trial (`nn_trial_started_at` in `chrome.storage.local`) deliberately resets on u
   differences — reuse the right one, don't add a fourth.
 - **Silent failures:** many empty `catch {}` blocks and no logging anywhere. Don't imitate in new code.
 
-Resolved since baseline (no longer traps): stored-XSS sanitizer added; `tabs`/`activeTab` permissions
-removed; `VITE_TRIAL_MODE` documented in `.env.example`; the dead `nnSessionsByUrl` per-URL session
-layer and the `OPEN_SCROLL_BOOKMARK` / `types/bookmark.ts` starter code removed; react-query and
-several unused exports (`setNNSync`, `findNotePlacement`, `noteShouldHighlightForBrowserTab`,
-`isContentToPanelMessage`) removed. (`EXTPAY_EXTENSION_URL` is still dead but lives in §7 extpay.ts.)
+Already handled — do not re-flag or re-add: the stored-XSS sanitizer is in place; the `tabs`/`activeTab`
+permissions, the dead `nnSessionsByUrl` per-URL session layer, and the `OPEN_SCROLL_BOOKMARK` /
+`types/bookmark.ts` starter code were removed; react-query was removed (don't re-add it without an
+actual query). (`EXTPAY_EXTENSION_URL` is an exported-but-unused constant in §7's extpay.ts.)
 
 ## 9. Conventions
 
 - TS strict; `unknown`-first parsing of storage payloads; almost no casts.
 - Prettier (80 cols, double quotes, semicolons) + ESLint 9 flat config + husky pre-commit.
-- Naming: `nn`/`NN` for product code; "AIR" = Alphabetical Index Rollout (the A–Z rail). JSDoc ticket
-  IDs refer to the agency's absent tracker.
+- Naming: `nn`/`NN` for product code; "AIR" = Alphabetical Index Rollout (the A–Z rail).
 - React function components, forwardRef where needed, props drilled (no context); shadcn primitives in
   `components/ui/`. Path alias `@/` → `src/`. Tailwind 4 utilities + `@theme` tokens in `styles.css`;
   one-off CSS only for host-page-level concerns.
