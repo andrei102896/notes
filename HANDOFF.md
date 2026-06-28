@@ -66,7 +66,8 @@ artifact you upload to the Chrome Web Store. (`npm run build` alone produces the
    click does nothing there, by design.)
 
 Smoke-test before shipping: toggle on/off, create / edit / minimize / delete a note,
-drag-reorder (and Cmd/Ctrl-drag to split a section), switch subject tabs, navigate within a
+drag-reorder (multi-select with Cmd/Ctrl- or Shift-click, then drag them together; Cmd/Ctrl-drag
+to drop into a new section), switch subject tabs, navigate within a
 tab and confirm the panel + state persist, and exercise the trial → buy flow.
 
 ---

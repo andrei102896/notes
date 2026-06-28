@@ -22,11 +22,13 @@ import { noteUrlMatchesBrowserTab } from "@/lib/nnDashboardNotes";
 import {
   applyDropPlacement,
   cloneNoteListLayout,
+  flattenLayoutNoteIds,
+  noteGroupingsEqual,
   pruneEmptyNoteGroups,
   resolveDropPlacement,
 } from "@/lib/nnNoteLayout";
 import { cn } from "@/lib/utils";
-import { Note } from "@/overlay/Note";
+import { Note, type NoteSelectModifiers } from "@/overlay/Note";
 import type {
   NNCopiedNote,
   NNNoteListLayout,
@@ -121,13 +123,16 @@ type DraggableNoteRowProps = {
   note: NNSyncNote;
   /** Leading margin class — small within a section, large at a section head. */
   marginClass: string;
-  /** This row is the note currently being dragged — dim it in place (the clone rides the cursor). */
+  /** Any note in the dragged set — dim it in place (the clone rides the cursor). */
   dimmed?: boolean;
   activeSubjectTabId: string | null;
   isActive: boolean;
+  /** Part of a multi-note selection. */
+  isSelected: boolean;
   isExpanded: boolean;
   matchesCurrentPage: boolean;
   onActivateNote: (noteId: string) => void;
+  onSelect: (noteId: string, mods: NoteSelectModifiers) => void;
   onSetNoteExpanded: (noteId: string, expanded: boolean) => void;
   onUpdateNote: NotesListProps["onUpdateNote"];
   onHighlightNote: NotesListProps["onHighlightNote"];
@@ -144,9 +149,11 @@ const DraggableNoteRow = React.memo(function DraggableNoteRow({
   dimmed = false,
   activeSubjectTabId,
   isActive,
+  isSelected,
   isExpanded,
   matchesCurrentPage,
   onActivateNote,
+  onSelect,
   onSetNoteExpanded,
   onUpdateNote,
   onHighlightNote,
@@ -174,9 +181,11 @@ const DraggableNoteRow = React.memo(function DraggableNoteRow({
           activeSubjectTabId={activeSubjectTabId}
           expanded={isExpanded}
           isActive={isActive}
+          isSelected={isSelected}
           matchesCurrentPage={matchesCurrentPage}
           isReadOnly={isReadOnly}
           onActivate={onActivateNote}
+          onSelect={onSelect}
           onSetExpanded={onSetNoteExpanded}
           onUpdateNote={onUpdateNote}
           onHighlightNote={onHighlightNote}
@@ -215,14 +224,24 @@ export function NotesList({
   const layoutRef = useRef(noteLayout);
   const [activeId, setActiveId] = useState<string | null>(null);
   const activeIdRef = useRef<string | null>(null);
+  /** Multi-note selection (Cmd/Ctrl toggle, Shift range); dragging a member moves the whole set. */
+  const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(
+    new Set(),
+  );
+  /** Shift-range anchor — the note last clicked plainly or with Cmd/Ctrl. */
+  const anchorNoteIdRef = useRef<string | null>(null);
+  /** True while the anchor came from a bare left-click and hasn't been consumed — the next Cmd/Ctrl-click folds it into the group. */
+  const plainAnchorPendingRef = useRef(false);
   const listContainerRef = useRef<HTMLDivElement>(null);
-  /** True when the live drag should drop the note into its own new section. */
+  /** True when the live drag should drop the block into its own new section. */
   const separateOnDropRef = useRef(false);
 
-  /** Pre-drag layout with the dragged note removed — the preview is rebuilt from it. */
+  /** Pre-drag layout with the dragged notes removed — the preview is rebuilt from it. */
   const baseLayoutRef = useRef<NNNoteListLayout | null>(null);
-  /** The note id being dragged (a one-element set, kept for the snapshot filter). */
+  /** Ids of every note in the drag (the selection if multi, else the active note); snapshot/base filter against this. */
   const draggedSetRef = useRef<Set<string>>(new Set());
+  /** The same ids in flat layout order — inserted as one contiguous block on drop. */
+  const dragOrderRef = useRef<string[]>([]);
   /** Frozen row geometry (list-container px) — hit-testing reads this, never the live DOM. */
   const snapshotRef = useRef<SnapshotRow[] | null>(null);
   /** Pointer Y at drag activation, in iframe-viewport px (delta-relative origin). */
@@ -241,8 +260,52 @@ export function NotesList({
   const sectionGapPxRef = useRef(0);
   /** List-container top in viewport px, cached at drag start + refreshed on scroll — avoids a forced reflow each move. */
   const containerTopRef = useRef(0);
+  /** Active dragged row's original extent (list-container px); a plain drop released inside it didn't move the item → no-op. */
+  const draggedRowTopRef = useRef<number | null>(null);
+  const draggedRowBottomRef = useRef<number | null>(null);
 
-  // Freezes every visible row's extent (incl. the dimmed dragged note) at drag start; list never reflows mid-drag, so it stays valid.
+  // Cmd/Ctrl toggles a note; Shift selects the range from the anchor; a plain click clears. Stable (functional updater + refs) so the rows don't churn on its identity.
+  const handleSelect = useCallback((noteId: string, mods: NoteSelectModifiers) => {
+    if (mods.metaKey || mods.ctrlKey) {
+      setSelectedNoteIds((prev) => {
+        const next = new Set(prev);
+        // First Cmd/Ctrl-click after a bare left-click folds that plain-clicked note (the anchor) into the group too.
+        if (
+          plainAnchorPendingRef.current &&
+          anchorNoteIdRef.current &&
+          anchorNoteIdRef.current !== noteId
+        ) {
+          next.add(anchorNoteIdRef.current);
+        }
+        if (next.has(noteId)) {
+          next.delete(noteId);
+        } else {
+          next.add(noteId);
+        }
+        return next;
+      });
+      plainAnchorPendingRef.current = false;
+      anchorNoteIdRef.current = noteId;
+      return;
+    }
+    if (mods.shiftKey && anchorNoteIdRef.current) {
+      const flatIds = flattenLayoutNoteIds(layoutRef.current);
+      const a = flatIds.indexOf(anchorNoteIdRef.current);
+      const b = flatIds.indexOf(noteId);
+      if (a !== -1 && b !== -1) {
+        const [start, end] = a <= b ? [a, b] : [b, a];
+        setSelectedNoteIds(new Set(flatIds.slice(start, end + 1)));
+        plainAnchorPendingRef.current = false;
+        return;
+      }
+    }
+    // Bare left-click: drop any selection, remember this note as the pending group start (no ring yet).
+    setSelectedNoteIds((prev) => (prev.size ? new Set() : prev));
+    anchorNoteIdRef.current = noteId;
+    plainAnchorPendingRef.current = true;
+  }, []);
+
+  // Freezes every visible row's extent (incl. the dimmed dragged notes) at drag start; list never reflows mid-drag, so it stays valid.
   const takeSnapshot = useCallback(() => {
     const container = listContainerRef.current;
     if (!container) {
@@ -274,47 +337,18 @@ export function NotesList({
     if (!base || !snap || id === null) {
       return;
     }
-    // Cmd/Ctrl: new section always appended BELOW all notes (never between); placeholder pinned under last note + a gap, cursor Y ignored.
-    if (separateOnDropRef.current) {
-      lastFlatIndexRef.current = null;
-      // Sole item of the last section already is its own bottom section — a new one is identical (no-op).
-      const groups = layoutRef.current.groups;
-      const last = groups[groups.length - 1];
-      if (last && last.noteIds.length === 1 && last.noteIds[0] === id) {
-        pendingNextRef.current = null;
-        setIndicator(null);
-        return;
-      }
-      const total = base.groups.reduce((n, g) => n + g.noteIds.length, 0);
-      const placement = resolveDropPlacement(base, total, null, true);
-      pendingNextRef.current = applyDropPlacement(base, placement, [id]);
-      if (snap.length === 0) {
-        setIndicator(null);
-        return;
-      }
-      const draggedRow = snap.find((r) => r.id === id);
-      setIndicator({
-        top: snap[snap.length - 1].bottom + sectionGapPxRef.current,
-        indent: false,
-        isSection: true,
-        boxHeight: draggedRow ? draggedRow.bottom - draggedRow.top : 0,
-        label: "Create a new section",
-      });
-      return;
-    }
-
     const y = probeY;
     if (snap.length === 0) {
       pendingNextRef.current = applyDropPlacement(
         base,
-        resolveDropPlacement(base, 0, null, false),
-        [id],
+        resolveDropPlacement(base, 0, null, separateOnDropRef.current),
+        dragOrderRef.current,
       );
       setIndicator(null);
       return;
     }
 
-    // Plain reorder: hit-test among ALL visible rows (incl. the dimmed dragged note) so the line follows the cursor past it.
+    // Hit-test among ALL visible rows (incl. the dimmed dragged rows) so the slot follows the cursor past them.
     let visualIndex = 0;
     while (visualIndex < snap.length && snap[visualIndex].mid < y) {
       visualIndex++;
@@ -345,7 +379,7 @@ export function NotesList({
       boundarySide = y < gapMid ? "above" : "below";
     }
 
-    // Map the visual insertion point to a base index (base excludes the dragged note).
+    // Map the visual insertion point to a base index (base excludes the dragged block).
     const dragged = draggedSetRef.current;
     let baseFlatIndex = 0;
     for (let i = 0; i < visualIndex; i++) {
@@ -354,21 +388,60 @@ export function NotesList({
       }
     }
 
-    const placement = resolveDropPlacement(base, baseFlatIndex, boundarySide, false);
-    pendingNextRef.current = applyDropPlacement(base, placement, [id]);
+    // Cmd/Ctrl drops the block as its own new section at the cursor slot (top, between, or bottom); plain reorder joins the adjacent section.
+    const asNew = separateOnDropRef.current;
+    // Cmd + cursor anywhere over the last row or below → snap to a new section at the very end, so the whole last row + the space under it is one forgiving drop zone (no pixel-hunting the placeholder).
+    const forceEnd = asNew && y >= snap[snap.length - 1].top;
+    const endIndex = base.groups.reduce((n, g) => n + g.noteIds.length, 0);
+    const placement = resolveDropPlacement(
+      base,
+      forceEnd ? endIndex : baseFlatIndex,
+      boundarySide,
+      asNew,
+    );
+    pendingNextRef.current = applyDropPlacement(
+      base,
+      placement,
+      dragOrderRef.current,
+    );
 
+    const atListEnd = visualIndex >= snap.length || forceEnd;
     const sectionBoundary = isSectionBoundaryIndex(base, baseFlatIndex);
     // Hug a row edge (never a gap midpoint) so the line lands in a real visible gap.
     let top: number;
     if (visualIndex <= 0) {
       top = snap[0].top;
-    } else if (visualIndex >= snap.length) {
+    } else if (atListEnd) {
       top = snap[snap.length - 1].bottom;
     } else if (sectionBoundary && boundarySide === "above") {
       top = snap[visualIndex - 1].bottom + 2;
     } else {
       top = snap[visualIndex].top - 2;
     }
+
+    if (asNew) {
+      // A new section that reproduces the current layout (e.g. dragging the sole item of the last section to the bottom) changes nothing — don't show the misleading cue.
+      if (
+        pendingNextRef.current &&
+        noteGroupingsEqual(pendingNextRef.current, layoutRef.current)
+      ) {
+        pendingNextRef.current = null;
+        setIndicator(null);
+        return;
+      }
+      // New-section cue follows the cursor; the dashed item-box only fits the empty space past the last note, elsewhere a labeled line marks the slot.
+      const draggedRow = snap.find((r) => r.id === id);
+      setIndicator({
+        top: atListEnd ? top + sectionGapPxRef.current : top,
+        indent: false,
+        isSection: true,
+        boxHeight:
+          atListEnd && draggedRow ? draggedRow.bottom - draggedRow.top : 0,
+        label: "New section",
+      });
+      return;
+    }
+
     setIndicator({
       top,
       indent: sectionBoundary && boundarySide === "below",
@@ -385,11 +458,54 @@ export function NotesList({
     }
     setLayout(noteLayout);
     layoutRef.current = noteLayout;
+    // Drop selected/anchor ids that no longer exist (e.g. a selected note was deleted).
+    const visible = new Set(flattenLayoutNoteIds(noteLayout));
+    setSelectedNoteIds((prev) => {
+      if (prev.size === 0) {
+        return prev;
+      }
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (visible.has(id)) {
+          next.add(id);
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+    if (anchorNoteIdRef.current && !visible.has(anchorNoteIdRef.current)) {
+      anchorNoteIdRef.current = null;
+    }
   }, [noteLayout]);
 
   useEffect(() => {
     // Iframe <body> is outside the frosted container, so the DragOverlay's fixed positioning resolves against the iframe viewport (no offset).
     setOverlayHost(listContainerRef.current?.ownerDocument.body ?? null);
+  }, []);
+
+  // Switching subject tabs swaps the list but doesn't remount — drop any selection so it can't carry across tabs.
+  useEffect(() => {
+    setSelectedNoteIds((prev) => (prev.size ? new Set() : prev));
+    anchorNoteIdRef.current = null;
+  }, [activeSubjectTabId]);
+
+  // A press outside the list clears the selection (finder-style multi-select). Capture phase so a child's stopPropagation can't swallow it.
+  useEffect(() => {
+    const doc = listContainerRef.current?.ownerDocument;
+    if (!doc) {
+      return;
+    }
+    const handleMouseDown = (e: MouseEvent) => {
+      const container = listContainerRef.current;
+      if (container && !container.contains(e.target as Node)) {
+        setSelectedNoteIds((prev) => (prev.size ? new Set() : prev));
+        anchorNoteIdRef.current = null;
+      }
+    };
+    doc.addEventListener("mousedown", handleMouseDown, true);
+    return () => doc.removeEventListener("mousedown", handleMouseDown, true);
   }, []);
 
   // "New section" tracks LIVE Ctrl/Cmd during the drag: key events catch a stationary press; pointermove (capture, to beat dnd-kit) the moving case.
@@ -440,7 +556,6 @@ export function NotesList({
   function handleDragStart(event: DragStartEvent) {
     const id = String(event.active.id);
     activeIdRef.current = id;
-    setActiveId(id);
 
     const activator = event.activatorEvent as {
       ctrlKey?: boolean;
@@ -455,11 +570,18 @@ export function NotesList({
     // Ctrl/Cmd at drag start → own new section on drop; live key listener keeps this in sync if toggled mid-drag.
     separateOnDropRef.current = Boolean(activator.ctrlKey || activator.metaKey);
 
-    // Base = current layout minus the dragged note; preview rebuilds from this each move, so it equals what commits on drop.
-    draggedSetRef.current = new Set([id]);
+    // Grabbing a selected note drags the whole selection; otherwise just that note. Block = the dragged ids in flat layout order.
+    const isMulti = selectedNoteIds.size > 1 && selectedNoteIds.has(id);
+    const flatIds = flattenLayoutNoteIds(layoutRef.current);
+    dragOrderRef.current = isMulti
+      ? flatIds.filter((nid) => selectedNoteIds.has(nid))
+      : [id];
+    draggedSetRef.current = new Set(dragOrderRef.current);
+
+    // Base = current layout minus the dragged block; preview rebuilds from this each move, so it equals what commits on drop.
     const base = cloneNoteListLayout(layoutRef.current);
     for (const g of base.groups) {
-      g.noteIds = g.noteIds.filter((nid) => nid !== id);
+      g.noteIds = g.noteIds.filter((nid) => !draggedSetRef.current.has(nid));
     }
     pruneEmptyNoteGroups(base);
     baseLayoutRef.current = base;
@@ -473,10 +595,16 @@ export function NotesList({
       ? 4 * (parseFloat(getComputedStyle(root).fontSize) || 16)
       : 64;
 
-    // Dimming the source doesn't change geometry, so the snapshot is valid taken now.
+    // Dimming the source rows doesn't change geometry, so the snapshot is valid taken now.
     takeSnapshot();
     containerTopRef.current =
       listContainerRef.current?.getBoundingClientRect().top ?? 0;
+
+    const activeRow = snapshotRef.current?.find((r) => r.id === id) ?? null;
+    draggedRowTopRef.current = activeRow ? activeRow.top : null;
+    draggedRowBottomRef.current = activeRow ? activeRow.bottom : null;
+
+    setActiveId(id);
   }
 
   function handleDragMove(event: DragMoveEvent) {
@@ -500,22 +628,47 @@ export function NotesList({
     baseLayoutRef.current = null;
     snapshotRef.current = null;
     draggedSetRef.current = new Set();
+    dragOrderRef.current = [];
     startClientYRef.current = null;
     lastPointerContentYRef.current = null;
     lastFlatIndexRef.current = null;
     separateOnDropRef.current = false;
     pendingNextRef.current = null;
     containerTopRef.current = 0;
+    draggedRowTopRef.current = null;
+    draggedRowBottomRef.current = null;
+    anchorNoteIdRef.current = null;
     setActiveId(null);
     setIndicator(null);
+    setSelectedNoteIds((prev) => (prev.size ? new Set() : prev));
   }
 
   function handleDragEnd() {
     const pending = pendingNextRef.current;
+    const wasAsNew = separateOnDropRef.current;
+    const single = dragOrderRef.current.length === 1;
+    const cursorY = lastPointerContentYRef.current;
+    const rowTop = draggedRowTopRef.current;
+    const rowBottom = draggedRowBottomRef.current;
+    const original = layoutRef.current;
     resetDragState();
 
-    // Commit the reorder applyPreview resolved (pendingNextRef). No move resolved → layout unchanged.
-    const next = cloneNoteListLayout(pending ?? layoutRef.current);
+    // A plain single-item drop released over the item's OWN original row never moved it → keep the original layout, so a near-zero "select" drag can't silently merge a sole-item section into its neighbor. (Dragging onto another note leaves the row → applies; a Cmd drop in place is an intentional split → applies.)
+    let resolved = pending ?? original;
+    if (
+      pending &&
+      !wasAsNew &&
+      single &&
+      cursorY !== null &&
+      rowTop !== null &&
+      rowBottom !== null &&
+      cursorY >= rowTop &&
+      cursorY <= rowBottom
+    ) {
+      resolved = original;
+    }
+
+    const next = cloneNoteListLayout(resolved);
     pruneEmptyNoteGroups(next);
     layoutRef.current = next;
     setLayout(next);
@@ -533,6 +686,7 @@ export function NotesList({
       noteId: string,
       marginClass: string,
       dimmed = false,
+      isSelected = false,
     ): React.ReactNode => {
       const note = notesById.get(noteId);
       if (!note) {
@@ -549,10 +703,12 @@ export function NotesList({
           dimmed={dimmed}
           activeSubjectTabId={activeSubjectTabId}
           isActive={activeNoteId === note.id}
+          isSelected={isSelected}
           isExpanded={isNoteExpanded(note.id)}
           matchesCurrentPage={matchesCurrentPage}
           isReadOnly={isReadOnly}
           onActivateNote={onActivateNote}
+          onSelect={handleSelect}
           onSetNoteExpanded={onSetNoteExpanded}
           onUpdateNote={onUpdateNote}
           onHighlightNote={onHighlightNote}
@@ -571,6 +727,7 @@ export function NotesList({
       isNoteExpanded,
       isReadOnly,
       onActivateNote,
+      handleSelect,
       onSetNoteExpanded,
       onUpdateNote,
       onHighlightNote,
@@ -581,33 +738,70 @@ export function NotesList({
     ],
   );
 
-  // Cursor-riding clone; dnd-kit sizes the overlay wrapper to the dragged row's rect, so the read-only Note fills the column.
+  const isMultiActive =
+    activeId !== null &&
+    selectedNoteIds.size > 1 &&
+    selectedNoteIds.has(activeId);
+
+  const renderNoteClone = (note: NNSyncNote): React.ReactNode => {
+    const matchesCurrentPage =
+      browserTabUrlKey !== null &&
+      noteUrlMatchesBrowserTab(note.url, browserTabUrlKey);
+    return (
+      <Note
+        note={note}
+        activeSubjectTabId={activeSubjectTabId}
+        expanded={isNoteExpanded(note.id)}
+        isActive={false}
+        matchesCurrentPage={matchesCurrentPage}
+        isReadOnly
+        onActivate={() => {}}
+        onSetExpanded={() => {}}
+        onUpdateNote={() => {}}
+        onHighlightNote={() => {}}
+        onValidityChange={() => {}}
+        onRequestDelete={() => {}}
+        copiedNote={null}
+        onCopyNote={() => {}}
+      />
+    );
+  };
+
+  // Cursor-riding clone; dnd-kit sizes the overlay wrapper to the dragged row's rect. A multi-drag stacks up to 2 faint clones behind + a count badge.
   const renderDragClone = (): React.ReactNode => {
     const note = activeId ? notesById.get(activeId) : undefined;
     if (!note) {
       return null;
     }
-    const matchesCurrentPage =
-      browserTabUrlKey !== null &&
-      noteUrlMatchesBrowserTab(note.url, browserTabUrlKey);
+    const backNotes = dragOrderRef.current
+      .filter((nid) => nid !== activeId)
+      .slice(0, 2)
+      .map((nid) => notesById.get(nid))
+      .filter((n): n is NNSyncNote => n !== undefined);
     return (
-      <div className="shadow-lg">
-        <Note
-          note={note}
-          activeSubjectTabId={activeSubjectTabId}
-          expanded={isNoteExpanded(note.id)}
-          isActive={false}
-          matchesCurrentPage={matchesCurrentPage}
-          isReadOnly
-          onActivate={() => {}}
-          onSetExpanded={() => {}}
-          onUpdateNote={() => {}}
-          onHighlightNote={() => {}}
-          onValidityChange={() => {}}
-          onRequestDelete={() => {}}
-          copiedNote={null}
-          onCopyNote={() => {}}
-        />
+      <div className="relative">
+        {backNotes.map((backNote, i) => (
+          <div
+            key={backNote.id}
+            aria-hidden
+            className="pointer-events-none absolute inset-0 shadow-lg"
+            style={{
+              transform: `translate(${(i + 1) * 6}px, ${(i + 1) * 6}px)`,
+              opacity: 0.45,
+              zIndex: -(i + 1),
+            }}
+          >
+            {renderNoteClone(backNote)}
+          </div>
+        ))}
+        <div className="relative shadow-lg">
+          {isMultiActive && (
+            <span className="absolute -top-2 -right-2 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[0.75rem] font-semibold text-accent-foreground">
+              {selectedNoteIds.size}
+            </span>
+          )}
+          {renderNoteClone(note)}
+        </div>
       </div>
     );
   };
@@ -615,16 +809,26 @@ export function NotesList({
   // Memoized so a per-move indicator update reuses the same row elements; React then skips reconciling the rows (and the expensive Note bodies). indicator is intentionally NOT a dep.
   const rows = useMemo(
     () =>
-      buildFlatEntries(layout).map(({ noteId, marginClass }) =>
-        renderNoteRow(noteId, marginClass, noteId === activeId),
-      ),
-    [layout, activeId, renderNoteRow],
+      buildFlatEntries(layout).map(({ noteId, marginClass }) => {
+        const dimmed =
+          activeId !== null &&
+          (noteId === activeId ||
+            (isMultiActive && selectedNoteIds.has(noteId)));
+        return renderNoteRow(
+          noteId,
+          marginClass,
+          dimmed,
+          selectedNoteIds.has(noteId),
+        );
+      }),
+    [layout, activeId, isMultiActive, selectedNoteIds, renderNoteRow],
   );
 
   // Drop indicator as a separate sibling so per-move setIndicator re-renders only this, not the rows.
-  const indicatorNode = indicator && (
-    indicator.isSection ? (
-      // New-section placeholder: dashed item-sized box (where the note lands) + a line under it.
+  const indicatorNode =
+    indicator &&
+    (indicator.isSection && indicator.boxHeight > 0 ? (
+      // New section past the last note: dashed item-sized box (where the block lands) + a line under it.
       <div
         aria-hidden
         className="pointer-events-none absolute right-0 left-0 z-20"
@@ -642,6 +846,20 @@ export function NotesList({
         </div>
         <div className="mt-1 h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
       </div>
+    ) : indicator.isSection ? (
+      // New section between/above rows: a labeled line at the slot (the frozen list leaves no room for a box).
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 left-0 z-20 -translate-y-1/2"
+        style={{ top: indicator.top }}
+      >
+        <div className="h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
+        {indicator.label && (
+          <span className="absolute top-1/2 left-1 -translate-y-1/2 rounded bg-[#111111] px-1 text-[0.75rem] font-semibold uppercase leading-none tracking-wide text-white">
+            {indicator.label}
+          </span>
+        )}
+      </div>
     ) : (
       // Plain reorder: one thin high-contrast line (#111 + white ring) at the drop slot.
       <div
@@ -651,8 +869,7 @@ export function NotesList({
       >
         <div className="-translate-y-1/2 h-[3px] rounded-full bg-[#111111] shadow-[0_0_0_1px_rgba(255,255,255,0.85)]" />
       </div>
-    )
-  );
+    ));
 
   return (
     <DndContext

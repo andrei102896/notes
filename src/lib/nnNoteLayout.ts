@@ -236,3 +236,26 @@ export function resolveNoteListLayout(
 export function flattenLayoutNoteIds(layout: NNNoteListLayout): string[] {
   return layout.groups.flatMap((g) => g.noteIds);
 }
+
+/** True when both layouts have the same sections, in order, with the same notes — i.e. a drop would change nothing. Ignores group ids (derived). */
+export function noteGroupingsEqual(
+  a: NNNoteListLayout,
+  b: NNNoteListLayout,
+): boolean {
+  if (a.groups.length !== b.groups.length) {
+    return false;
+  }
+  for (let i = 0; i < a.groups.length; i++) {
+    const ga = a.groups[i].noteIds;
+    const gb = b.groups[i].noteIds;
+    if (ga.length !== gb.length) {
+      return false;
+    }
+    for (let j = 0; j < ga.length; j++) {
+      if (ga[j] !== gb[j]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}

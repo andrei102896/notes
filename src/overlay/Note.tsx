@@ -21,15 +21,25 @@ import type { NNCopiedNote, NNSyncNote } from "@/types/nnData";
 
 const NOTE_HEADING_MAX_LEN = 50;
 
+/** Modifier keys a selection click carries (Cmd/Ctrl = toggle, Shift = range). */
+export type NoteSelectModifiers = {
+  metaKey: boolean;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+};
+
 type NoteProps = {
   note: NNSyncNote;
   activeSubjectTabId: string | null;
   expanded: boolean;
   isActive: boolean;
+  /** Part of a multi-note selection — shows the selection ring. */
+  isSelected?: boolean;
   matchesCurrentPage: boolean;
   /** Trial-ended unpaid mode: heading/body/url frozen, delete hidden. */
   isReadOnly?: boolean;
   onActivate: (noteId: string) => void;
+  onSelect?: (noteId: string, mods: NoteSelectModifiers) => void;
   onSetExpanded: (noteId: string, expanded: boolean) => void;
   onUpdateNote: (
     noteId: string,
@@ -49,9 +59,11 @@ export function Note({
   note,
   activeSubjectTabId,
   expanded,
+  isSelected = false,
   matchesCurrentPage,
   isReadOnly = false,
   onActivate,
+  onSelect,
   onSetExpanded,
   onUpdateNote,
   onHighlightNote,
@@ -88,6 +100,7 @@ export function Note({
       onMouseDown={() => onActivate(note.id)}
       className={cn(
         "border-[6px] bg-note p-0",
+        isSelected && "ring-2 ring-primary ring-offset-2",
         matchesCurrentPage ? "border-accent" : "border-border",
       )}
     >
@@ -135,9 +148,30 @@ export function Note({
               }
             }}
             onClick={(event) => {
-              if (!headingFocused && !isReadOnly) {
-                event.currentTarget.focus();
+              if (headingFocused || isReadOnly) {
+                return;
               }
+              // Modifier-click selects (dnd-kit suppresses this click after a real drag, so a modifier-drag never selects); a clean click edits the title.
+              if (event.metaKey || event.ctrlKey || event.shiftKey) {
+                // Mouse-down preventDefault blocks the implicit blur, so a note being edited elsewhere keeps focus — drop it explicitly. (No instanceof: the node lives in the iframe realm, where the content-script HTMLElement won't match.)
+                const active = event.currentTarget.ownerDocument
+                  .activeElement as HTMLElement | null;
+                if (active && active !== event.currentTarget) {
+                  active.blur();
+                }
+                onSelect?.(note.id, {
+                  metaKey: event.metaKey,
+                  ctrlKey: event.ctrlKey,
+                  shiftKey: event.shiftKey,
+                });
+                return;
+              }
+              onSelect?.(note.id, {
+                metaKey: false,
+                ctrlKey: false,
+                shiftKey: false,
+              });
+              event.currentTarget.focus();
             }}
             onFocus={() => {
               headingFocusedRef.current = true;
