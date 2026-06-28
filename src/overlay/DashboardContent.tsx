@@ -10,7 +10,7 @@ import {
 
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
 import { getTabSession, patchTabSession } from "@/lib/tabSession";
-import { ModalBrandBar } from "@/overlay/NnModalFrame";
+import { ModalBrandBar, ModalWatermark } from "@/overlay/NnModalFrame";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
 import { NotesList } from "@/overlay/NotesList";
 import { storageService } from "@/services/storageService";
@@ -200,11 +200,15 @@ export const DashboardContent = forwardRef<
         <div className="flex min-h-0 flex-1 items-center justify-center p-4">
           <div className="flex w-full flex-col">
             <ModalBrandBar />
-            {/* Figma layout (source of truth): two instructions split by an accent OR — not the single sentence in docs/1_NN_DASHBOARD.txt. Don't collapse. */}
-            <div className="flex flex-col gap-6 border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-navmin uppercase leading-tight text-modal-foreground">
-              <p>Select a subject tab to view, edit or add notes to</p>
-              <p className="text-accent">or</p>
-              <p>Create a new subject tab to add notes to</p>
+            {/* Figma (source of truth): tall modal body 252px (MODAL BG); 24px Fjalla; SELECT / CREATE / SUBJECT TAB in accent; faint NN watermark behind. */}
+            <div className="relative isolate flex min-h-[15.75rem] flex-col justify-center gap-6 overflow-hidden border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-subject-label uppercase leading-tight text-modal-foreground">
+              <ModalWatermark />
+              <p>
+                <span className="text-accent">Select</span> or{" "}
+                <span className="text-accent">create</span> a{" "}
+                <span className="text-accent">subject tab</span>
+              </p>
+              <p>to view, edit or add notes to</p>
             </div>
           </div>
         </div>

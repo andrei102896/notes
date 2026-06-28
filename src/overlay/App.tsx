@@ -76,6 +76,8 @@ export function App(): React.ReactElement {
   const trialStartMsRef = useRef<number | null>(null);
   const [hasInvalidUrlDraft, setHasInvalidUrlDraft] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+  // Lifted from SubjectTabStrip so the empty-state panel hides while the add-tab dialog is open.
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [, setHighlightedNoteId] = useState<string | null>(null);
   // Rail highlight follows the SELECTED subject — derived, so it survives remount and clears on deselect.
   const activeAirLetter = firstSubjectTabLetter(
@@ -244,6 +246,8 @@ export function App(): React.ReactElement {
         ref={subjectTabStripRef}
         tabs={subjectTabsForDisplay}
         activeSubjectTabId={pageSession.activeSubjectTabId}
+        addDialogOpen={addDialogOpen}
+        onAddDialogOpenChange={setAddDialogOpen}
         isReadOnly={isReadOnly}
         onSelectTab={(id) => {
           if (pageSession.activeSubjectTabId === id) {
@@ -330,7 +334,7 @@ export function App(): React.ReactElement {
           browserTabUrlKey={browserTabUrlKey}
           activeSubjectTabId={pageSession.activeSubjectTabId}
           activeNoteId={effectiveActiveNoteId}
-          showSubjectTabInstruction={showSubjectTabInstruction}
+          showSubjectTabInstruction={showSubjectTabInstruction && !addDialogOpen}
           isReadOnly={isReadOnly}
           onUpdateNote={(noteId, patch) => {
             if (isReadOnly) {

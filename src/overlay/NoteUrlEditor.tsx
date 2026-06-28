@@ -108,7 +108,6 @@ export function NoteUrlEditor({
   isReadOnly = false,
 }: NoteUrlEditorProps): React.ReactElement {
   const [draft, setDraft] = useState(value);
-  const [error, setError] = useState<string | null>(null);
   const [isPicking, setIsPicking] = useState(false);
   const [isCopyFlashing, setIsCopyFlashing] = useState(false);
   const copyFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -126,23 +125,18 @@ export function NoteUrlEditor({
   const commit = useCallback(() => {
     const trimmed = draft.trim();
     if (!trimmed) {
-      setError(null);
       onSave("");
       return;
     }
-    if (!isValidUrl(trimmed)) {
-      setError("Please enter a valid URL.");
-      return;
-    }
     const normalized = normalizeUrlForStorage(trimmed);
-    if (!normalized) {
-      setError("Please enter a valid URL.");
+    if (normalized) {
+      setDraft(normalized);
+      onSave(normalized);
       return;
     }
-    setDraft(normalized);
-    setError(null);
-    onSave(normalized);
-  }, [draft, onSave]);
+    // Invalid input was never persisted — quietly restore the last saved URL instead of nagging.
+    setDraft(normalizeDraftUrl(value));
+  }, [draft, onSave, value]);
 
   const openableDraftUrl = toOpenableUrl(draft);
   const canOpenLink = openableDraftUrl !== null;
@@ -179,7 +173,7 @@ export function NoteUrlEditor({
   return (
     <div className="bg-background">
       <div className="flex items-stretch border-b border-black">
-        <div className="flex h-5 w-12 shrink-0 items-center justify-center border-r border-black bg-note-field text-xs font-bold leading-none">
+        <div className="flex h-5 w-12 shrink-0 items-center justify-center border-r border-black bg-note-field font-ui text-note-meta font-bold leading-none">
           URL
         </div>
 
@@ -208,11 +202,6 @@ export function NoteUrlEditor({
             } else {
               setDraft(nextValue);
             }
-            if (error) {
-              if (!trimmed || isValidUrl(trimmed)) {
-                setError(null);
-              }
-            }
           }}
           onBlur={isReadOnly ? undefined : commit}
           onFocus={onInteract}
@@ -224,12 +213,9 @@ export function NoteUrlEditor({
               }
             }
           }}
-          className={cn(
-            "h-5 min-w-0 flex-1 rounded-none border-0 bg-note-field px-2 text-xs font-semibold shadow-none focus-visible:ring-0",
-            error ? "bg-destructive/10" : undefined,
-          )}
+          className="h-5 min-w-0 flex-1 rounded-none border-0 bg-note-field px-2 font-ui text-note-meta font-bold shadow-none focus-visible:ring-0"
         />
-        <div className="flex h-5 w-26 shrink-0 items-center justify-center border-l border-black bg-note-field px-2 text-xs font-bold leading-none">
+        <div className="flex h-5 w-26 shrink-0 items-center justify-center border-l border-black bg-note-field px-2 font-ui text-note-meta font-bold leading-none">
           {formatCreatedDateForBox(createdAt)}
         </div>
       </div>
@@ -504,12 +490,6 @@ export function NoteUrlEditor({
           </Button>
         </ButtonGroup>
       </div>
-
-      {error ? (
-        <p className="m-0 border-t px-2 py-1 text-xs text-destructive">
-          {error}
-        </p>
-      ) : null}
     </div>
   );
 }

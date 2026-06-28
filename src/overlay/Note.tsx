@@ -182,7 +182,7 @@ export function Note({
               headingFocusedRef.current = false;
               setHeadingFocused(false);
             }}
-            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-bold text-white outline-none cursor-pointer"
+            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-normal text-white outline-none cursor-pointer"
           />
           <div className="flex shrink-0 items-stretch">
             <CollapsibleTrigger asChild>

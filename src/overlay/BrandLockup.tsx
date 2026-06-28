@@ -1,13 +1,20 @@
 import React from "react";
 
 import { IS_WINDOWS } from "@/lib/platform";
+import { cn } from "@/lib/utils";
 
 /** Brand-cluster NN mark (white NN) — NOT the off-limits payment logo. */
-export function BrandLogo(): React.ReactElement {
+export function BrandLogo({
+  className,
+  viewBox = "0 0 63 30",
+}: {
+  className?: string;
+  viewBox?: string;
+}): React.ReactElement {
   return (
     <svg
-      viewBox="0 0 63 30"
-      className="h-5 w-auto shrink-0"
+      viewBox={viewBox}
+      className={cn("h-5 w-auto shrink-0", className)}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden

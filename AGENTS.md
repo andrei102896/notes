@@ -66,10 +66,10 @@ src/overlay/         React UI inside the panel iframe
   DashboardContent.tsx Note-list container + copy/paste buffer + scroll-position persistence
   NotesList.tsx      Static-list dnd with multi-note selection: flat column, useDraggable, section groups, frozen-snapshot cursor hit-test. Selection (local state `selectedNoteIds`) = Cmd/Ctrl-click toggle + Shift-click range (anchor = last plain/Cmd click, inclusive; range via flattenLayoutNoteIds); a bare left-click rings nothing but sets a pending anchor (`plainAnchorPendingRef`) that the NEXT Cmd/Ctrl-click folds into the group (so "click A then Cmd-click B,C" = {A,B,C}); shown as a dark ring; cleared on drop, tab switch, outside-click, or when a selected note vanishes. Grabbing a selected note drags the whole set (dragOrderRef = ordered block, draggedSetRef = the same as a Set); the clone stacks up to 2 faint back-notes + a count badge. The list NEVER reflows during a drag — the dragged rows dim in place and a clone rides the cursor via DragOverlay (portaled to the iframe <body> so the frosted container's backdrop-filter doesn't offset its fixed positioning). Snapshot includes ALL visible rows (incl. the dimmed sources) in list-container px (rows scroll together → no scroll offset); the cursor hit-tests this for a visual slot, mapped back to a dragged-excluded `base` index, then applyDropPlacement inserts the whole block. Plain reorder shows one thin high-contrast line (#111 + white ring) hugging a row edge (last-of-A vs first-of-B via boundarySide). Cmd/Ctrl = NEW SECTION at the CURSOR slot (top / between / bottom — resolveDropPlacement asNewSection): a labeled "New section" line at the slot, or a dashed item-sized box past the last note (where there's room); Cmd + cursor at/below the last row's top snaps it to the very end (forgiving bottom drop zone). A plain single-note drop released over the note's OWN original row is a no-op (so a near-zero "select" drag can't merge a sole-item section into its neighbor); dragging onto another note applies normally. Commit on drop via applyDropPlacement. (~880 lines — over the 300-LOC house rule; split deferred.)
   Note.tsx           Note card; header = drag handle only while title unfocused. Title edits on a CLEAN click (≤4px = PointerSensor distance), not on mousedown (preventDefault'd then focused in onClick) so click+drag moves instead of editing. Modifier-click (Cmd/Ctrl/Shift) selects via onSelect instead of editing — resolved in onClick so a modifier-drag doesn't also select (dnd-kit suppresses the click after a real drag); isSelected → selection ring.  NoteUrlEditor.tsx URL row + LINK/ANCHOR/COPY/PASTE
-  RichTextBodyEditor.tsx contentEditable + execCommand B/I/U, sanitized; body font = Inter
-  SubjectTabStrip.tsx Rotated strip + click-vs-dblclick; wheel-scroll is free, then `scrollend` snaps to the nearest full 3-cell tab (never rests mid-tab)     AlphabetIndexRollout.tsx A–Z rail (SELECTED subject's letter = blue, derived from activeSubjectTabId; matching letters hover-cue)
-  BrandLockup.tsx    Shared NN logo/wordmark     NnModalFrame.tsx shared dialog shell + Cancel/OK buttons
-  SubjectTab*Dialog.tsx / NoteDeleteConfirmDialog.tsx dialogs (deletes use NO/YES)     PaywallDialog.tsx full-width trial bar (BrandLockup + BUY + $5); wiring OFF-LIMITS (§7)
+  RichTextBodyEditor.tsx contentEditable + execCommand B/I/U, sanitized; body font = Inter; body bg = #D9D9D9 (`bg-note`) with the editor transparent so the dimmed `ModalWatermark` (0.15) reads behind the text
+  SubjectTabStrip.tsx Rotated strip + click-vs-dblclick; wheel-scroll uses native CSS scroll-snap (`snap-y snap-mandatory` on the scroll area + `snap-start` on each 3-cell tab) so it settles on a full tab without resting mid-tab     AlphabetIndexRollout.tsx A–Z rail (SELECTED subject's letter = blue, derived from activeSubjectTabId; matching letters hover-cue)
+  BrandLockup.tsx    Shared NN logo/wordmark; `BrandLogo(viewBox?)` renders the two-N mark     NnModalFrame.tsx shared dialog shell (Cancel/OK buttons; body is `min-h` 214px with content vertically centered) + `ModalWatermark` — the dimmed NN mark behind the body (glyph-tight viewBox so it's wide + full-height, NOT stretched; `-z-10` inside `relative isolate overflow-hidden`; opacity 0.03 on modals, 0.15 on the note). Reused by every modal, the empty-state panel, and the note body.
+  SubjectTab*Dialog.tsx / NoteDeleteConfirmDialog.tsx dialogs (deletes use CANCEL/OK)     PaywallDialog.tsx full-width trial bar (BrandLockup + BUY + $5); wiring OFF-LIMITS (§7)
   styles.css         Tailwind 4 @theme + iframe-injected styles (?inline import)
 src/components/ui/   shadcn primitives, re-themed to h-10 / text-2xl scale (§6)
 dist/                Built output (loadable). Built from the configured `.env` (real ExtPay id + prod 7-day trial) → paywall active (§7)
@@ -104,8 +104,9 @@ Gates: `npm run typecheck`, `npm run lint` (husky pre-commit runs both). No test
 `chrome.storage.session` (keyed by `tabId`, cleared on `tabs.onRemoved`). `content.ts` (on
 `<all_urls>`) appends a fixed, right-anchored shell `<div>` (z-index 2147483647) holding an
 about:blank `<iframe>`, doc.writes a blank doc, and renders React `App` into it via
-`overlay/mountOverlayApp.tsx` (which injects the whole Tailwind stylesheet as an inline `<style>`,
-so `dist/` has no .css asset — expected). Mounting is **eager and synchronous, from the
+`overlay/mountOverlayApp.tsx` (which injects the self-hosted `@font-face` set + the whole Tailwind
+stylesheet as inline `<style>`s, so `dist/` has no .css asset — expected; the fonts are separate
+web-accessible `.ttf` assets referenced via `chrome.runtime.getURL`). Mounting is **eager and synchronous, from the
 content-script realm**, so panel and content script share one JS context (messaging/ is in-memory
 function calls, not postMessage). **Do not lazy-load the app via a content-script `import()`:** it
 was tried and reverted — the runtime `import()` failed on some strict-CSP sites (e.g. tesla.com),
@@ -129,8 +130,12 @@ Still open (minor):
 1. **Legacy stored `gapBeforePxByNoteId`** — no longer written (sections are layout groups now, §8),
    but old stored values may exist; account for them on migrate.
 
-By design (not a defect, do not re-flag): the UI + note-body fonts load from Google Fonts at runtime
-([styles.css:1](src/overlay/styles.css#L1)) — intentional, will not be bundled locally.
+Fonts are **self-hosted** (Fjalla One + Inter 400/600/700 + italic): bundled as web-accessible
+`.ttf` assets and injected as `@font-face` by `mountOverlayApp` via `chrome.runtime.getURL` (absolute
+`chrome-extension://` URLs — the iframe is host-origin, so a bundler-relative path would resolve
+against the page). The Google Fonts CDN `@import` was removed (it was blocked on strict-CSP pages and
+dead offline). Caveat (do not re-flag): a host CSP whose `font-src` excludes the `chrome-extension:`
+scheme still forces a system-font fallback; the only complete fix is an extension-origin iframe (not done).
 
 Fix surface (keep payment lines out of any diff): `content.ts`, `styles.css`,
 `components/ui/{button,input,tabs}.tsx`, `SubjectTabStrip.tsx`, `nnNoteLayout.ts` + `NotesList.tsx`,

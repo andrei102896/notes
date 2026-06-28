@@ -11,9 +11,9 @@ import {
   applyTypingStyle,
   type FormatState,
   formatStateFromSelection,
-  isRichTextEmpty,
 } from "@/lib/richTextFormat";
 import { sanitizeNoteHtml } from "@/lib/sanitizeNoteHtml";
+import { ModalWatermark } from "@/overlay/NnModalFrame";
 
 export type RichTextBodyEditorHandle = {
   applyFormat: (command: "bold" | "italic" | "underline") => void;
@@ -147,20 +147,11 @@ export const RichTextBodyEditor = forwardRef<
 
   useImperativeHandle(ref, () => ({ applyFormat }), [applyFormat]);
 
-  const showPlaceholder = !isFocused && isRichTextEmpty(value);
-
   return (
-    <div className="border-b bg-background">
-      <div className="relative">
-        {showPlaceholder ? (
-          // Inline font-family (beats the ID-scoped global Fjalla rule) so the placeholder matches the Inter body.
-          <p
-            className="pointer-events-none absolute top-3 left-3 m-0 text-sm text-muted-foreground"
-            style={{ fontFamily: "var(--font-ui)" }}
-          >
-            Write your note...
-          </p>
-        ) : null}
+    <div className="relative isolate overflow-hidden border-b bg-note">
+      {/* Same NN watermark as the modals, dimmed to 0.15 for the light note body. */}
+      <ModalWatermark className="opacity-[0.15]" />
+      <div>
         <div
           ref={editorRef}
           role="textbox"
@@ -248,7 +239,7 @@ export const RichTextBodyEditor = forwardRef<
               );
             }
           }}
-          className="h-[11.3125rem] w-full overflow-y-auto bg-background px-3 py-3 outline-none"
+          className="h-[11.3125rem] w-full overflow-y-auto bg-transparent px-3 py-3 outline-none"
         />
       </div>
     </div>

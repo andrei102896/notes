@@ -59,37 +59,41 @@ export function SubjectTabAddDialog({
       open={open}
       onOpenChange={onOpenChange}
       title="Add subject tab"
-      widthClassName="w-[30rem]"
+      bodyClassName="px-12"
     >
-      <label
-        htmlFor={fieldId}
-        className="text-subject-label uppercase leading-none text-modal-foreground"
-      >
-        Add subject tab
-      </label>
+      <div className="flex items-end gap-3">
+        {/* Label + input stacked; items-center centers the narrower input box under the ADD SUBJECT TAB label (Figma). */}
+        <div className="flex flex-col items-center gap-4">
+          <label
+            htmlFor={fieldId}
+            className="text-subject-label uppercase leading-none text-modal-foreground"
+          >
+            Add subject tab
+          </label>
+          <Input
+            id={fieldId}
+            ref={inputRef}
+            data-subject-name-input
+            /* Box matches the OK/CANCEL buttons (Figma TAB BOX #515151, light text); label Fjalla One Regular 26 centered — size is ID-scoped in styles.css to dodge the text-size/color twMerge clash. */
+            className="h-auto w-28 border-[0.5px] border-white bg-[#515151] px-4 py-1 text-center leading-none text-white"
+            value={draft}
+            maxLength={SUBJECT_TAB_NAME_MAX_LEN}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === " ") {
+                e.stopPropagation();
+              }
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void submit();
+              }
+            }}
+            aria-label="New subject tab name"
+          />
+        </div>
 
-      <div className="flex items-stretch gap-3">
-        <Input
-          id={fieldId}
-          ref={inputRef}
-          className="h-auto w-44 min-w-0 border-white bg-note-field"
-          value={draft}
-          maxLength={SUBJECT_TAB_NAME_MAX_LEN}
-          placeholder="Name"
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === " ") {
-              e.stopPropagation();
-            }
-            if (e.key === "Enter") {
-              e.preventDefault();
-              void submit();
-            }
-          }}
-          aria-label="New subject tab name"
-        />
-
-        <div className="ml-auto flex gap-3">
+        {/* h-fit + self-end: don't stretch to the tall label+input column; sit at the input's level. */}
+        <div className="ml-auto flex h-fit gap-3 self-end">
           <ModalCancelButton onClick={() => onOpenChange(false)}>
             Cancel
           </ModalCancelButton>

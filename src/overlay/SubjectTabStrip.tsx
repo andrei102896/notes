@@ -58,6 +58,9 @@ type SubjectTabStripProps = {
   activeSubjectTabId: string | null;
   onSelectTab: (subjectTabId: string) => void;
   onCreateTab: (name: string) => void | Promise<void>;
+  /** Add-tab dialog open state, lifted to the parent so the empty-state panel can hide while it's open. */
+  addDialogOpen: boolean;
+  onAddDialogOpenChange: (open: boolean) => void;
   /** Select this tab without toggling off (e.g. SUBJECT-TABS-2 rename). */
   onEnsureActiveSubjectTab: (subjectTabId: string) => void | Promise<void>;
   onRenameSubjectTab: (
@@ -78,6 +81,8 @@ export const SubjectTabStrip = forwardRef<
     activeSubjectTabId,
     onSelectTab,
     onCreateTab,
+    addDialogOpen,
+    onAddDialogOpenChange,
     onEnsureActiveSubjectTab,
     onRenameSubjectTab,
     isReadOnly = false,
@@ -87,8 +92,6 @@ export const SubjectTabStrip = forwardRef<
   const sortedTabs = [...tabs].sort((a, b) =>
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
   );
-
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const [renameTarget, setRenameTarget] = useState<SubjectTabStripItem | null>(
     null,
@@ -166,43 +169,11 @@ export const SubjectTabStrip = forwardRef<
     clearPendingDeselect();
   }, [activeSubjectTabId]);
 
-  // On scrollend, snap to the nearest 3-cell tab boundary (doc 2: never rest mid-tab); ends clamp to 0/maxScroll so the first/last tab is fully revealed and A–Z-aligned.
-  useEffect(() => {
-    const el = tabsScrollAreaRef.current;
-    if (el === null) {
-      return;
-    }
-    const onScrollEnd = () => {
-      const first = el.querySelector<HTMLElement>('[data-slot="tabs-trigger"]');
-      if (first === null) {
-        return;
-      }
-      const tabHeight = first.getBoundingClientRect().height;
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      if (tabHeight <= 0 || maxScroll <= 0) {
-        return;
-      }
-      let target: number;
-      if (el.scrollTop < tabHeight / 2) {
-        target = 0;
-      } else if (maxScroll - el.scrollTop < tabHeight / 2) {
-        target = maxScroll;
-      } else {
-        target = Math.round(el.scrollTop / tabHeight) * tabHeight;
-      }
-      if (Math.abs(target - el.scrollTop) > 1) {
-        el.scrollTo({ top: target, behavior: "smooth" });
-      }
-    };
-    el.addEventListener("scrollend", onScrollEnd);
-    return () => el.removeEventListener("scrollend", onScrollEnd);
-  }, []);
-
   return (
     <>
       <SubjectTabAddDialog
         open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
+        onOpenChange={onAddDialogOpenChange}
         onConfirm={(name) => onCreateTab(name)}
       />
 
@@ -237,7 +208,7 @@ export const SubjectTabStrip = forwardRef<
             if (isReadOnly) {
               return;
             }
-            setAddDialogOpen(true);
+            onAddDialogOpenChange(true);
           }}
           disabled={isReadOnly}
           aria-disabled={isReadOnly}
@@ -262,8 +233,8 @@ export const SubjectTabStrip = forwardRef<
         >
           <div
             ref={tabsScrollAreaRef}
-            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter/scrollToTab. */
-            className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
+            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter/scrollToTab. snap-y/mandatory drives native snapping to each tab (snap-start on the triggers) so a slow scroll settles without the old JS delay-then-jump. */
+            className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar snap-y snap-mandatory"
           >
             <TabsList>
               {sortedTabs.map((tab) => (
@@ -293,7 +264,7 @@ export const SubjectTabStrip = forwardRef<
                   onDoubleClick={(e) => {
                     e.preventDefault();
                     clearPendingDeselect();
-                    setAddDialogOpen(false);
+                    onAddDialogOpenChange(false);
                     void onEnsureActiveSubjectTab(tab.id);
                     if (isReadOnly) {
                       return;

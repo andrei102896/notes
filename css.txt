@@ -1,20 +1,16 @@
-/* NN_DASHBOARD */
+/* NN_DASHBOARD FULL */
 
 position: absolute;
-width: 686px;
+width: 1008px;
 height: 1003px;
-left: 23px;
-top: 14px;
 
 
 
 /* MN */
 
 position: absolute;
-width: 686px;
+width: 1008px;
 height: 1003px;
-left: 23px;
-top: 14px;
 
 
 
@@ -23,8 +19,6 @@ top: 14px;
 position: absolute;
 width: 610px;
 height: 910px;
-left: 99px;
-top: 66px;
 
 background: #C7C7C7;
 border: 0.2px solid #000000;
@@ -37,8 +31,6 @@ backdrop-filter: blur(4.7px);
 position: absolute;
 width: 40px;
 height: 951px;
-left: 60px;
-top: 66px;
 
 
 
@@ -47,8 +39,6 @@ top: 66px;
 position: absolute;
 width: 110px;
 height: 40px;
-left: 60px;
-top: 66px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -60,14 +50,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 71.45px;
 height: 31.66px;
-left: 61.34px;
-top: 72.64px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -79,8 +67,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 109.11px;
 height: 39.34px;
-left: 60.46px;
-top: 176.15px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -92,14 +78,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 107.68px;
 height: 32px;
-left: 61px;
-top: 183.27px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -111,8 +95,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 109.11px;
 height: 39.34px;
-left: 60.46px;
-top: 285.26px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -122,16 +104,14 @@ transform: rotate(-90deg);
 /* WORDS_CHAIR */
 
 position: absolute;
-width: 71.45px;
-height: 31.66px;
-left: 61.34px;
-top: 292.94px;
+width: 94px;
+height: 32px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -143,8 +123,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 109.11px;
 height: 39.34px;
-left: 60.46px;
-top: 394.37px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -156,14 +134,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 102.65px;
 height: 32px;
-left: 61px;
-top: 401.66px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -175,8 +151,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 108.69px;
 height: 40px;
-left: 60px;
-top: 504.31px;
 
 background: #29ABE2;
 border: 0.5px solid #FFFFFF;
@@ -188,14 +162,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 101.65px;
 height: 32px;
-left: 61px;
-top: 510.35px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -207,8 +179,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 108.89px;
 height: 40px;
-left: 60px;
-top: 613.43px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -220,14 +190,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 71.45px;
 height: 31.66px;
-left: 61.34px;
-top: 621.28px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -239,8 +207,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 109.88px;
 height: 40px;
-left: 60px;
-top: 722.31px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -252,14 +218,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 71.45px;
 height: 31.66px;
-left: 61.34px;
-top: 728.39px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -271,8 +235,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 109.88px;
 height: 40px;
-left: 60px;
-top: 832.2px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -284,14 +246,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 71.45px;
 height: 31.66px;
-left: 61.34px;
-top: 838.5px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -303,8 +263,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 35px;
 height: 40px;
-left: 60px;
-top: 941px;
 
 background: #3F3F3F;
 border: 0.5px solid #FFFFFF;
@@ -316,14 +274,12 @@ transform: rotate(-90deg);
 position: absolute;
 width: 69px;
 height: 32px;
-left: 61px;
-top: 948px;
 
 font-family: 'Fjalla One';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 30px;
+font-size: 26px;
+line-height: 33px;
 
 color: #FFFFFF;
 
@@ -336,871 +292,8 @@ position: absolute;
 visibility: hidden;
 width: 610.2px;
 height: 908.6px;
-left: 99.8px;
-top: 104.69px;
 
 background: #FEFEFE;
-
-
-/* AI ALL */
-
-position: absolute;
-width: 37.46px;
-height: 947px;
-left: 23px;
-top: 30px;
-
-
-
-/* AI BOXES + LETTERS */
-
-position: absolute;
-width: 37.46px;
-height: 947px;
-left: 23px;
-top: 30px;
-
-
-
-/* AI SHADOW */
-
-position: absolute;
-width: 22px;
-height: 947px;
-left: 23px;
-top: 30px;
-
-background: #000000;
-box-shadow: 0px 4px 4.5px 4px rgba(0, 0, 0, 0.25);
-
-
-/* AI LETTERS + BOXES */
-
-position: absolute;
-width: 36.46px;
-height: 945.76px;
-left: 24px;
-top: 30px;
-
-
-
-/* Rectangle 26 */
-
-position: absolute;
-visibility: hidden;
-left: 3.23%;
-right: 91.9%;
-top: 90.39%;
-bottom: 6.05%;
-
-background: #DDDDDD;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 27 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 940px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 25 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 904.79px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 24 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 612.88px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 23 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 868.06px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 22 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 722.11px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 21 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 576.15px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 20 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 795.57px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 19 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 649.61px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 18 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 503.66px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 17 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 831.33px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 16 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 685.38px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 15 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 540.39px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 14 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 758.84px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 13 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 466.93px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 12 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 431.17px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 11 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 357.71px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 10 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 394.44px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 9 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 321.94px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 8 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 285.21px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 7 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 211.75px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 6 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 248.48px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 5 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 175.99px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 4 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 139.26px;
-
-background: #29ABE2;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 3 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 102.53px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 2 */
-
-position: absolute;
-width: 36.46px;
-height: 35.76px;
-left: 24px;
-top: 66.76px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 1 */
-
-position: absolute;
-width: 36.46px;
-height: 36.73px;
-left: 24px;
-top: 30px;
-
-background: #686868;
-border: 0.3px solid #000000;
-
-
-/* Z */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 952.16px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* Y */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 915.43px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* X */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 879.66px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* W */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 840.9px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* V */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 806.2px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* U */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 769.47px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* T */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 733.71px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* S */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 697.94px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* R */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 660.25px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* Q */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 625.45px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* P */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 588.72px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* O */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 550.99px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* N */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 514.23px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* M */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 475.5px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* L */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 443.73px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* K */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 406.04px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* J */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 369.3px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* I */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 335.54px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* H */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 295.78px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* G */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 260.08px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* F */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 224.32px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* E */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 188.55px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* D */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 149.86px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* C */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 114.13px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* B */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 78.36px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
-
-
-/* A */
-
-position: absolute;
-width: 13.53px;
-height: 25.9px;
-left: 32.72px;
-top: 42.6px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 26px;
-line-height: 33px;
-
-color: #FFFFFF;
-
-transform: rotate(90deg);
 
 
 /* NOTE_06_COLLAPSED */
@@ -1208,8 +301,6 @@ transform: rotate(90deg);
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 919.09px;
 
 
 
@@ -1220,8 +311,6 @@ box-sizing: border-box;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 919.09px;
 
 background: #D9D9D9;
 border: 6px solid #0D0D0D;
@@ -1232,8 +321,6 @@ border: 6px solid #0D0D0D;
 position: absolute;
 width: 544px;
 height: 38.66px;
-left: 124.58px;
-top: 924.89px;
 
 background: #666666;
 
@@ -1243,8 +330,6 @@ background: #666666;
 position: absolute;
 width: 386px;
 height: 25.19px;
-left: 133px;
-top: 930.48px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1261,8 +346,6 @@ color: #FFFFFF;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 924.89px;
 
 
 
@@ -1271,8 +354,6 @@ top: 924.89px;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 924.89px;
 
 background: #D9D9D9;
 
@@ -1282,8 +363,6 @@ background: #D9D9D9;
 position: absolute;
 width: 20.15px;
 height: 0px;
-left: 563.04px;
-top: 942.78px;
 
 border: 2px solid #000000;
 
@@ -1295,8 +374,6 @@ box-sizing: border-box;
 position: absolute;
 width: 20.15px;
 height: 20.3px;
-left: 596.62px;
-top: 933.59px;
 
 border: 2px solid #000000;
 
@@ -1306,8 +383,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 933.59px;
 
 
 
@@ -1318,8 +393,6 @@ box-sizing: border-box;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 933.59px;
 
 border: 2px solid #FFFFFF;
 
@@ -1329,8 +402,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 643.64px;
-top: 935.53px;
 
 border: 2px solid #FFFFFF;
 
@@ -1340,8 +411,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 647.47px;
-top: 935.53px;
 
 border: 2px solid #FFFFFF;
 
@@ -1351,8 +420,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 651.31px;
-top: 935.53px;
 
 border: 2px solid #FFFFFF;
 
@@ -1362,8 +429,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 655.15px;
-top: 935.53px;
 
 border: 2px solid #FFFFFF;
 
@@ -1373,8 +438,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 861.64px;
 
 
 
@@ -1385,8 +448,6 @@ box-sizing: border-box;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 861.64px;
 
 background: #D9D9D9;
 border: 6px solid #000000;
@@ -1400,8 +461,6 @@ position: absolute;
 visibility: hidden;
 width: 496.03px;
 height: 34.8px;
-left: 172.55px;
-top: 1098.45px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1415,8 +474,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 34.8px;
-left: 124.58px;
-top: 1098.45px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -1430,8 +487,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 20.3px;
-left: 124.58px;
-top: 1078.15px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1445,8 +500,6 @@ position: absolute;
 visibility: hidden;
 width: 103.62px;
 height: 20.3px;
-left: 564.96px;
-top: 1078.15px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1458,8 +511,6 @@ position: absolute;
 visibility: hidden;
 width: 23.99px;
 height: 20.3px;
-left: 138.97px;
-top: 1081.05px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1477,8 +528,6 @@ position: absolute;
 visibility: hidden;
 width: 60.44px;
 height: 20.3px;
-left: 586.07px;
-top: 1081.05px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1496,8 +545,6 @@ position: absolute;
 visibility: hidden;
 width: 23.99px;
 height: 20.3px;
-left: 136.09px;
-top: 1107.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1517,8 +564,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 34.8px;
-left: 232.04px;
-top: 1098.45px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -1530,8 +575,6 @@ position: absolute;
 visibility: hidden;
 width: 29.74px;
 height: 20.3px;
-left: 242.59px;
-top: 1107.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1549,8 +592,6 @@ position: absolute;
 visibility: hidden;
 width: 49.89px;
 height: 20.3px;
-left: 180.23px;
-top: 1107.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1568,8 +609,6 @@ position: absolute;
 visibility: hidden;
 width: 35.5px;
 height: 20.3px;
-left: 287.68px;
-top: 1107.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1589,8 +628,6 @@ position: absolute;
 visibility: hidden;
 width: 392.41px;
 height: 20.3px;
-left: 172.55px;
-top: 1078.15px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1602,8 +639,6 @@ position: absolute;
 visibility: hidden;
 width: 277.28px;
 height: 15.47px;
-left: 180.23px;
-top: 1082.02px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -1621,8 +656,6 @@ color: #000000;
 position: absolute;
 width: 544px;
 height: 38.66px;
-left: 124.58px;
-top: 867.44px;
 
 background: #666666;
 
@@ -1632,8 +665,6 @@ background: #666666;
 position: absolute;
 width: 393px;
 height: 25.19px;
-left: 133px;
-top: 873.59px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1650,8 +681,6 @@ color: #FFFFFF;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 867.44px;
 
 
 
@@ -1660,8 +689,6 @@ top: 867.44px;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 867.44px;
 
 background: #D9D9D9;
 
@@ -1671,8 +698,6 @@ background: #D9D9D9;
 position: absolute;
 width: 20.15px;
 height: 0px;
-left: 563.04px;
-top: 885.32px;
 
 border: 2px solid #000000;
 
@@ -1684,8 +709,6 @@ box-sizing: border-box;
 position: absolute;
 width: 20.15px;
 height: 20.3px;
-left: 596.62px;
-top: 876.14px;
 
 border: 2px solid #000000;
 
@@ -1695,8 +718,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 876.14px;
 
 
 
@@ -1707,8 +728,6 @@ box-sizing: border-box;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 876.14px;
 
 border: 2px solid #FFFFFF;
 
@@ -1718,8 +737,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 643.64px;
-top: 878.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -1729,8 +746,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 647.47px;
-top: 878.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -1740,8 +755,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 651.31px;
-top: 878.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -1751,8 +764,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 655.15px;
-top: 878.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -1763,8 +774,6 @@ position: absolute;
 visibility: hidden;
 width: 0px;
 height: 34.31px;
-left: 328.94px;
-top: 1098.93px;
 
 border: 0.5px solid #000000;
 
@@ -1777,8 +786,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 564.96px;
-top: 1098.45px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -1792,8 +799,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 599.5px;
-top: 1098.45px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -1807,8 +812,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 634.04px;
-top: 1098.45px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -1820,8 +823,6 @@ position: absolute;
 visibility: hidden;
 width: 13.43px;
 height: 16.43px;
-left: 577.44px;
-top: 1107.15px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -1839,8 +840,6 @@ position: absolute;
 visibility: hidden;
 width: 9.59px;
 height: 14.5px;
-left: 613.89px;
-top: 1107.15px;
 
 font-family: 'Myriad Pro';
 font-style: italic;
@@ -1858,8 +857,6 @@ position: absolute;
 visibility: hidden;
 width: 10.55px;
 height: 14.5px;
-left: 646.51px;
-top: 1107.15px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -1877,8 +874,6 @@ position: absolute;
 visibility: hidden;
 width: 10.07px;
 height: 0px;
-left: 646.99px;
-top: 1124.07px;
 
 border: 2px solid #000000;
 
@@ -1888,8 +883,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 803.64px;
 
 
 
@@ -1900,8 +893,6 @@ box-sizing: border-box;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 803.64px;
 
 background: #D9D9D9;
 border: 6px solid #000000;
@@ -1915,8 +906,6 @@ position: absolute;
 visibility: hidden;
 width: 496.03px;
 height: 34.8px;
-left: 172.55px;
-top: 1040.46px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1930,8 +919,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 34.8px;
-left: 124.58px;
-top: 1040.46px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -1945,8 +932,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 20.3px;
-left: 124.58px;
-top: 1020.16px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1960,8 +945,6 @@ position: absolute;
 visibility: hidden;
 width: 103.62px;
 height: 20.3px;
-left: 564.96px;
-top: 1020.16px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -1973,8 +956,6 @@ position: absolute;
 visibility: hidden;
 width: 23.99px;
 height: 20.3px;
-left: 138.97px;
-top: 1023.06px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -1992,8 +973,6 @@ position: absolute;
 visibility: hidden;
 width: 60.44px;
 height: 20.3px;
-left: 586.07px;
-top: 1023.06px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2011,8 +990,6 @@ position: absolute;
 visibility: hidden;
 width: 23.99px;
 height: 20.3px;
-left: 136.09px;
-top: 1049.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2032,8 +1009,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 34.8px;
-left: 232.04px;
-top: 1040.46px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -2045,8 +1020,6 @@ position: absolute;
 visibility: hidden;
 width: 29.74px;
 height: 20.3px;
-left: 242.59px;
-top: 1049.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2064,8 +1037,6 @@ position: absolute;
 visibility: hidden;
 width: 49.89px;
 height: 20.3px;
-left: 180.23px;
-top: 1049.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2083,8 +1054,6 @@ position: absolute;
 visibility: hidden;
 width: 35.5px;
 height: 20.3px;
-left: 287.68px;
-top: 1049.15px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2104,8 +1073,6 @@ position: absolute;
 visibility: hidden;
 width: 392.41px;
 height: 20.3px;
-left: 172.55px;
-top: 1020.16px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2117,8 +1084,6 @@ position: absolute;
 visibility: hidden;
 width: 277.28px;
 height: 15.47px;
-left: 180.23px;
-top: 1024.02px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -2136,8 +1101,6 @@ color: #000000;
 position: absolute;
 width: 544px;
 height: 38.66px;
-left: 124.58px;
-top: 809.44px;
 
 background: #666666;
 
@@ -2147,8 +1110,6 @@ background: #666666;
 position: absolute;
 width: 336px;
 height: 25.19px;
-left: 133px;
-top: 815.16px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2165,8 +1126,6 @@ color: #FFFFFF;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 809.44px;
 
 
 
@@ -2175,8 +1134,6 @@ top: 809.44px;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 809.44px;
 
 background: #D9D9D9;
 
@@ -2186,8 +1143,6 @@ background: #D9D9D9;
 position: absolute;
 width: 20.15px;
 height: 0px;
-left: 563.04px;
-top: 827.32px;
 
 border: 2px solid #000000;
 
@@ -2199,8 +1154,6 @@ box-sizing: border-box;
 position: absolute;
 width: 20.15px;
 height: 20.3px;
-left: 596.62px;
-top: 818.14px;
 
 border: 2px solid #000000;
 
@@ -2210,8 +1163,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 818.14px;
 
 
 
@@ -2222,8 +1173,6 @@ box-sizing: border-box;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 818.14px;
 
 border: 2px solid #FFFFFF;
 
@@ -2233,8 +1182,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 643.64px;
-top: 820.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -2244,8 +1191,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 647.47px;
-top: 820.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -2255,8 +1200,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 651.31px;
-top: 820.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -2266,8 +1209,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 655.15px;
-top: 820.07px;
 
 border: 2px solid #FFFFFF;
 
@@ -2278,8 +1219,6 @@ position: absolute;
 visibility: hidden;
 width: 0px;
 height: 34.31px;
-left: 328.94px;
-top: 1040.94px;
 
 border: 0.5px solid #000000;
 
@@ -2292,8 +1231,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 564.96px;
-top: 1040.46px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -2307,8 +1244,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 599.5px;
-top: 1040.46px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -2322,8 +1257,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 634.04px;
-top: 1040.46px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -2335,8 +1268,6 @@ position: absolute;
 visibility: hidden;
 width: 13.43px;
 height: 16.43px;
-left: 577.44px;
-top: 1049.15px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -2354,8 +1285,6 @@ position: absolute;
 visibility: hidden;
 width: 9.59px;
 height: 14.5px;
-left: 613.89px;
-top: 1049.15px;
 
 font-family: 'Myriad Pro';
 font-style: italic;
@@ -2373,8 +1302,6 @@ position: absolute;
 visibility: hidden;
 width: 10.55px;
 height: 14.5px;
-left: 646.51px;
-top: 1049.15px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -2392,8 +1319,6 @@ position: absolute;
 visibility: hidden;
 width: 10.07px;
 height: 0px;
-left: 646.99px;
-top: 1066.07px;
 
 border: 2px solid #000000;
 
@@ -2403,8 +1328,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 555.52px;
 height: 277.41px;
-left: 118.82px;
-top: 458.5px;
 
 
 
@@ -2415,8 +1338,6 @@ box-sizing: border-box;
 position: absolute;
 width: 555.52px;
 height: 277.41px;
-left: 118.82px;
-top: 458.5px;
 
 background: #D9D9D9;
 border: 6px solid #0D0D0D;
@@ -2429,8 +1350,6 @@ box-sizing: border-box;
 position: absolute;
 width: 496.03px;
 height: 34.8px;
-left: 172.55px;
-top: 695.32px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2443,8 +1362,6 @@ box-sizing: border-box;
 position: absolute;
 width: 47.97px;
 height: 34.8px;
-left: 124.58px;
-top: 695.32px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -2457,8 +1374,6 @@ box-sizing: border-box;
 position: absolute;
 width: 47.97px;
 height: 20.3px;
-left: 124.58px;
-top: 675.02px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2471,8 +1386,6 @@ box-sizing: border-box;
 position: absolute;
 width: 103.62px;
 height: 20.3px;
-left: 564.96px;
-top: 675.02px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2483,8 +1396,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 23.99px;
 height: 20.3px;
-left: 138.97px;
-top: 677.92px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2501,14 +1412,12 @@ color: #000000;
 position: absolute;
 width: 71px;
 height: 20.3px;
-left: 583.07px;
-top: 677.92px;
 
-font-family: 'Inter';
+font-family: 'Fjalla One';
 font-style: normal;
-font-weight: 600;
-font-size: 11px;
-line-height: 13px;
+font-weight: 400;
+font-size: 13px;
+line-height: 16px;
 
 color: #000000;
 
@@ -2519,8 +1428,6 @@ color: #000000;
 position: absolute;
 width: 31px;
 height: 20.15px;
-left: 136px;
-top: 704.36px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2539,8 +1446,6 @@ box-sizing: border-box;
 position: absolute;
 width: 47.97px;
 height: 34.8px;
-left: 232.04px;
-top: 695.32px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -2551,8 +1456,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 29.74px;
 height: 20.3px;
-left: 242.59px;
-top: 704.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2569,8 +1472,6 @@ color: #FFFFFF;
 position: absolute;
 width: 49.89px;
 height: 20.3px;
-left: 180.23px;
-top: 704.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2587,8 +1488,6 @@ color: #000000;
 position: absolute;
 width: 35.5px;
 height: 20.3px;
-left: 287.68px;
-top: 704.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2607,8 +1506,6 @@ box-sizing: border-box;
 position: absolute;
 width: 392.41px;
 height: 20.3px;
-left: 172.55px;
-top: 675.02px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2619,8 +1516,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 544px;
 height: 38.66px;
-left: 124.58px;
-top: 464.3px;
 
 background: #666666;
 
@@ -2630,8 +1525,6 @@ background: #666666;
 position: absolute;
 width: 367.47px;
 height: 25.13px;
-left: 133.21px;
-top: 470.1px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2648,8 +1541,6 @@ color: #FFFFFF;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 464.3px;
 
 
 
@@ -2658,8 +1549,6 @@ top: 464.3px;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 464.3px;
 
 background: #D9D9D9;
 
@@ -2669,8 +1558,6 @@ background: #D9D9D9;
 position: absolute;
 width: 20.15px;
 height: 0px;
-left: 563.04px;
-top: 482.19px;
 
 border: 2px solid #000000;
 
@@ -2682,8 +1569,6 @@ box-sizing: border-box;
 position: absolute;
 width: 20.15px;
 height: 20.3px;
-left: 596.62px;
-top: 473px;
 
 border: 2px solid #000000;
 
@@ -2693,8 +1578,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 473px;
 
 
 
@@ -2705,8 +1588,6 @@ box-sizing: border-box;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 473px;
 
 border: 2px solid #FFFFFF;
 
@@ -2716,8 +1597,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 643.64px;
-top: 474.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -2727,8 +1606,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 647.47px;
-top: 474.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -2738,8 +1615,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 651.31px;
-top: 474.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -2749,8 +1624,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 655.15px;
-top: 474.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -2760,8 +1633,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 34.31px;
-left: 328.94px;
-top: 695.8px;
 
 border: 0.5px solid #000000;
 
@@ -2773,8 +1644,6 @@ box-sizing: border-box;
 position: absolute;
 width: 34.54px;
 height: 34.8px;
-left: 564.96px;
-top: 695.32px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -2787,8 +1656,6 @@ box-sizing: border-box;
 position: absolute;
 width: 34.54px;
 height: 34.8px;
-left: 599.5px;
-top: 695.32px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -2801,8 +1668,6 @@ box-sizing: border-box;
 position: absolute;
 width: 34.54px;
 height: 34.8px;
-left: 634.04px;
-top: 695.32px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -2813,8 +1678,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 13.43px;
 height: 16.43px;
-left: 577.44px;
-top: 704.02px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -2831,8 +1694,6 @@ color: #000000;
 position: absolute;
 width: 9.59px;
 height: 14.5px;
-left: 613.89px;
-top: 704.02px;
 
 font-family: 'Inter';
 font-style: italic;
@@ -2849,8 +1710,6 @@ color: #000000;
 position: absolute;
 width: 10.55px;
 height: 14.5px;
-left: 646.51px;
-top: 704.02px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -2867,8 +1726,6 @@ color: #000000;
 position: absolute;
 width: 9px;
 height: 0px;
-left: 648px;
-top: 721px;
 
 border: 2px solid #000000;
 
@@ -2878,8 +1735,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 82.5px;
 height: 0px;
-left: 548.5px;
-top: 502.87px;
 
 border: 1px solid #999999;
 
@@ -2889,8 +1744,6 @@ border: 1px solid #999999;
 position: absolute;
 width: 500px;
 height: 134px;
-left: 142px;
-top: 519px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -2898,7 +1751,7 @@ font-weight: 400;
 font-size: 18px;
 line-height: 23px;
 
-color: #464646;
+color: #000000;
 
 
 
@@ -2907,8 +1760,6 @@ color: #464646;
 position: absolute;
 width: 452px;
 height: 16px;
-left: 179px;
-top: 678px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -2925,8 +1776,6 @@ color: #000000;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 400.51px;
 
 
 
@@ -2937,8 +1786,6 @@ box-sizing: border-box;
 position: absolute;
 width: 555.52px;
 height: 50.26px;
-left: 118.82px;
-top: 400.51px;
 
 background: #D9D9D9;
 border: 6px solid #000000;
@@ -2952,8 +1799,6 @@ position: absolute;
 visibility: hidden;
 width: 496.03px;
 height: 34.8px;
-left: 172.55px;
-top: 637.32px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2967,8 +1812,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 34.8px;
-left: 124.58px;
-top: 637.32px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -2982,8 +1825,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 20.3px;
-left: 124.58px;
-top: 617.02px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -2997,8 +1838,6 @@ position: absolute;
 visibility: hidden;
 width: 103.62px;
 height: 20.3px;
-left: 564.96px;
-top: 617.02px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -3010,8 +1849,6 @@ position: absolute;
 visibility: hidden;
 width: 23.99px;
 height: 20.3px;
-left: 138.97px;
-top: 619.92px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3029,8 +1866,6 @@ position: absolute;
 visibility: hidden;
 width: 60.44px;
 height: 20.3px;
-left: 586.07px;
-top: 619.92px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3048,8 +1883,6 @@ position: absolute;
 visibility: hidden;
 width: 23.99px;
 height: 20.3px;
-left: 136.09px;
-top: 646.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3069,8 +1902,6 @@ position: absolute;
 visibility: hidden;
 width: 47.97px;
 height: 34.8px;
-left: 232.04px;
-top: 637.32px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -3082,8 +1913,6 @@ position: absolute;
 visibility: hidden;
 width: 29.74px;
 height: 20.3px;
-left: 242.59px;
-top: 646.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3101,8 +1930,6 @@ position: absolute;
 visibility: hidden;
 width: 49.89px;
 height: 20.3px;
-left: 180.23px;
-top: 646.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3120,8 +1947,6 @@ position: absolute;
 visibility: hidden;
 width: 35.5px;
 height: 20.3px;
-left: 287.68px;
-top: 646.02px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3141,8 +1966,6 @@ position: absolute;
 visibility: hidden;
 width: 392.41px;
 height: 20.3px;
-left: 172.55px;
-top: 617.02px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -3154,8 +1977,6 @@ position: absolute;
 visibility: hidden;
 width: 277.28px;
 height: 15.47px;
-left: 180.23px;
-top: 620.89px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -3173,8 +1994,6 @@ color: #000000;
 position: absolute;
 width: 544px;
 height: 38.66px;
-left: 124.58px;
-top: 406.31px;
 
 background: #666666;
 
@@ -3184,8 +2003,6 @@ background: #666666;
 position: absolute;
 width: 368px;
 height: 25.19px;
-left: 133px;
-top: 412.2px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3202,8 +2019,6 @@ color: #FFFFFF;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 406.31px;
 
 
 
@@ -3212,8 +2027,6 @@ top: 406.31px;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.65px;
-top: 406.31px;
 
 background: #D9D9D9;
 
@@ -3223,8 +2036,6 @@ background: #D9D9D9;
 position: absolute;
 width: 20.15px;
 height: 0px;
-left: 563.04px;
-top: 424.19px;
 
 border: 2px solid #000000;
 
@@ -3236,8 +2047,6 @@ box-sizing: border-box;
 position: absolute;
 width: 20.15px;
 height: 20.3px;
-left: 596.62px;
-top: 415.01px;
 
 border: 2px solid #000000;
 
@@ -3247,8 +2056,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 415.01px;
 
 
 
@@ -3259,8 +2066,6 @@ box-sizing: border-box;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 638.84px;
-top: 415.01px;
 
 border: 2px solid #FFFFFF;
 
@@ -3270,8 +2075,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 643.64px;
-top: 416.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -3281,8 +2084,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 647.47px;
-top: 416.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -3292,8 +2093,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 651.31px;
-top: 416.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -3303,8 +2102,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 655.15px;
-top: 416.94px;
 
 border: 2px solid #FFFFFF;
 
@@ -3315,8 +2112,6 @@ position: absolute;
 visibility: hidden;
 width: 0px;
 height: 34.31px;
-left: 328.94px;
-top: 637.81px;
 
 border: 0.5px solid #000000;
 
@@ -3329,8 +2124,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 564.96px;
-top: 637.32px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -3344,8 +2137,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 599.5px;
-top: 637.32px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -3359,8 +2150,6 @@ position: absolute;
 visibility: hidden;
 width: 34.54px;
 height: 34.8px;
-left: 634.04px;
-top: 637.32px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -3372,8 +2161,6 @@ position: absolute;
 visibility: hidden;
 width: 13.43px;
 height: 16.43px;
-left: 577.44px;
-top: 646.02px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -3391,8 +2178,6 @@ position: absolute;
 visibility: hidden;
 width: 9.59px;
 height: 14.5px;
-left: 613.89px;
-top: 646.02px;
 
 font-family: 'Myriad Pro';
 font-style: italic;
@@ -3410,8 +2195,6 @@ position: absolute;
 visibility: hidden;
 width: 10.55px;
 height: 14.5px;
-left: 646.51px;
-top: 646.02px;
 
 font-family: 'Myriad Pro';
 font-style: normal;
@@ -3429,8 +2212,6 @@ position: absolute;
 visibility: hidden;
 width: 10.07px;
 height: 0px;
-left: 646.99px;
-top: 662.94px;
 
 border: 2px solid #000000;
 
@@ -3440,8 +2221,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 555.52px;
 height: 277.41px;
-left: 119px;
-top: 115px;
 
 
 
@@ -3452,8 +2231,6 @@ box-sizing: border-box;
 position: absolute;
 width: 555.52px;
 height: 277.41px;
-left: 119px;
-top: 115px;
 
 background: #D9D9D9;
 border: 6px solid #29ABE2;
@@ -3466,8 +2243,6 @@ box-sizing: border-box;
 position: absolute;
 width: 496.03px;
 height: 34.8px;
-left: 172.73px;
-top: 351.81px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -3480,8 +2255,6 @@ box-sizing: border-box;
 position: absolute;
 width: 47.97px;
 height: 34.8px;
-left: 124.76px;
-top: 351.81px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -3494,8 +2267,6 @@ box-sizing: border-box;
 position: absolute;
 width: 47.97px;
 height: 20.3px;
-left: 124.76px;
-top: 331.52px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -3508,8 +2279,6 @@ box-sizing: border-box;
 position: absolute;
 width: 103.62px;
 height: 20.3px;
-left: 565.14px;
-top: 331.52px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -3520,8 +2289,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 23.99px;
 height: 20.3px;
-left: 139.15px;
-top: 334.41px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3538,14 +2305,12 @@ color: #000000;
 position: absolute;
 width: 69px;
 height: 21px;
-left: 583px;
-top: 335px;
 
-font-family: 'Inter';
+font-family: 'Fjalla One';
 font-style: normal;
-font-weight: 600;
-font-size: 11px;
-line-height: 13px;
+font-weight: 400;
+font-size: 13px;
+line-height: 16px;
 
 color: #000000;
 
@@ -3556,8 +2321,6 @@ color: #000000;
 position: absolute;
 width: 30px;
 height: 20.15px;
-left: 136.18px;
-top: 360.45px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3576,8 +2339,6 @@ box-sizing: border-box;
 position: absolute;
 width: 47.97px;
 height: 34.8px;
-left: 232.21px;
-top: 351.81px;
 
 background: #000000;
 border: 0.3px solid #000000;
@@ -3588,8 +2349,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 29.74px;
 height: 20.3px;
-left: 242.77px;
-top: 360.51px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3606,8 +2365,6 @@ color: #FFFFFF;
 position: absolute;
 width: 49.89px;
 height: 20.3px;
-left: 180.4px;
-top: 360.51px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3624,8 +2381,6 @@ color: #000000;
 position: absolute;
 width: 35.5px;
 height: 20.3px;
-left: 287.86px;
-top: 360.51px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3644,8 +2399,6 @@ box-sizing: border-box;
 position: absolute;
 width: 392.41px;
 height: 20.3px;
-left: 172.73px;
-top: 331.52px;
 
 background: #FEFEFE;
 border: 0.3px solid #000000;
@@ -3656,8 +2409,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 544px;
 height: 38.66px;
-left: 124.76px;
-top: 120.8px;
 
 background: #666666;
 
@@ -3667,8 +2418,6 @@ background: #666666;
 position: absolute;
 width: 375px;
 height: 25.19px;
-left: 133.18px;
-top: 126.72px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3686,8 +2435,6 @@ position: absolute;
 visibility: hidden;
 width: 375px;
 height: 25.19px;
-left: 133.18px;
-top: 126.72px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3704,8 +2451,6 @@ color: #A2A2A2;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.83px;
-top: 120.8px;
 
 
 
@@ -3714,8 +2459,6 @@ top: 120.8px;
 position: absolute;
 width: 81.55px;
 height: 38.66px;
-left: 548.83px;
-top: 120.8px;
 
 background: #D9D9D9;
 
@@ -3725,8 +2468,6 @@ background: #D9D9D9;
 position: absolute;
 width: 20.15px;
 height: 0px;
-left: 563.22px;
-top: 138.68px;
 
 border: 2px solid #000000;
 
@@ -3738,8 +2479,6 @@ box-sizing: border-box;
 position: absolute;
 width: 20.15px;
 height: 20.3px;
-left: 596.8px;
-top: 129.5px;
 
 border: 2px solid #000000;
 
@@ -3749,8 +2488,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 639.02px;
-top: 129.5px;
 
 
 
@@ -3761,8 +2498,6 @@ box-sizing: border-box;
 position: absolute;
 width: 21.11px;
 height: 20.3px;
-left: 639.02px;
-top: 129.5px;
 
 border: 2px solid #FFFFFF;
 
@@ -3772,8 +2507,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 643.81px;
-top: 131.43px;
 
 border: 2px solid #FFFFFF;
 
@@ -3783,8 +2516,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 647.65px;
-top: 131.43px;
 
 border: 2px solid #FFFFFF;
 
@@ -3794,8 +2525,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 651.49px;
-top: 131.43px;
 
 border: 2px solid #FFFFFF;
 
@@ -3805,8 +2534,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 16.92px;
-left: 655.33px;
-top: 131.43px;
 
 border: 2px solid #FFFFFF;
 
@@ -3816,8 +2543,6 @@ border: 2px solid #FFFFFF;
 position: absolute;
 width: 0px;
 height: 34.31px;
-left: 329.12px;
-top: 352.3px;
 
 border: 0.5px solid #000000;
 
@@ -3829,8 +2554,6 @@ box-sizing: border-box;
 position: absolute;
 width: 34.54px;
 height: 34.8px;
-left: 565.14px;
-top: 351.81px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -3843,8 +2566,6 @@ box-sizing: border-box;
 position: absolute;
 width: 34.54px;
 height: 34.8px;
-left: 599.68px;
-top: 351.81px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -3857,8 +2578,6 @@ box-sizing: border-box;
 position: absolute;
 width: 34.54px;
 height: 34.8px;
-left: 634.22px;
-top: 351.81px;
 
 background: #D9D9D9;
 border: 0.3px solid #000000;
@@ -3869,8 +2588,6 @@ border: 0.3px solid #000000;
 position: absolute;
 width: 13.43px;
 height: 16.43px;
-left: 577.61px;
-top: 360.51px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -3887,8 +2604,6 @@ color: #000000;
 position: absolute;
 width: 9.59px;
 height: 14.5px;
-left: 614.07px;
-top: 360.51px;
 
 font-family: 'Inter';
 font-style: italic;
@@ -3903,10 +2618,8 @@ color: #000000;
 /* U_UNDERLINE */
 
 position: absolute;
-width: 10.07px;
+width: 9px;
 height: 0px;
-left: 647.17px;
-top: 377.43px;
 
 border: 2px solid #000000;
 
@@ -3916,10 +2629,8 @@ border: 2px solid #000000;
 position: absolute;
 width: 10.55px;
 height: 14.5px;
-left: 646.69px;
-top: 360.51px;
 
-font-family: 'Myriad Pro';
+font-family: 'Inter';
 font-style: normal;
 font-weight: 700;
 font-size: 16px;
@@ -3934,8 +2645,6 @@ color: #000000;
 position: absolute;
 width: 81px;
 height: 0px;
-left: 549.18px;
-top: 158.96px;
 
 border: 1px solid #999999;
 
@@ -3945,8 +2654,6 @@ border: 1px solid #999999;
 position: absolute;
 width: 510px;
 height: 110px;
-left: 142px;
-top: 175px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -3954,7 +2661,7 @@ font-weight: 400;
 font-size: 18px;
 line-height: 23px;
 
-color: #464646;
+color: #000000;
 
 
 
@@ -3963,8 +2670,6 @@ color: #464646;
 position: absolute;
 width: 406px;
 height: 17px;
-left: 179px;
-top: 335px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -3976,16 +2681,88 @@ color: #000000;
 
 
 
-/* BLUR_BTTM_DB */
+/* SPACE CREATED  LEFT CLICK + CMD/ CTRL */
 
 position: absolute;
-visibility: hidden;
-width: 606px;
-height: 35px;
-left: 100px;
-top: 941px;
+width: 632px;
+height: 154px;
 
-background: rgba(41, 171, 226, 0.46);
+
+
+/* Vector 32 */
+
+position: absolute;
+width: 353px;
+height: 0px;
+
+border: 2px solid #000000;
+
+
+/* Rectangle 35 */
+
+position: absolute;
+width: 279px;
+height: 154px;
+
+background: #3F3F3F;
+
+
+/* SCROLL BAR */
+
+position: absolute;
+width: 255px;
+height: 126px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 25px;
+
+color: #FFFFFF;
+
+
+
+/* SCROLL BAR */
+
+position: absolute;
+width: 168.5px;
+height: 55px;
+
+
+
+/* Vector 32 */
+
+position: absolute;
+width: 53px;
+height: 0px;
+
+border: 2px solid #000000;
+
+
+/* Rectangle 35 */
+
+position: absolute;
+width: 116px;
+height: 55px;
+
+background: #3F3F3F;
+
+
+/* SCROLL BAR */
+
+position: absolute;
+width: 93px;
+height: 27px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 25px;
+
+color: #FFFFFF;
+
 
 
 /* NN_SCROLL BAR */
@@ -3993,96 +2770,26 @@ background: rgba(41, 171, 226, 0.46);
 position: absolute;
 width: 7px;
 height: 844px;
-left: 691px;
-top: 119px;
 
 background: #686868;
 border-radius: 6px;
+
+
+/* BLUR_BTTM_DB */
+
+position: absolute;
+visibility: hidden;
+width: 606px;
+height: 35px;
+
+background: rgba(41, 171, 226, 0.46);
 
 
 /* NAV_BAR_ALL */
 
 position: absolute;
 width: 609px;
-height: 38px;
-left: 100px;
-top: 65px;
-
-
-
-/* BOX_THIS TAB NOTES */
-
-position: absolute;
-width: 305px;
-height: 38px;
-left: 222px;
-top: 65px;
-
-background: #B7B5B5;
-
-
-/* BOX_THIS TAB NOTES */
-
-position: absolute;
-width: 120px;
-height: 38px;
-left: 222px;
-top: 65px;
-
-background: #565656;
-
-
-/* Polygon 1 */
-
-position: absolute;
-width: 38px;
-height: 18px;
-left: 337px;
-top: 65px;
-
-background: #565656;
-transform: rotate(90deg);
-
-
-/* BORDER_THIS TAB NOTES */
-
-box-sizing: border-box;
-
-position: absolute;
-width: 135.28px;
-height: 27.06px;
-left: 228.36px;
-top: 70.83px;
-
-
-
-/* BOX_MIN MAX DELETE */
-
-position: absolute;
-visibility: hidden;
-width: 160px;
-height: 27px;
-left: 358px;
-top: 70px;
-
-background: #D0D0D0;
-
-
-/* WORDS_MIN MAX DELETE */
-
-position: absolute;
-width: 151px;
-height: 25px;
-left: 364px;
-top: 72px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 21px;
-line-height: 26px;
-
-color: #252525;
+height: 44px;
 
 
 
@@ -4091,10 +2798,8 @@ color: #252525;
 position: absolute;
 width: 116px;
 height: 32px;
-left: 103px;
-top: 68px;
 
-background: #313131;
+background: #29ABE2;
 border: 3px solid #FFFFFF;
 
 
@@ -4103,8 +2808,6 @@ border: 3px solid #FFFFFF;
 position: absolute;
 width: 112px;
 height: 32px;
-left: 530px;
-top: 68px;
 
 background: #313131;
 border: 3px solid #FFFFFF;
@@ -4115,8 +2818,6 @@ border: 3px solid #FFFFFF;
 position: absolute;
 width: 83.47px;
 height: 23.2px;
-left: 117.98px;
-top: 70.83px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -4133,8 +2834,6 @@ color: #FFFFFF;
 position: absolute;
 width: 96px;
 height: 24px;
-left: 539px;
-top: 71px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -4146,35 +2845,39 @@ color: #FFFFFF;
 
 
 
-/* WHITE LINE_NAV_BAR_BTTM */
+/* BOX_THIS TAB NOTES */
 
 position: absolute;
-width: 609px;
-height: 0px;
-left: 100px;
-top: 102px;
+width: 305px;
+height: 38px;
 
-border: 2px solid #FFFFFF;
+background: #B7B5B5;
 
 
-/* WHITE LINE_NAV_BAR_TOP */
+/* BOX_THIS TAB NOTES */
 
 position: absolute;
-width: 609px;
-height: 0px;
-left: 100px;
-top: 66px;
+width: 120px;
+height: 37px;
 
-border: 2px solid #FFFFFF;
+background: #565656;
+
+
+/* Polygon 1 */
+
+position: absolute;
+width: 44px;
+height: 18px;
+
+background: #565656;
+transform: rotate(90deg);
 
 
 /* WORDS_THIS TAB NOTES */
 
 position: absolute;
-width: 105px;
+width: 107px;
 height: 22px;
-left: 229px;
-top: 74px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -4186,13 +2889,66 @@ color: #FFFFFF;
 
 
 
+/* BORDER_THIS TAB NOTES */
+
+box-sizing: border-box;
+
+position: absolute;
+visibility: hidden;
+width: 135.28px;
+height: 27.06px;
+
+
+
+/* WORDS_MIN MAX DELETE */
+
+position: absolute;
+width: 151px;
+height: 25px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 21px;
+line-height: 26px;
+
+color: #252525;
+
+
+
+/* WHITE LINE_NAV_BAR_BTTM */
+
+position: absolute;
+width: 609px;
+height: 0px;
+
+border: 4px solid #FFFFFF;
+
+
+/* WHITE LINE_NAV_BAR_TOP */
+
+position: absolute;
+width: 609px;
+height: 0px;
+
+border: 4px solid #FFFFFF;
+
+
+/* NOISE BLURRED */
+
+position: absolute;
+width: 596px;
+height: 16px;
+
+background: #014461;
+opacity: 0.79;
+
+
 /* UI LOGO + BOX_NAV_BAR */
 
 position: absolute;
-left: 88.8%;
-right: 2.35%;
-top: 6.65%;
-bottom: 89.46%;
+width: 64px;
+height: 38px;
 
 
 
@@ -4203,8 +2959,6 @@ box-sizing: border-box;
 position: absolute;
 width: 64px;
 height: 38px;
-left: 642px;
-top: 65px;
 
 background: #29ABE2;
 border: 3px solid #FFFFFF;
@@ -4213,10 +2967,8 @@ border: 3px solid #FFFFFF;
 /* N_RIGHT */
 
 position: absolute;
-left: 93.32%;
-right: 3.64%;
-top: 7.59%;
-bottom: 90.47%;
+width: 22px;
+height: 19px;
 
 background: #FFFFFF;
 
@@ -4224,10 +2976,8 @@ background: #FFFFFF;
 /* N_LEFT */
 
 position: absolute;
-left: 90%;
-right: 6.96%;
-top: 7.59%;
-bottom: 90.47%;
+width: 22px;
+height: 19px;
 
 background: #FFFFFF;
 
@@ -4236,15 +2986,11 @@ background: #FFFFFF;
 
 position: absolute;
 width: 605px;
-height: 35px;
-left: 101px;
-top: 30px;
+height: 36px;
 
 background: #686868;
-border: 1px solid #000000;
-box-shadow: 0px 9px 10.3px rgba(0, 0, 0, 0.52);
-backdrop-filter: blur(2px);
-/* Note: backdrop-filter has minimal browser support */
+box-shadow: 0px 9px 6.6px rgba(0, 0, 0, 0.61);
+border-radius: 0px;
 
 
 /* MN_STROKE_DB */
@@ -4252,10 +2998,8 @@ backdrop-filter: blur(2px);
 box-sizing: border-box;
 
 position: absolute;
-width: 686px;
+width: 688px;
 height: 952px;
-left: 23px;
-top: 27px;
 
 border: 3px solid #282828;
 
@@ -4263,10 +3007,8 @@ border: 3px solid #282828;
 /* ADD SUB TAB  ALL */
 
 position: absolute;
-width: 43.9px;
+width: 42.9px;
 height: 53px;
-left: 60px;
-top: 14px;
 
 
 
@@ -4275,10 +3017,8 @@ top: 14px;
 box-sizing: border-box;
 
 position: absolute;
-width: 41px;
+width: 40px;
 height: 39px;
-left: 60px;
-top: 28px;
 
 background: #29ABE2;
 border: 2px solid #000000;
@@ -4289,8 +3029,6 @@ border: 2px solid #000000;
 position: absolute;
 width: 34.9px;
 height: 48px;
-left: 69px;
-top: 14px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -4307,8 +3045,6 @@ color: #FFFFFF;
 position: absolute;
 width: 101px;
 height: 16px;
-left: 428px;
-top: 41px;
 
 
 
@@ -4317,8 +3053,6 @@ top: 41px;
 position: absolute;
 width: 101px;
 height: 16px;
-left: 428px;
-top: 41px;
 
 background: #1E1D1D;
 
@@ -4328,8 +3062,6 @@ background: #1E1D1D;
 position: absolute;
 width: 94px;
 height: 9px;
-left: 431px;
-top: 43px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -4344,10 +3076,8 @@ color: #FFFFFF;
 /* TOP_BAR_DB_LOGO_NN */
 
 position: absolute;
+width: 146px;
 height: 19.61px;
-left: 38.04%;
-right: 41.77%;
-top: calc(50% - 19.61px/2 - 439.7px);
 
 
 
@@ -4356,8 +3086,6 @@ top: calc(50% - 19.61px/2 - 439.7px);
 position: absolute;
 width: 146px;
 height: 18.81px;
-left: 275px;
-top: 39px;
 
 background: #29ABE2;
 border: 2px solid #282828;
@@ -4368,8 +3096,6 @@ border: 2px solid #282828;
 position: absolute;
 width: 38.38px;
 height: 19.61px;
-left: 275px;
-top: 39px;
 
 background: #2C2C2C;
 
@@ -4379,18 +3105,14 @@ background: #2C2C2C;
 position: absolute;
 width: 29.35px;
 height: 12.79px;
-left: 278.76px;
-top: 42.01px;
 
 
 
 /* Vector */
 
 position: absolute;
-left: 40.68%;
-right: 57.38%;
-top: 4.3%;
-bottom: 94.39%;
+width: 13.97px;
+height: 12.79px;
 
 background: #FFFFFF;
 
@@ -4398,10 +3120,8 @@ background: #FFFFFF;
 /* Vector */
 
 position: absolute;
-left: 38.56%;
-right: 59.51%;
-top: 4.3%;
-bottom: 94.39%;
+width: 13.97px;
+height: 12.79px;
 
 background: #FFFFFF;
 
@@ -4411,8 +3131,6 @@ background: #FFFFFF;
 position: absolute;
 width: 97px;
 height: 13px;
-left: 320px;
-top: 41px;
 
 font-family: 'Inter';
 font-style: normal;
@@ -4421,4 +3139,42 @@ font-size: 12px;
 line-height: 15px;
 
 color: #FFFFFF;
+
+
+/* =====================================================================
+   MODALS — Figma reference (distilled from the modal frame exports).
+   Header bar + chrome-ext bar + NN top-bar logo are identical across all
+   four frames (see the dashboard sections above) and are omitted here.
+   Shared frame:
+     MODAL BG    577 wide, border 7px #29ABE2, bg #3C3C3C   (height varies)
+     HEADER BOX  575 x 42, bg #686868, shadow 0 4px 6.5px rgba(0,0,0,.25)
+     watermark   "UI LOGO + BOX_NAV_BAR" 401.78 x 97, opacity 0.03
+                 (centered; ~71% of the 563px inner width, ~45% height in
+                  the 214 modal → shrunk with padding around it)
+     BOX_NN      559 x 194 guide box (hidden) — watermark safe area
+   Buttons (OK / CANCEL): 109.11 x 39.34, border 0.5px #FFFFFF, Fjalla 24/30
+     CANCEL  bg #FFFFFF, text #4D4D4D
+     OK      bg #29ABE2 (add) | #E22929 (delete), text #E0E0E0
+   ===================================================================== */
+
+/* MODAL — ADD SUBJECT TAB (short) */
+/* MODAL BG 577 x 214 */
+/* TAB BOX (input) 109 x 39, bg #515151, border 0.5px #FFFFFF */
+/* label "ADD SUBJECT TAB" Fjalla 24/30 #E0E0E0 */
+/* OK box bg #29ABE2 (blue) */
+
+/* MODAL — DELETE: NOTE / SUB TAB UNIVERSAL (short) */
+/* MODAL BG 577 x 214 */
+/* text "THIS CANNOT BE UNDONE: PROCEED?" Fjalla 24/30 #E0E0E0, centered */
+/* OK box bg #E22929 (red) */
+
+/* MODAL — SELECT OR CREATE A SUBJECT TAB / empty state (tall) */
+/* MODAL BG 577 x 252 */
+/* text "SELECT OR CREATE A SUBJECT TAB TO VIEW, EDIT OR ADD NOTES TO" */
+/*   Fjalla 24/30, centered; SELECT / CREATE / SUBJECT TAB accent #29ABE2 */
+
+/* MODAL — ADDING FIRST SUBJECT TAB / empty state (tall) — SPRINT 2, NOT BUILT */
+/* MODAL BG 577 x 252 */
+/* text "CREATE A SUBJECT TAB BY PRESSING [+]" Fjalla 24/30 #29ABE2 */
+/* + button: Rectangle 41 x 39 bg #29ABE2 border 2px #000, "+" Fjalla 55.77 #FFF */
 

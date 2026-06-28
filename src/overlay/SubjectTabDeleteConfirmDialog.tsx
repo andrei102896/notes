@@ -34,10 +34,10 @@ export function SubjectTabDeleteConfirmDialog({
       </p>
       <div className="flex justify-center gap-3">
         <ModalCancelButton onClick={() => onOpenChange(false)}>
-          No
+          Cancel
         </ModalCancelButton>
         <ModalOkButton destructive onClick={() => void confirm()}>
-          Yes
+          OK
         </ModalOkButton>
       </div>
     </NnModalFrame>
