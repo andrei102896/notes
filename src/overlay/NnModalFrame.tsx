@@ -26,23 +26,23 @@ export function ModalWatermark({
 } = {}): React.ReactElement {
   return (
     <svg
-      /* Figma "UI LOGO" watermark: the two wide N glyphs (N_LEFT / N_RIGHT assets) side by side with the design's gap → 401.78×99.21 box. Centered at ~71% of the body width (3% opacity) so it sits inset/padded behind the body — natural aspect, no stretch. */
-      viewBox="0 0 401.78 99.21"
+      /* Figma "OLD LOGO REDO 4" watermark: the two N glyphs (N_LEFT 189w + N_RIGHT 191.19w, the src/assets/icons/N_*.svg shapes, inlined — the app has no SVG-import pipeline; bundled asset URLs break in the host-origin iframe) laid side by side with the design's 3px gap → 383.19×120 box. Centered at ~71% of body width; opacity is set by the className (0.04 modals / 0.15 note) so the fills stay plain white. */
+      viewBox="0 0 383.19 120"
       fill="none"
       aria-hidden
       xmlns="http://www.w3.org/2000/svg"
       className={cn(
-        "pointer-events-none absolute top-1/2 left-1/2 -z-10 h-auto w-[71%] -translate-x-1/2 -translate-y-1/2 opacity-[0.03]",
+        "pointer-events-none absolute top-1/2 left-1/2 -z-10 h-auto w-[71%] -translate-x-1/2 -translate-y-1/2 opacity-[0.04]",
         className,
       )}
     >
       <path
-        d="M0 99.2019V0H36.0592L118.096 50.1897C137.097 61.8233 151.885 72.2619 164.044 82.4193L164.821 82.2787C161.773 69.0284 161.026 56.9554 161.026 41.5084V0H192.156V99.2019H158.756L77.4959 48.8541C59.6306 37.818 42.5719 26.4831 29.6659 15.7282L28.5307 15.8688C30.4128 28.3811 31.1895 40.2958 31.1895 56.7973V99.1843H0V99.2019Z"
+        d="M72.3016 63.2665L45.3717 39.1977H44.3113V120H0V0H52.4405C78.1828 22.5 91.6828 34.6154 116.698 56.7335L143.628 80.8023H144.689V0H189V120H136.56L72.3016 63.2665Z"
         fill="white"
       />
       <path
-        transform="translate(209.62 0)"
-        d="M161.013 99.2019V56.8115C161.013 40.3302 161.765 28.4058 163.661 15.8877L162.517 15.7305C149.609 26.4853 132.517 37.8161 114.674 48.8502L33.4002 99.1845H0V0H31.1434V41.5C31.1434 56.9512 30.3911 69.0328 27.3219 82.2667L28.0742 82.4238C40.2306 72.2627 55.0351 61.8222 74.022 50.1946L156.078 0H192.156V99.2019H161.013Z"
+        transform="translate(192 0)"
+        d="M119.409 63.2665L148.301 39.1977H149.439V120H191.186V0H140.717C113.099 22.5 98.6153 34.6154 71.7768 56.7335L42.8844 80.8023H41.7468V0H-4.57764e-05V120H50.4683L119.409 63.2665Z"
         fill="white"
       />
     </svg>
