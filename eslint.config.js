@@ -48,6 +48,11 @@ export default tseslint.config(
     },
     rules: {
       "react/prop-types": "off",
+      // Backstop for the 300-LOC house rule: warns (never blocks) once a file reaches the cap so it gets surfaced every `npm run lint`. Counts raw lines to match wc -l.
+      "max-lines": [
+        "warn",
+        { max: 300, skipBlankLines: false, skipComments: false },
+      ],
       "import/order": [
         "error",
         {

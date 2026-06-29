@@ -67,14 +67,16 @@ no test suite yet.
 
 - `src/background.ts` — service worker: relays the toolbar click as `TOGGLE_OVERLAY`, opens
   URLs in new tabs, and broadcasts the ExtensionPay trial/purchase state.
-- `src/content.ts` — runs on every page: mounts the right-edge panel shell + iframe, sizes
-  the panel proportionally to the viewport, and restores scroll position for note anchors.
+- `src/content.ts` + `src/content/` — the content-script entry (slim) and its modules, which
+  run on every page: mount the right-edge panel shell + iframe, size the panel proportionally to
+  the viewport, and restore scroll position for note anchors.
 - `src/overlay/` — the React UI rendered inside the panel iframe (header, subject-tab strip,
   A–Z rail, note list, note card, dialogs).
-- `src/services/nnStorage.ts` — all persistence: a sharded `chrome.storage.local` schema
-  with defensive migrations.
-- `src/lib/` — pure helpers (note-list layout, URL comparison, A–Z helpers, HTML sanitizer,
-  cross-navigation anchor handoff).
+- `src/services/nnStorage.ts` — the persistence read/init layer over a sharded
+  `chrome.storage.local` schema with defensive migrations; CRUD + helpers live in sibling
+  `nnStorage*` modules, imported directly where they're used.
+- `src/lib/` — pure helpers (note-list layout + drag geometry, panel sizing math, URL
+  comparison, A–Z helpers, HTML sanitizer, cross-navigation anchor handoff).
 
 See `AGENTS.md` for the full architecture, the responsive-sizing notes, and the areas that
 are off-limits for changes.

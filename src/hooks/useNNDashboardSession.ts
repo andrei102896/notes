@@ -8,25 +8,28 @@ import {
 import { useBrowserTabLocation } from "@/hooks/useBrowserTabLocation";
 import { visibleNotesForDashboard } from "@/lib/nnDashboardNotes";
 import { noteListLayoutKey, resolveNoteListLayout } from "@/lib/nnNoteLayout";
+import { DEFAULT_NN_SYNC, DEFAULT_PAGE_SESSION } from "@/lib/nnStorageDefaults";
+import { migrateNNSyncPayload } from "@/lib/nnStorageNormalize";
 import { getTabSession, patchTabSession } from "@/lib/tabSession";
 import {
-  DEFAULT_NN_SYNC,
-  DEFAULT_PAGE_SESSION,
   ensureNNSyncInitialized,
   getNNSync,
-  migrateNNSyncPayload,
+  subscribeNNSync,
+} from "@/services/nnStorage";
+import {
   addNote as persistAddNote,
-  addSubjectTab as persistAddSubjectTab,
   commitNoteListLayout as persistCommitNoteListLayout,
-  deleteAllNotesInSubjectTab as persistDeleteAllNotesInSubjectTab,
   deleteNote as persistDeleteNote,
-  deleteSubjectTab as persistDeleteSubjectTab,
-  renameSubjectTab as persistRenameSubjectTab,
   reorderNotes as persistReorderNotes,
   setNotesExpanded as persistSetNotesExpanded,
   updateNote as persistUpdateNote,
-  subscribeNNSync,
-} from "@/services/nnStorage";
+} from "@/services/nnStorageNotes";
+import {
+  addSubjectTab as persistAddSubjectTab,
+  deleteAllNotesInSubjectTab as persistDeleteAllNotesInSubjectTab,
+  deleteSubjectTab as persistDeleteSubjectTab,
+  renameSubjectTab as persistRenameSubjectTab,
+} from "@/services/nnStorageSubjectTabs";
 import type {
   NNNoteListLayout,
   NNPageSessionState,

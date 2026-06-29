@@ -1,7 +1,7 @@
 # AGENTS.md — Notes For Net (NN) Chrome Extension
 
 Governance + context for ALL agent work on this repo. **Read fully before touching any file.**
-This file reflects current state as of 2026-06-23. Treat any documented behavior as unverified until
+This file reflects current state as of 2026-06-29. Treat any documented behavior as unverified until
 traced in code.
 
 ---
@@ -45,16 +45,19 @@ vite.config.ts       Vite + react + tailwind + crx; "@" → src.   package.json 
 .env.example         VITE_EXTPAY_EXTENSION_ID + VITE_TRIAL_MODE (both documented)
 
 src/background.ts    SW: ExtPay init/onPaid broadcast (§7); action click → TOGGLE_OVERLAY; owns per-tab session (chrome.storage.session, keyed tabId)
-src/content.ts       Content script on <all_urls>: mounts panel shell + iframe; proportional sizing (THE sizing file); per-tab open-state
-                     restore; anchor scroll; uninstall teardown + cross-origin loading veil
+src/content.ts       Content-script ENTRY on <all_urls> (slim ~70 LOC): console suppressions, registerContentPanelHost, startup sequence (orphan-shell cleanup → open-hint paint → restore → anchor scroll). Logic split into src/content/
+src/content/         Content-script modules (each owns its module-level state): overlayShell.ts (mount + show/hide/toggle/showOverlayWhenReady + uninstall teardown), overlayMetrics.ts (THE proportional sizing; uses lib/panelScaling), anchorScroll.ts (cross-nav scroll restore + the open-gate promise), loadingVeil.ts (cross-origin cold-restore veil), runtimeMessages.ts (TOGGLE_OVERLAY / PAYMENT_COMPLETED listeners, side-effect import), consoleSuppressions.ts, openHint.ts, constants.ts
 src/messaging/       contentPanelProtocol.ts + contentPanelBridge.ts — in-realm panel↔content API (NOT postMessage, §8)
 src/services/
-  nnStorage.ts       All persistence: sharded chrome.storage.local (nnSyncMeta/nnNoteIndex/nnNote:<id>/nnLayout:<key>), migrations, CRUD (~834 lines)
+  nnStorage.ts       Persistence read layer: ensureNNSyncInitialized / getNNSync (assembles the payload from shards) / subscribeNNSync. The rest of the family is imported DIRECTLY where used (no barrel re-export): pure helpers nnStorage{Defaults,Normalize,Builders} in src/lib/; side-effecting nnStorage{Shards,Migrations,SubjectTabs,Notes} in services/. Sharded chrome.storage.local (nnSyncMeta/nnNoteIndex/nnNote:<id>/nnLayout:<key>), migrations, CRUD
   storageService.ts  Typed wrapper. WARNING: "sync" namespace is remapped to local (§8) — nothing syncs
 src/types/nnData.ts  Domain model + the most accurate JSDoc "spec"
-src/hooks/           useNNDashboardSession (central state), useBrowserTabLocation (host URL poll), useOverlayPortalContainer (iframe portal)
+src/hooks/           useNNDashboardSession (central state), useBrowserTabLocation (host URL poll), useOverlayPortalContainer (iframe portal); useNoteSelection + useNoteDrag (NotesList multi-select + drag state machine, §3 NotesList)
 src/lib/
   nnNoteLayout.ts    Note-list layout: section = group; resolveDropPlacement/applyDropPlacement (pure); NN_COLLAPSED_NOTE_HEADER_PX=40 (px trap §8)
+  panelScaling.ts    Pure panel-width/root-font math (REFERENCE_PANEL_WIDTH_PX=686, clampPanelWidth, snapToDevicePx, rootFontPxForPanelWidth)
+  notesListGeometry.ts / notesListConstants.ts  NotesList pure hit-test (resolveDragPreview, buildFlatEntries, snapshotRows) + drag constants
+  nnStorage{Defaults,Normalize,Builders}.ts  nnStorage facade's pure pieces (defaults, payload migration, index/layout builders)
   tabSession.ts      Per-tab session type {open, activeSubjectTabId, notesScrollTop?} + GET/SET message helpers
   sanitizeNoteHtml.ts  Allowlist DOMParser sanitizer for note-body HTML
   airSubjectTabs.ts  A–Z helpers     nnDashboardNotes.ts URL match + visibility     pendingNavigation.ts cross-nav anchor/overlay keys
@@ -64,7 +67,7 @@ src/overlay/         React UI inside the panel iframe
   App.tsx            Root composition + trial/billing gating (§7 lines OFF-LIMITS)
   DashboardHeader.tsx Single white-frame button strip (Add Note / nav Min·Max·Delete / Delete Tab / NN); trial button wiring (§7)
   DashboardContent.tsx Note-list container + copy/paste buffer + scroll-position persistence
-  NotesList.tsx      Static-list dnd with multi-note selection: flat column, useDraggable, section groups, frozen-snapshot cursor hit-test. Selection (local state `selectedNoteIds`) = Cmd/Ctrl-click toggle + Shift-click range (anchor = last plain/Cmd click, inclusive; range via flattenLayoutNoteIds); a bare left-click rings nothing but sets a pending anchor (`plainAnchorPendingRef`) that the NEXT Cmd/Ctrl-click folds into the group (so "click A then Cmd-click B,C" = {A,B,C}); shown as a dark ring; cleared on drop, tab switch, outside-click, or when a selected note vanishes. Grabbing a selected note drags the whole set (dragOrderRef = ordered block, draggedSetRef = the same as a Set); the clone stacks up to 2 faint back-notes + a count badge. The list NEVER reflows during a drag — the dragged rows dim in place and a clone rides the cursor via DragOverlay (portaled to the iframe <body> so the frosted container's backdrop-filter doesn't offset its fixed positioning). Snapshot includes ALL visible rows (incl. the dimmed sources) in list-container px (rows scroll together → no scroll offset); the cursor hit-tests this for a visual slot, mapped back to a dragged-excluded `base` index, then applyDropPlacement inserts the whole block. Plain reorder shows one thin high-contrast line (#111 + white ring) hugging a row edge (last-of-A vs first-of-B via boundarySide). Cmd/Ctrl = NEW SECTION at the CURSOR slot (top / between / bottom — resolveDropPlacement asNewSection): a labeled "New section" line at the slot, or a dashed item-sized box past the last note (where there's room); Cmd + cursor at/below the last row's top snaps it to the very end (forgiving bottom drop zone). A plain single-note drop released over the note's OWN original row is a no-op (so a near-zero "select" drag can't merge a sole-item section into its neighbor); dragging onto another note applies normally. Commit on drop via applyDropPlacement. (~880 lines — over the 300-LOC house rule; split deferred.)
+  NotesList.tsx      Static-list dnd with multi-note selection: flat column, useDraggable, section groups, frozen-snapshot cursor hit-test. Selection (local state `selectedNoteIds`) = Cmd/Ctrl-click toggle + Shift-click range (anchor = last plain/Cmd click, inclusive; range via flattenLayoutNoteIds); a bare left-click rings nothing but sets a pending anchor (`plainAnchorPendingRef`) that the NEXT Cmd/Ctrl-click folds into the group (so "click A then Cmd-click B,C" = {A,B,C}); shown as a dark ring; cleared on drop, tab switch, outside-click, or when a selected note vanishes. Grabbing a selected note drags the whole set (dragOrderRef = ordered block, draggedSetRef = the same as a Set); the clone stacks up to 2 faint back-notes + a count badge. The list NEVER reflows during a drag — the dragged rows dim in place and a clone rides the cursor via DragOverlay (portaled to the iframe <body> so the frosted container's backdrop-filter doesn't offset its fixed positioning). Snapshot includes ALL visible rows (incl. the dimmed sources) in list-container px (rows scroll together → no scroll offset); the cursor hit-tests this for a visual slot, mapped back to a dragged-excluded `base` index, then applyDropPlacement inserts the whole block. Plain reorder shows one thin high-contrast line (#111 + white ring) hugging a row edge (last-of-A vs first-of-B via boundarySide). Cmd/Ctrl = NEW SECTION at the CURSOR slot (top / between / bottom — resolveDropPlacement asNewSection): a labeled "New section" line at the slot, or a dashed item-sized box past the last note (where there's room); Cmd + cursor at/below the last row's top snaps it to the very end (forgiving bottom drop zone). A plain single-note drop released over the note's OWN original row is a no-op (so a near-zero "select" drag can't merge a sole-item section into its neighbor); dragging onto another note applies normally. Commit on drop via applyDropPlacement. Split: `useNoteSelection` / `useNoteDrag` hooks (src/hooks/), `notesListGeometry` + `notesListConstants` (src/lib/, incl. the pure `resolveDragPreview` hit-test), `DraggableNoteRow` / `DropIndicator` / `DragClone` components.
   Note.tsx           Note card; header = drag handle only while title unfocused. Title edits on a CLEAN click (≤4px = PointerSensor distance), not on mousedown (preventDefault'd then focused in onClick) so click+drag moves instead of editing. Modifier-click (Cmd/Ctrl/Shift) selects via onSelect instead of editing — resolved in onClick so a modifier-drag doesn't also select (dnd-kit suppresses the click after a real drag); isSelected → selection ring.  NoteUrlEditor.tsx URL row + LINK/ANCHOR/COPY/PASTE
   RichTextBodyEditor.tsx contentEditable + execCommand B/I/U, sanitized; body font = Inter; body bg = #D9D9D9 (`bg-note`) with the editor transparent so the dimmed `ModalWatermark` (0.15) reads behind the text
   SubjectTabStrip.tsx Rotated strip + click-vs-dblclick; wheel-scroll uses native CSS scroll-snap (`snap-y snap-mandatory` on the scroll area + `snap-start` on each 3-cell tab) so it settles on a full tab without resting mid-tab     AlphabetIndexRollout.tsx A–Z rail (SELECTED subject's letter = blue, derived from activeSubjectTabId; matching letters hover-cue)
@@ -111,7 +114,7 @@ content-script realm**, so panel and content script share one JS context (messag
 function calls, not postMessage). **Do not lazy-load the app via a content-script `import()`:** it
 was tried and reverted — the runtime `import()` failed on some strict-CSP sites (e.g. tesla.com),
 leaving a visible but empty, click-blocking shell. Eager mount keeps NN reliable on `<all_urls>`
-at the cost of the ~420 kB content chunk on every page. All persistence is `chrome.storage.local`
+at the cost of the ~400 kB content chunk on every page. All persistence is `chrome.storage.local`
 via `nnStorage.ts`. Panel height tracks `visualViewport`; width is viewport-proportional with a
 root-font knob (§6).
 
@@ -119,10 +122,10 @@ root-font knob (§6).
 
 **Calibration reference: 16" laptop, 1920×1080, Windows 11 @ 100% scaling.**
 
-Core sizing is done: `content.ts` sets a viewport-proportional panel width
-(`viewportWidth × REFERENCE_PANEL_WIDTH_PX / REFERENCE_VIEWPORT_PX`, clamped) and an iframe
-root-font knob (`rootFontPx = panelWidth/686 × 16`) on every `visualViewport` resize, so rem lengths
-scale with the panel; an `--air-cell: calc(100vh/26)` grid drives the A–Z rail, the "+", subject
+Core sizing is done: `src/content/overlayMetrics.ts` (math in `src/lib/panelScaling.ts`) sets a
+viewport-proportional panel width (`viewportWidth × REFERENCE_PANEL_WIDTH_PX / REFERENCE_VIEWPORT_PX`,
+clamped) and an iframe root-font knob (`rootFontPx = panelWidth/686 × 16`) on every `visualViewport`
+resize, so rem lengths scale with the panel; an `--air-cell: calc(100vh/26)` grid drives the A–Z rail, the "+", subject
 tabs (3 cells) and the two header bars (1 cell each). The old "no width logic / constant ~758px"
 defect is gone.
 
@@ -137,7 +140,7 @@ against the page). The Google Fonts CDN `@import` was removed (it was blocked on
 dead offline). Caveat (do not re-flag): a host CSP whose `font-src` excludes the `chrome-extension:`
 scheme still forces a system-font fallback; the only complete fix is an extension-origin iframe (not done).
 
-Fix surface (keep payment lines out of any diff): `content.ts`, `styles.css`,
+Fix surface (keep payment lines out of any diff): `src/content/` (overlayMetrics + lib/panelScaling), `styles.css`,
 `components/ui/{button,input,tabs}.tsx`, `SubjectTabStrip.tsx`, `nnNoteLayout.ts` + `NotesList.tsx`,
 `RichTextBodyEditor.tsx`, `DashboardHeader.tsx`, `App.tsx` (presentation lines only — §7),
 `AlphabetIndexRollout.tsx`, `NoteUrlEditor.tsx`, dialog offsets.
@@ -154,7 +157,7 @@ Do **not** modify any of the following, for any reason, in any task (line ranges
 | [src/overlay/PaywallDialog.tsx](src/overlay/PaywallDialog.tsx) | Full-width trial bar: BUY → `onBuy`, LOG IN (restore) → `onLogin`. The `onBuy`/`onLogin`/`onOpenChange`/trial props are the protected wiring; layout-only edits were done with explicit human OK and still need it. |
 | [src/overlay/DashboardHeader.tsx](src/overlay/DashboardHeader.tsx) ~21–46, ~124–129 | Trial logo-button wiring |
 | [src/background.ts](src/background.ts) ~14–29 | ExtPay `startBackground` + `onPaid` → `PAYMENT_COMPLETED` broadcast |
-| [src/content.ts](src/content.ts) ~368–411 | `PAYMENT_COMPLETED` → `nn-payment-completed` event |
+| [src/content/runtimeMessages.ts](src/content/runtimeMessages.ts) ~34–35 | `PAYMENT_COMPLETED` → `nn-payment-completed` event |
 | [manifest.config.ts](manifest.config.ts) ~28–39 | ExtPay content script on extensionpay.com |
 | `.env` / `VITE_EXTPAY_EXTENSION_ID` / `VITE_TRIAL_MODE` | Build-time payment config |
 
@@ -207,3 +210,14 @@ actual query). (`EXTPAY_EXTENSION_URL` is an exported-but-unused constant in §7
 - Comments: **max one line each** (no multi-line blocks); describe what/why only and **delete
   self-explanatory ones** (anything that merely restates the code); never narrate the change you just
   made; sparse.
+- **File size — hard cap 300 LOC.** At ~250 LOC (the approach zone) a file is already due to split;
+  do it *before* adding more, not "later": constants → a sibling `*Constants.ts` (or `src/lib/`),
+  pure helpers → `src/lib/`, React hooks → `src/hooks/`, sub-components → their own files in the
+  owning folder, content-script modules → `src/content/`. Do not merge new behavior into a file
+  already over the cap. Detection is mechanical: ESLint `max-lines` warns at 300 (run
+  `npm run lint`), so any file in the 300 zone surfaces every lint. Known over-cap files left as-is
+  for now: `NoteUrlEditor.tsx`, `contentPanelBridge.ts`, `App.tsx` (trial logic), `useNoteDrag.ts`
+  (310, cohesive).
+- **No barrel / re-export facades.** Import each helper directly from the module that defines it;
+  never re-export others' symbols (`export … from "…"`) just to keep a stable import surface. When
+  you split a file, repoint its consumers to the new modules (don't leave the old file re-exporting).

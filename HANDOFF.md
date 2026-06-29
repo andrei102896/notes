@@ -121,6 +121,11 @@ npm run lint        # eslint .
 Both run automatically on commit via a husky pre-commit hook. **There is no automated test
 suite** — every behavioral change must be verified in a loaded build (see §4).
 
+`npm run lint` also emits **non-blocking** `max-lines` warnings for any file over the 300-LOC house
+cap (see [`AGENTS.md`](AGENTS.md) §9). These are informational — they do not fail the gate; a few
+known-large files (`NoteUrlEditor.tsx`, `contentPanelBridge.ts`, `App.tsx`, `useNoteDrag.ts`) are
+left as-is for now.
+
 ---
 
 ## 8. Repo orientation
