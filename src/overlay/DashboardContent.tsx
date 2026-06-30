@@ -207,11 +207,13 @@ export const DashboardContent = forwardRef<
               {emptyState === "first-run" ? (
                 // First launch (no subject tabs): the "+" mirrors the strip's create button but is illustrative here (no handler yet).
                 <div className="flex items-center justify-center gap-3">
-                  <p>
+                  {/* translate-y nudges the all-caps line down to optically center with the taller "+" (caps ride high in the line box). */}
+                  <p className="translate-y-[2px]">
                     <span className="text-accent">Create</span> a{" "}
                     <span className="text-accent">subject tab</span> by clicking
                   </p>
-                  <AddSubjectTabButton />
+                  {/* Square here (w = h = air-cell) so the "+" reads centered next to the text; the strip keeps w-10. */}
+                  <AddSubjectTabButton className="w-[var(--air-cell)]" />
                 </div>
               ) : (
                 <>
