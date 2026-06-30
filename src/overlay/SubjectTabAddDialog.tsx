@@ -75,7 +75,7 @@ export function SubjectTabAddDialog({
             ref={inputRef}
             data-subject-name-input
             /* Same box as the OK/CANCEL buttons (Figma TAB BOX #515151, light text, ≈109×39); text Fjalla One Regular 24 centered + uppercase so typed names match the all-caps buttons' cap-height (display only — stored value keeps its case, like the strip). Size is ID-scoped in styles.css to dodge the text-size/color twMerge clash. */
-            className="h-[2.46rem] w-28 border-[0.5px] border-white bg-[#515151] px-4 text-center uppercase leading-none text-white"
+            className="h-[2.46rem] w-28 border-[0.5px] border-white bg-[#515151] px-2 text-center uppercase leading-none text-white"
             value={draft}
             maxLength={SUBJECT_TAB_NAME_MAX_LEN}
             onChange={(e) => setDraft(e.target.value)}
