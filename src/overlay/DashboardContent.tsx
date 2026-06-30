@@ -10,6 +10,7 @@ import {
 
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
 import { getTabSession, patchTabSession } from "@/lib/tabSession";
+import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
 import { ModalBrandBar, ModalWatermark } from "@/overlay/NnModalFrame";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
 import { NotesList } from "@/overlay/NotesList";
@@ -25,8 +26,8 @@ type DashboardContentProps = {
   browserTabUrlKey: string | null;
   activeSubjectTabId: string | null;
   activeNoteId: string | null;
-  /** Show instructional empty state when no subject tab is selected/available. */
-  showSubjectTabInstruction: boolean;
+  /** Which empty-state panel to show: first launch (no tabs), tabs-but-none-selected, or none. */
+  emptyState: "first-run" | "select-or-create" | null;
   onUpdateNote: (
     noteId: string,
     patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body">>,
@@ -57,7 +58,7 @@ export const DashboardContent = forwardRef<
     browserTabUrlKey,
     activeSubjectTabId,
     activeNoteId,
-    showSubjectTabInstruction,
+    emptyState,
     onUpdateNote,
     onHighlightNote,
     onHasInvalidUrlDraftChange,
@@ -191,7 +192,7 @@ export const DashboardContent = forwardRef<
     resolvedNoteListLayout ??
     buildDefaultNoteListLayout(notes.map((n) => n.id));
 
-  if (showSubjectTabInstruction) {
+  if (emptyState !== null) {
     return (
       <section
         className="nn-dashboard-content-frosted flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
@@ -200,15 +201,28 @@ export const DashboardContent = forwardRef<
         <div className="flex min-h-0 flex-1 items-center justify-center p-4">
           <div className="flex w-full flex-col">
             <ModalBrandBar />
-            {/* Figma (source of truth): tall modal body 252px (MODAL BG); 24px Fjalla; SELECT / CREATE / SUBJECT TAB in accent; faint NN watermark behind. */}
+            {/* Figma (source of truth): tall modal body 252px (MODAL BG); 24px Fjalla; accent words #29ABE2; faint NN watermark behind. */}
             <div className="relative isolate flex min-h-[15.75rem] flex-col justify-center gap-6 overflow-hidden border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-subject-label uppercase leading-tight text-modal-foreground">
               <ModalWatermark />
-              <p>
-                <span className="text-accent">Select</span> or{" "}
-                <span className="text-accent">create</span> a{" "}
-                <span className="text-accent">subject tab</span>
-              </p>
-              <p>to view, edit or add notes to</p>
+              {emptyState === "first-run" ? (
+                // First launch (no subject tabs): the "+" mirrors the strip's create button but is illustrative here (no handler yet).
+                <div className="flex items-center justify-center gap-3">
+                  <p>
+                    <span className="text-accent">Create</span> a{" "}
+                    <span className="text-accent">subject tab</span> by clicking
+                  </p>
+                  <AddSubjectTabButton />
+                </div>
+              ) : (
+                <>
+                  <p>
+                    <span className="text-accent">Select</span> or{" "}
+                    <span className="text-accent">create</span> a{" "}
+                    <span className="text-accent">subject tab</span>
+                  </p>
+                  <p>to view, edit or add notes to</p>
+                </>
+              )}
             </div>
           </div>
         </div>

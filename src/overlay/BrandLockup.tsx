@@ -51,7 +51,7 @@ export function BrandLockup(): React.ReactElement {
       </div>
       <div
         className="flex items-center justify-center bg-chrome-ext px-1 py-1"
-        style={{ paddingTop: IS_WINDOWS ? "5px" : "4px" }}
+        style={{ paddingTop: "4px" }}
       >
         <span className="font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
           Chrome Extension

@@ -6,9 +6,9 @@ import {
   useState,
 } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { indexOfFirstTabForLetter, type AirLetter } from "@/lib/airSubjectTabs";
+import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
 import { SubjectTabAddDialog } from "@/overlay/SubjectTabAddDialog";
 import { SubjectTabRenameDialog } from "@/overlay/SubjectTabRenameDialog";
 import type { SubjectTabStripItem } from "@/types/nnData";
@@ -17,16 +17,17 @@ import type { SubjectTabStripItem } from "@/types/nnData";
 const DESELECT_DEFER_MS = 200;
 
 export type SubjectTabStripHandle = {
-  /** Select and scroll to the first tab whose name starts with `letter` (AIR-2). */
+  /** Scroll (cue) to the first tab whose name starts with `letter` — no select (AIR-2). */
   scrollToFirstLetter: (letter: AirLetter) => void;
   /** Scroll the tab list so the tab with the given id is visible (NN-10). */
   scrollToTab: (id: string) => void;
 };
 
+/** Scroll the strip so the given trigger is fully in view (NN-10). */
 function scrollTriggerFullyIntoView(
   container: HTMLDivElement,
   trigger: HTMLElement,
-): void {
+): boolean {
   const triggerTop = trigger.offsetTop;
   const triggerBottom = triggerTop + trigger.offsetHeight;
   const viewportTop = container.scrollTop;
@@ -34,7 +35,7 @@ function scrollTriggerFullyIntoView(
 
   if (triggerTop < viewportTop) {
     container.scrollTo({ top: triggerTop, behavior: "smooth" });
-    return;
+    return true;
   }
 
   if (triggerBottom > viewportBottom) {
@@ -42,15 +43,21 @@ function scrollTriggerFullyIntoView(
       top: triggerBottom - container.clientHeight,
       behavior: "smooth",
     });
+    return true;
   }
+  return false;
 }
 
-/** Pin a trigger to the TOP of the strip so a clicked A–Z letter's tabs "cue up" from the top (AIR-2); offsetTop is the pre-transform box so rotated triggers still align to snap-start. */
+/** Pin a trigger to the TOP of the strip so a clicked A–Z letter's tabs "cue up" from the top (AIR-2); offsetTop is the pre-transform box so rotated triggers still align. Returns whether it actually scrolled. */
 function scrollTriggerToTop(
   container: HTMLDivElement,
   trigger: HTMLElement,
-): void {
+): boolean {
+  if (Math.abs(trigger.offsetTop - container.scrollTop) <= 1) {
+    return false;
+  }
   container.scrollTo({ top: trigger.offsetTop, behavior: "smooth" });
+  return true;
 }
 
 type SubjectTabStripProps = {
@@ -107,11 +114,6 @@ export const SubjectTabStrip = forwardRef<
         if (idx < 0) {
           return;
         }
-        const id = sortedTabs[idx]?.id;
-        if (id === undefined) {
-          return;
-        }
-        void onEnsureActiveSubjectTab(id);
         const root = tabsScrollAreaRef.current;
         if (root === null) {
           return;
@@ -120,6 +122,7 @@ export const SubjectTabStrip = forwardRef<
           '[data-slot="tabs-trigger"]',
         );
         const target = triggers[idx];
+        // Cue only: scroll the letter's first tab to the top WITHOUT selecting it (AIR-2).
         if (target !== undefined) {
           scrollTriggerToTop(root, target);
         }
@@ -142,7 +145,7 @@ export const SubjectTabStrip = forwardRef<
         }
       },
     }),
-    [sortedTabs, onEnsureActiveSubjectTab],
+    [sortedTabs],
   );
 
   /** Same-tab deselect: Radix skips `onValueChange` when value unchanged; avoid `onClick` vs `onValueChange` ordering (first click was toggling off). */
@@ -198,28 +201,11 @@ export const SubjectTabStrip = forwardRef<
         className="flex h-full w-10 shrink-0 flex-col"
         aria-label="Subject tabs"
       >
-        <Button
-          variant="icon"
-          size="icon"
-          /* One A–Z cell tall (var(--air-cell)) — top-aligned with letter A. */
-          className="relative z-30 h-[var(--air-cell)] shrink-0 border-border bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100"
-          type="button"
-          onClick={() => {
-            if (isReadOnly) {
-              return;
-            }
-            onAddDialogOpenChange(true);
-          }}
+        <AddSubjectTabButton
+          onClick={() => onAddDialogOpenChange(true)}
           disabled={isReadOnly}
-          aria-disabled={isReadOnly}
-          aria-label="Add subject tab"
-          aria-haspopup="dialog"
-          aria-expanded={addDialogOpen}
-        >
-          <span data-add-tab-glyph aria-hidden>
-            +
-          </span>
-        </Button>
+          addDialogOpen={addDialogOpen}
+        />
 
         <Tabs
           value={activeSubjectTabId ?? ""}
@@ -233,8 +219,8 @@ export const SubjectTabStrip = forwardRef<
         >
           <div
             ref={tabsScrollAreaRef}
-            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter/scrollToTab. snap-y/mandatory drives native snapping to each tab (snap-start on the triggers) so a slow scroll settles without the old JS delay-then-jump. */
-            className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar snap-y snap-mandatory"
+            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter/scrollToTab. snap-y/proximity = native smooth snap to each tab (snap-start on triggers): keeps trackpad momentum smooth and, unlike mandatory, doesn't yank the mouse wheel back ("works then stops"). Smooth scrolling is prioritized over perfect snapping (client). */
+            className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar snap-y snap-proximity"
           >
             <TabsList>
               {sortedTabs.map((tab) => (

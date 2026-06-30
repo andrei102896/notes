@@ -65,9 +65,13 @@ export function App(): React.ReactElement {
     id: t.id,
     name: t.name,
   }));
-  const showSubjectTabInstruction =
-    subjectTabsForDisplay.length === 0 ||
-    pageSession.activeSubjectTabId === null;
+  // First launch (no tabs) gets the "create a tab" prompt; tabs-but-none-selected gets "select or create".
+  const emptyState: "first-run" | "select-or-create" | null =
+    subjectTabsForDisplay.length === 0
+      ? "first-run"
+      : pageSession.activeSubjectTabId === null
+        ? "select-or-create"
+        : null;
 
   const subjectTabStripRef = useRef<SubjectTabStripHandle>(null);
   const dashboardContentRef = useRef<DashboardContentHandle>(null);
@@ -334,7 +338,7 @@ export function App(): React.ReactElement {
           browserTabUrlKey={browserTabUrlKey}
           activeSubjectTabId={pageSession.activeSubjectTabId}
           activeNoteId={effectiveActiveNoteId}
-          showSubjectTabInstruction={showSubjectTabInstruction && !addDialogOpen}
+          emptyState={addDialogOpen ? null : emptyState}
           isReadOnly={isReadOnly}
           onUpdateNote={(noteId, patch) => {
             if (isReadOnly) {

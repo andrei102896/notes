@@ -111,9 +111,10 @@ body {
   font-size: var(--text-note-title);
 }
 
-/* Add Subject Tab naming box: Fjalla One Regular 26 — ID-scoped (beats Input's md:text-sm) to avoid the text-size/color twMerge clash. */
-#nn-scroll-bookmarks-overlay-host [data-subject-name-input] {
-  font-size: 1.625rem;
+/* Add Subject Tab naming box: Fjalla One Regular 24 to match the CANCEL/OK buttons. element+attribute selector (NOT #host-scoped) so it still applies when the dialog portals to the iframe body, and its specificity beats the Input's md:text-sm. */
+input[data-subject-name-input] {
+  font-family: "Fjalla One", sans-serif;
+  font-size: 1.5rem;
 }
 
 /* Size in CSS, not a text-* class: twMerge drops it vs the button's text color. */

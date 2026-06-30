@@ -26,7 +26,7 @@ export function ModalWatermark({
 } = {}): React.ReactElement {
   return (
     <svg
-      /* Figma "OLD LOGO REDO 4" watermark: the two N glyphs (N_LEFT 189w + N_RIGHT 191.19w, the src/assets/icons/N_*.svg shapes, inlined — the app has no SVG-import pipeline; bundled asset URLs break in the host-origin iframe) laid side by side with the design's 3px gap → 383.19×120 box. Centered at ~71% of body width; opacity is set by the className (0.04 modals / 0.15 note) so the fills stay plain white. */
+      /* Figma "OLD LOGO REDO 4" watermark: the two N glyphs (N_LEFT 189w + N_RIGHT 191.19w from the client's export) INLINED — the app has no SVG-import pipeline (bundled asset URLs break in the host-origin iframe), so a glyph change is edited here. Laid side by side with the design's 3px gap → 383.19×120 box. Centered at ~71% of body width; opacity from the className (0.04 modals / 0.15 note) so the fills stay plain white. */
       viewBox="0 0 383.19 120"
       fill="none"
       aria-hidden
@@ -104,8 +104,9 @@ type ModalButtonProps = {
   disabled?: boolean;
 };
 
+// Fixed Figma box (≈109×39) + flex-centered label so CANCEL/OK sit centered on both axes; matches the Add-tab input box.
 const MODAL_BUTTON_BASE =
-  "min-w-[7rem] border-[0.5px] border-white px-4 py-1 text-center text-subject-label uppercase leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-[2.46rem] min-w-[7rem] items-center justify-center border-[0.5px] border-white px-4 text-subject-label uppercase leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-50";
 
 /** CANCEL: white box, gray label (Figma CANCEL BOX). */
 export function ModalCancelButton({
