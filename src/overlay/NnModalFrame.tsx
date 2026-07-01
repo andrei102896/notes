@@ -7,15 +7,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { BrandLockup } from "@/overlay/BrandLockup";
+import { BrandHeaderBar } from "@/overlay/BrandLockup";
 
-/** Modal header bar: NN brand lockup on the gray header band (Figma HEADER BOX); shared by the modal frame and the inline empty-state panel. */
+/** Modal header bar: shared brand header band + the modal frame's accent top/side border. */
 export function ModalBrandBar(): React.ReactElement {
-  return (
-    <div className="flex shrink-0 items-center justify-center gap-2 border-x border-t border-accent bg-air-box px-2 py-1.5 shadow-[0px_4px_6.5px_rgba(0,0,0,0.25)]">
-      <BrandLockup />
-    </div>
-  );
+  return <BrandHeaderBar className="border-x border-t border-accent" />;
 }
 
 /** The two NN letterforms, dimmed and centered behind a modal/empty-state body (Figma: ~3% opacity). Parent must be `relative isolate overflow-hidden` so the -z-10 sits behind the content but above bg-modal. */

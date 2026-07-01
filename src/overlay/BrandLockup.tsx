@@ -53,10 +53,29 @@ export function BrandLockup(): React.ReactElement {
         className="flex items-center justify-center bg-chrome-ext px-1 py-1"
         style={{ paddingTop: "4px" }}
       >
-        <span className="font-ui text-brand-sub font-semibold uppercase leading-none tracking-wide text-accent-foreground">
+        {/* pl offsets the 0.25em trailing track so the wide-spaced caps stay optically centered in the box. */}
+        <span className="pl-[0.25em] font-ui text-brand-sub font-semibold uppercase leading-none tracking-[0.25em] text-accent-foreground">
           Chrome Extension
         </span>
       </div>
     </>
+  );
+}
+
+/** Shared header band (Figma HEADER BOX): gray bar + brand cluster; className overrides height (e.g. the header's --air-cell). */
+export function BrandHeaderBar({
+  className,
+}: {
+  className?: string;
+} = {}): React.ReactElement {
+  return (
+    <div
+      className={cn(
+        "flex shrink-0 items-center justify-center gap-2 bg-air-box px-2 py-1.5 shadow-[0px_4px_6.5px_rgba(0,0,0,0.25)]",
+        className,
+      )}
+    >
+      <BrandLockup />
+    </div>
   );
 }

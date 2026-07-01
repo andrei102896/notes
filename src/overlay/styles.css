@@ -17,8 +17,8 @@ body {
   --text-note-body: 1.125rem; /* 18px — note body */
   --text-note-title: 1.4375rem; /* 23px — note title (Fjalla One Regular, Figma BOX_TITLE text) */
   --text-note-meta: 0.6875rem; /* 11px — note URL / date row (Inter Bold) */
-  --text-brand-title: 0.75rem; /* 12px — "NOTES FOR NET" (Inter Bold) */
-  --text-brand-sub: 0.5625rem; /* 9px — "CHROME EXTENSION" (Inter Semi Bold) */
+  --text-brand-title: 0.8125rem; /* 13px — "NOTES FOR NET" (Inter Bold) */
+  --text-brand-sub: 0.625rem; /* 10px — "CHROME EXTENSION" (Inter Semi Bold) */
   --text-navlabel: 1.4375rem; /* 23px — ADD NOTE / DELETE TAB (Figma) */
   --text-navmin: 1.3125rem; /* 21px — MIN MAX DELETE (Figma) */
   --text-navribbon: 1.125rem; /* 18px — THIS TAB NOTES (Figma) */
@@ -42,7 +42,7 @@ body {
   --color-note-field: #fefefe; /* URL label / URL field / date box bg (Figma BOX_URL / BOX_URL_ADDRESS / BOX_DATE) */
   --color-note-action: #000000; /* LINK / COPY action buttons (Figma BOX_LINK / BOX_COPY) */
   --color-ribbon: #565656; /* THIS TAB NOTES ribbon (Figma) */
-  --color-chrome-ext: #1e1d1d; /* CHROME EXTENSION pill (Figma) */
+  --color-chrome-ext: #3c3c3c; /* CHROME EXTENSION pill (Figma CHR EXT BOX) */
   --color-mn-stroke: #282828; /* outer panel + NN BIG BOX stroke (Figma) */
   --color-logo-box: #2c2c2c; /* NN logo box (Figma LOGO BOX) */
   --color-mintext: #252525; /* MIN MAX DELETE text (Figma) */
@@ -117,10 +117,10 @@ input[data-subject-name-input] {
   font-size: 1.5rem;
 }
 
-/* Size in CSS, not a text-* class: twMerge drops it vs the button's text color. */
+/* "+" sized here, ID-scoped so it beats the button's forced svg size-6; height tracks --air-cell, width auto keeps aspect. */
 #nn-scroll-bookmarks-overlay-host [data-add-tab-glyph] {
-  font-size: var(--text-add-glyph);
-  line-height: 1;
+  height: calc(var(--air-cell) * 0.58);
+  width: auto;
 }
 
 #nn-scroll-bookmarks-overlay-host [data-note-body] :is(b, strong) {

@@ -25,7 +25,7 @@ export function PaywallDialog({
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="top-[4.25rem] right-0 left-0 h-[2.3125rem] w-auto max-w-none translate-x-0 translate-y-0 flex flex-row items-stretch gap-0 overflow-hidden rounded-none border-none bg-[#d9d9d9] p-0 sm:max-w-none"
+        className="top-[4.25rem] right-0 left-0 h-[2.3125rem] w-auto max-w-none translate-x-0 translate-y-0 flex flex-row items-stretch gap-0 overflow-hidden rounded-none border-none bg-air-box shadow-[0px_4px_6.5px_rgba(0,0,0,0.25)] p-0 sm:max-w-none"
       >
         <DialogTitle className="sr-only">Notes for Net trial status</DialogTitle>
 
@@ -34,7 +34,7 @@ export function PaywallDialog({
         </div>
 
         <div className="flex flex-1 items-center justify-end px-4">
-          <span className="text-[1rem] uppercase leading-none text-[#646464]">
+          <span className="text-[1rem] uppercase leading-none text-modal-foreground">
             {trialDaysLeft !== null
               ? trialUnit === "minutes"
                 ? `TRIAL PERIOD: ${trialDaysLeft}-MINUTE${trialDaysLeft === 1 ? "" : "S"} LEFT`
@@ -73,7 +73,7 @@ export function PaywallDialog({
         </button>
 
         <div className="flex h-full shrink-0 items-center justify-center pr-3 pl-2">
-          <span className="text-[1.5rem] uppercase leading-none text-[#585858]">
+          <span className="text-[1.5rem] uppercase leading-none text-modal-foreground">
             $5
           </span>
         </div>

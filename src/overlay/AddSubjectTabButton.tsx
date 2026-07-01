@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Button } from "@/components/ui/button";
+import { IS_WINDOWS } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 
 type AddSubjectTabButtonProps = {
@@ -37,9 +38,15 @@ export function AddSubjectTabButton({
       aria-haspopup="dialog"
       aria-expanded={addDialogOpen}
     >
-      <span data-add-tab-glyph aria-hidden>
-        +
-      </span>
+      {/* Vector "+" (font glyph off-center on Windows); square viewBox + symmetric arms → uniform padding. Windows shifts viewBox min-y to -1 to cancel a ~1px top-lean from its SVG pixel-snapping (Mac renders centered). */}
+      <svg
+        data-add-tab-glyph
+        viewBox={IS_WINDOWS ? "0 -1 24 24" : "0 0 24 24"}
+        fill="currentColor"
+        aria-hidden
+      >
+        <path d="M9.45 24V14.55H0V9.45H9.45V0H14.55V9.45H24V14.55H14.55V24H9.45Z" />
+      </svg>
     </Button>
   );
 }

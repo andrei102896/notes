@@ -6,7 +6,7 @@ import {
   ButtonGroupSeparator,
   ButtonGroupText,
 } from "@/components/ui/button-group";
-import { BrandLockup, BrandLogo } from "@/overlay/BrandLockup";
+import { BrandHeaderBar, BrandLogo } from "@/overlay/BrandLockup";
 import { SubjectTabDeleteConfirmDialog } from "@/overlay/SubjectTabDeleteConfirmDialog";
 
 type DashboardHeaderProps = {
@@ -53,15 +53,14 @@ export function DashboardHeader({
 
   return (
     <header className="sticky top-0 z-20 flex h-auto flex-col bg-air-box">
-      <div className="relative z-[1] flex h-[var(--air-cell)] shrink-0 items-center justify-center gap-2 border-b border-black bg-air-box px-2 shadow-[0px_9px_10.3px_rgba(0,0,0,0.52)]">
-        <BrandLockup />
-      </div>
+      {/* py-0: fixed --air-cell height already sets the band; the shared bar's default vertical padding would squeeze the cluster. */}
+      <BrandHeaderBar className="relative z-[1] h-[var(--air-cell)] border-b border-black py-0" />
       {/* One white frame around the whole strip: bg-background is the 3px surround (padding) and dividers (gap); no button has its own border. */}
       <div className="flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
         <Button
           variant="default"
           size="sm"
-          className="shrink-0 h-full whitespace-nowrap px-3.5 text-navlabel uppercase text-accent-foreground"
+          className="shrink-0 h-full whitespace-nowrap bg-accent px-3.5 text-navlabel uppercase text-accent-foreground hover:bg-accent/90"
           disabled={!canAddNote}
           aria-disabled={!canAddNote}
           onClick={() => {
