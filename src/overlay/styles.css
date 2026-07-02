@@ -95,6 +95,12 @@ body {
   font-family: "Fjalla One", sans-serif;
 }
 
+/* The font-ui utility (brand badge, note URL/date row — Inter per Figma) must survive the host-wide Fjalla default above: the ID selector beats the plain class, so re-assert it ID-scoped. Dialogs portal to the iframe body (outside #host) where .font-ui already works — this keeps both scopes on one rendering. */
+#nn-scroll-bookmarks-overlay-host .font-ui,
+#nn-scroll-bookmarks-overlay-host .font-ui * {
+  font-family: var(--font-ui);
+}
+
 /* Note body uses multi-weight Inter (not single-weight Fjalla) so the B/I/U accents render for real. */
 #nn-scroll-bookmarks-overlay-host [data-note-body],
 #nn-scroll-bookmarks-overlay-host [data-note-body] * {
