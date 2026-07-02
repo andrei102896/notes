@@ -28,6 +28,8 @@ type DashboardContentProps = {
   activeNoteId: string | null;
   /** Which empty-state panel to show: first launch (no tabs), tabs-but-none-selected, or none. */
   emptyState: "first-run" | "select-or-create" | null;
+  /** Opens the strip's Add Subject Tab dialog; wired to the first-run "+". */
+  onRequestAddSubjectTab: () => void;
   onUpdateNote: (
     noteId: string,
     patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body">>,
@@ -59,6 +61,7 @@ export const DashboardContent = forwardRef<
     activeSubjectTabId,
     activeNoteId,
     emptyState,
+    onRequestAddSubjectTab,
     onUpdateNote,
     onHighlightNote,
     onHasInvalidUrlDraftChange,
@@ -205,7 +208,7 @@ export const DashboardContent = forwardRef<
             <div className="relative isolate flex min-h-[15.75rem] flex-col justify-center gap-6 overflow-hidden border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-subject-label uppercase leading-tight text-modal-foreground">
               <ModalWatermark />
               {emptyState === "first-run" ? (
-                // First launch (no subject tabs): the "+" mirrors the strip's create button but is illustrative here (no handler yet).
+                // First launch (no subject tabs): the "+" opens the same Add dialog as the strip's (client update 2026-07-02).
                 <div className="flex items-center justify-center gap-3">
                   {/* translate-y nudges the all-caps line down to optically center with the taller "+" (caps ride high in the line box). */}
                   <p className="translate-y-[2px]">
@@ -213,7 +216,11 @@ export const DashboardContent = forwardRef<
                     <span className="text-accent">subject tab</span> by clicking
                   </p>
                   {/* Square here (w = h = air-cell) so the "+" reads centered next to the text; the strip keeps w-10. */}
-                  <AddSubjectTabButton className="w-[var(--air-cell)]" />
+                  <AddSubjectTabButton
+                    onClick={onRequestAddSubjectTab}
+                    disabled={isReadOnly}
+                    className="w-[var(--air-cell)]"
+                  />
                 </div>
               ) : (
                 <>

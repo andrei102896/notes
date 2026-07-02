@@ -339,6 +339,7 @@ export function App(): React.ReactElement {
           activeSubjectTabId={pageSession.activeSubjectTabId}
           activeNoteId={effectiveActiveNoteId}
           emptyState={addDialogOpen ? null : emptyState}
+          onRequestAddSubjectTab={() => setAddDialogOpen(true)}
           isReadOnly={isReadOnly}
           onUpdateNote={(noteId, patch) => {
             if (isReadOnly) {
