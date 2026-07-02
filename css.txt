@@ -1,3 +1,5 @@
+/* [SYNC MARKER 2026-07-02] Figma CSS export snapshot - NOT current app state. Known divergences: docs/DESIGN_SOURCES_STATUS.md; code is the final truth. */
+
 /* NN_DASHBOARD FULL */
 
 position: absolute;
@@ -3176,5 +3178,6 @@ color: #FFFFFF;
 /* MODAL — ADDING FIRST SUBJECT TAB / empty state (tall) — SPRINT 2, NOT BUILT */
 /* MODAL BG 577 x 252 */
 /* text "CREATE A SUBJECT TAB BY PRESSING [+]" Fjalla 24/30 #29ABE2 */
+/* [OUTDATED 2026-07-02] The "+" ships as an inline SVG vector (AddSubjectTabButton.tsx, 24x24 viewBox, height 0.58*--air-cell) - NOT a Fjalla font glyph. See docs/DESIGN_SOURCES_STATUS.md. */
 /* + button: Rectangle 41 x 39 bg #29ABE2 border 2px #000, "+" Fjalla 55.77 #FFF */
 

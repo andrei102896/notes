@@ -1,8 +1,9 @@
 # AGENTS.md — Notes For Net (NN) Chrome Extension
 
 Governance + context for ALL agent work on this repo. **Read fully before touching any file.**
-This file reflects current state as of 2026-06-29. Treat any documented behavior as unverified until
-traced in code.
+This file reflects current state as of 2026-07-02. Treat any documented behavior as unverified until
+traced in code. Design snapshots (`docs/`, `css.txt`, `NN_DASHBOARD.png`) are NOT auto-updated —
+check `docs/DESIGN_SOURCES_STATUS.md` for known divergences before relying on them.
 
 ---
 
@@ -35,7 +36,9 @@ subject tab…"), NOT the single sentence in `docs/1_NN_DASHBOARD.txt`.
 - Payment/trial code is **OFF-LIMITS** (§7) — never edit, not even to "clean up".
 - Read a file before editing it (several traps, §8).
 - After any TS edit run `npm run typecheck` + `npm run lint` (husky pre-commit enforces both; keep
-  them clean). **Zero tests exist** — every behavioral change must be verified in a loaded build.
+  them clean). An **e2e suite exists** (`npm run test:e2e`, §4) — run it for overlay-behavior
+  changes; what it does not cover (trial/paywall, drag & drop, rich-text B/I/U, LINK/ANCHOR) must
+  still be verified in a loaded build.
 
 ## 3. File map
 
@@ -66,17 +69,21 @@ src/lib/
 src/overlay/         React UI inside the panel iframe
   App.tsx            Root composition + trial/billing gating (§7 lines OFF-LIMITS)
   DashboardHeader.tsx Single white-frame button strip (Add Note / nav Min·Max·Delete / Delete Tab / NN); trial button wiring (§7)
-  DashboardContent.tsx Note-list container + copy/paste buffer + scroll-position persistence; two empty states via an `emptyState` prop from App.tsx — `first-run` (zero tabs → "CREATE A SUBJECT TAB BY CLICKING [+]"; the inline + is the shared `AddSubjectTabButton`, rendered handler-less/illustrative) and `select-or-create` (tabs exist, none selected)
-  AddSubjectTabButton.tsx Shared blue "+" create-tab button — interactive at the top of the strip (opens the add dialog), illustrative (no onClick) in the first-run panel
+  DashboardContent.tsx Note-list container + copy/paste buffer + scroll-position persistence; two empty states via an `emptyState` prop from App.tsx — `first-run` (zero tabs → "CREATE A SUBJECT TAB BY CLICKING [+]"; the inline + is the shared `AddSubjectTabButton` and OPENS the strip's Add dialog via `onRequestAddSubjectTab` — clickable since 2026-07-02, client update) and `select-or-create` (tabs exist, none selected)
+  AddSubjectTabButton.tsx Shared blue "+" create-tab button — at the top of the strip AND in the first-run panel, both opening the same Add dialog. The "+" is an inline SVG vector (symmetric 24×24 viewBox; height 0.58×--air-cell via styles.css; Windows shifts viewBox min-y −1 to cancel a 1px top-lean) — NOT the Fjalla font glyph css.txt describes
+  TrashIcon.tsx      Note delete glyph — the client's Figma "TRASH ICON-01" (box + 4 bars) inlined; replaced the old Columns4 placeholder (2026-07-02)
   NotesList.tsx      Static-list dnd with multi-note selection: flat column, useDraggable, section groups, frozen-snapshot cursor hit-test. Selection (local state `selectedNoteIds`) = Cmd/Ctrl-click toggle + Shift-click range (anchor = last plain/Cmd click, inclusive; range via flattenLayoutNoteIds); a bare left-click rings nothing but sets a pending anchor (`plainAnchorPendingRef`) that the NEXT Cmd/Ctrl-click folds into the group (so "click A then Cmd-click B,C" = {A,B,C}); shown as a dark ring; cleared on drop, tab switch, outside-click, or when a selected note vanishes. Grabbing a selected note drags the whole set (dragOrderRef = ordered block, draggedSetRef = the same as a Set); the clone stacks up to 2 faint back-notes + a count badge. The list NEVER reflows during a drag — the dragged rows dim in place and a clone rides the cursor via DragOverlay (portaled to the iframe <body> so the frosted container's backdrop-filter doesn't offset its fixed positioning). Snapshot includes ALL visible rows (incl. the dimmed sources) in list-container px (rows scroll together → no scroll offset); the cursor hit-tests this for a visual slot, mapped back to a dragged-excluded `base` index, then applyDropPlacement inserts the whole block. Plain reorder shows one thin high-contrast line (#111 + white ring) hugging a row edge (last-of-A vs first-of-B via boundarySide). Cmd/Ctrl = NEW SECTION at the CURSOR slot (top / between / bottom — resolveDropPlacement asNewSection): a labeled "New section" line at the slot, or a dashed item-sized box past the last note (where there's room); Cmd + cursor at/below the last row's top snaps it to the very end (forgiving bottom drop zone). A plain single-note drop released over the note's OWN original row is a no-op (so a near-zero "select" drag can't merge a sole-item section into its neighbor); dragging onto another note applies normally. Commit on drop via applyDropPlacement. Split: `useNoteSelection` / `useNoteDrag` hooks (src/hooks/), `notesListGeometry` + `notesListConstants` (src/lib/, incl. the pure `resolveDragPreview` hit-test), `DraggableNoteRow` / `DropIndicator` / `DragClone` components.
   Note.tsx           Note card; header = drag handle only while title unfocused. Title edits on a CLEAN click (≤4px = PointerSensor distance), not on mousedown (preventDefault'd then focused in onClick) so click+drag moves instead of editing. Modifier-click (Cmd/Ctrl/Shift) selects via onSelect instead of editing — resolved in onClick so a modifier-drag doesn't also select (dnd-kit suppresses the click after a real drag); isSelected → selection ring.  NoteUrlEditor.tsx URL row + LINK/ANCHOR/COPY/PASTE
   RichTextBodyEditor.tsx contentEditable + execCommand B/I/U, sanitized; body font = Inter; body bg = #D9D9D9 (`bg-note`) with the editor transparent so the dimmed `ModalWatermark` (0.15) reads behind the text
   SubjectTabStrip.tsx Rotated strip + click-vs-dblclick; the "+" is the shared `AddSubjectTabButton`. Wheel-scroll = plain native scrolling, NO scroll-snap and no JS. The strip scrolls freely on touchpad AND mouse wheel; tabs are NOT magnetically snapped to whole positions. Why dropped: Chrome's CSS scroll-snap BLOCKS the mouse wheel (it fights each discrete notch → freezes after the first notch), and the web platform can't reliably tell a mouse from a trackpad, so snap can't be limited to the trackpad. After many attempts (JS scrollend settle → ~1s wait + 2-step; one-tab-per-notch → capped speed; custom rAF glide → fought trackpad momentum; `snap-proximity` → smooth on trackpad but froze the mouse wheel; device-detected snap-toggle in a `useTabStripScroll` hook → detection missed real mice) we dropped snapping entirely per the client's priority "smooth scrolling first, snapping second". Programmatic cue/select scrolls (`scrollToFirstLetter` AIR-2, `scrollToTab` NN-10) still `scrollTo({behavior:"smooth"})` to tab offsets. AlphabetIndexRollout.tsx A–Z rail: clicking a letter CUES it — scrolls the first tab starting with that letter to the TOP and does NOT select it (client AIR rule); the previously-selected tab stays selected with its notes visible (scrolled out of view). Blue letter = SELECTED subject's letter (derived from activeSubjectTabId); matching letters hover-cue.
   BrandLockup.tsx    Shared NN logo/wordmark; `BrandLogo(viewBox?)` renders the two-N mark; `BrandHeaderBar` = gray header band (Figma HEADER BOX) reused by the modal frame, dashboard header + trial bar     NnModalFrame.tsx shared dialog shell (Cancel/OK buttons; width = Figma MODAL BG 577px; body `min-h` 214px, content vertically centered) + `ModalWatermark` — the dimmed faint NN behind the body: two N glyphs INLINED as paths (N_LEFT 189w + N_RIGHT 191.19w from the client's Figma export). The app has NO SVG-import pipeline — nothing imports `.svg` files, every icon/logo is inline, because bundled asset URLs break in the host-origin iframe (same reason fonts use `chrome.runtime.getURL`); so a glyph change is edited here, not by swapping a file. Laid side-by-side with the design's 3px gap (Figma "OLD LOGO REDO 4" 383.19×120 box; ~71% of body width, centered, natural aspect — NOT the narrow header `BrandLogo`); fills are plain white, opacity comes from the className (0.04 modals / 0.15 note); `-z-10` inside `relative isolate overflow-hidden`. Reused by every dialog + the note body; the empty-state panel (DashboardContent) uses the same watermark with a taller `min-h` 252px body (the two Figma modal heights).
   SubjectTab*Dialog.tsx / NoteDeleteConfirmDialog.tsx dialogs (deletes use CANCEL/OK)     PaywallDialog.tsx full-width trial bar (BrandLockup + BUY + $5); wiring OFF-LIMITS (§7)
-  styles.css         Tailwind 4 @theme + iframe-injected styles (?inline import)
+  styles.css         Tailwind 4 @theme + iframe-injected styles (?inline import). Host-wide `#host *` Fjalla default + an ID-scoped `.font-ui` re-assert so Inter surfaces (brand badge, note URL/date row) survive it (§8)
 src/components/ui/   shadcn primitives, re-themed to h-10 / text-2xl scale (§6)
 dist/                Built output (loadable). Built from the configured `.env` (real ExtPay id + prod 7-day trial) → paywall active (§7)
+dist-e2e/            E2E build (`npm run build:e2e` — ExtPay compiled OUT); what the test suite loads. Gitignored
+tests/e2e/           Playwright suite (23 tests: functional + visual; baselines in __screenshots__/ ARE committed). Fixtures boot headed Chromium per test with the extension loaded — see tests/e2e/README.md
+playwright.config.ts Playwright config (1 worker, screenshot settings, snapshot path template)
 ```
 
 ## 4. Stack & how to run
@@ -100,7 +107,9 @@ gate). **Cross-machine testing (e.g. Windows): `npm run pack`** = build + zip `d
 `nn-extension-dist.zip` (gitignored). The dev `dist/` is wired to the localhost dev server and will
 NOT run off-machine — always `pack` (a production build) for another machine, then refresh the test tab.
 
-Gates: `npm run typecheck`, `npm run lint` (husky pre-commit runs both). No test script/framework.
+Gates: `npm run typecheck`, `npm run lint` (husky pre-commit runs both). E2E: `npm run test:e2e`
+(Playwright, headed-only — windows popping per test is expected; refresh visual baselines
+deliberately with `npm run test:e2e:update`). Details + covered/uncovered scope: `tests/e2e/README.md`.
 
 ## 5. Architecture in one paragraph
 
@@ -193,7 +202,9 @@ trial (`nn_trial_started_at` in `chrome.storage.local`) deliberately resets on u
   `splitGroupsAtSeparationGaps`, never written. Old stored pixel gaps may still exist (migration).
 - **Duplicated helpers** (`trimTrailingSlash` ×3, three URL-normalizer flavors) have subtle semantic
   differences — reuse the right one, don't add a fourth.
-- **Host-scoped CSS misses portaled dialogs.** Dialogs portal via `useOverlayPortalContainer`, which in practice resolves to the iframe `<body>` — OUTSIDE `#nn-scroll-bookmarks-overlay-host`. So a rule scoped `#nn-scroll-bookmarks-overlay-host [data-x]` does NOT reach dialog content; global utility classes (and the iframe-body default font) still do. This is why the Add-tab input's font-size uses a plain `input[data-subject-name-input]` rule (not host-scoped) and its specificity beats the shadcn Input's `md:text-sm`. For anything inside a modal, don't rely on host-scoped selectors.
+- **Host-scoped CSS misses portaled dialogs — in BOTH directions.** Dialogs portal via `useOverlayPortalContainer`, which in practice resolves to the iframe `<body>` — OUTSIDE `#nn-scroll-bookmarks-overlay-host`. So a rule scoped `#nn-scroll-bookmarks-overlay-host [data-x]` does NOT reach dialog content; global utility classes (and the iframe-body default font) still do. This is why the Add-tab input's font-size uses a plain `input[data-subject-name-input]` rule (not host-scoped). The reverse also bites: host-wide defaults (`#host * { font-family: Fjalla }`) don't reach portaled dialogs — that produced the two-renderings brand-badge bug (header Fjalla vs modal Inter; client-reported, fixed 2026-07-02 by re-asserting `.font-ui` ID-scoped in styles.css, pinned by an e2e regression test). Any utility that must beat the host-wide default needs that same ID-scoped re-assert; any host-wide default must be checked against portaled content.
+- **Creating tabs/notes silently fails on plain-http pages (OPEN BUG, found 2026-07-02).** Ids are minted with `crypto.randomUUID` (5 call sites — e.g. `services/nnStorageNotes.ts`, `lib/nnStorageNormalize.ts`, `messaging/contentPanelBridge.ts`), which only exists in secure contexts; on `http://` hosts the create dialog throws and just stays open. Fix would be a fallback id generator — not yet approved/implemented.
+- **Rotated subject tabs report a bogus bounding box.** The rotate-90 + translate combo (Tailwind v4 individual transform props) PAINTS correctly, but `getBoundingClientRect` is a ~104px square overlapping the A–Z rail — breaking rect-based tooling (Playwright rect-center clicks hit an A–Z letter; any future scrollIntoView/hit math would too). The e2e helpers `clickSubjectTab`/`dblclickSubjectTab` encode the workaround (real mouse click at strip-column x + tab-box y).
 - **Silent failures:** many empty `catch {}` blocks and no logging anywhere. Don't imitate in new code.
 
 Already handled — do not re-flag or re-add: the stored-XSS sanitizer is in place; the `tabs`/`activeTab`
@@ -220,8 +231,9 @@ actual query). (`EXTPAY_EXTENSION_URL` is an exported-but-unused constant in §7
   line and otherwise untouched; but when you go to add behavior to one, split first instead of
   merging. Detection is mechanical: ESLint `max-lines` warns at 300 (run `npm run lint`), so any
   file in the 300 zone surfaces every lint. Known over-cap files left as-is (split only when next
-  adding to them): `NoteUrlEditor.tsx`, `contentPanelBridge.ts`, `App.tsx` (trial logic),
-  `useNoteDrag.ts` (310), `DashboardContent.tsx` (306).
+  adding to them): `NoteUrlEditor.tsx` (495), `contentPanelBridge.ts` (420), `App.tsx` (377, trial
+  logic), `useNoteDrag.ts` (310), `DashboardContent.tsx` (308). Files within ~±10 LOC of the cap
+  are fine — leave them untouched (user rule, 2026-07-02).
 - **No barrel / re-export facades.** Import each helper directly from the module that defines it;
   never re-export others' symbols (`export … from "…"`) just to keep a stable import surface. When
   you split a file, repoint its consumers to the new modules (don't leave the old file re-exporting).

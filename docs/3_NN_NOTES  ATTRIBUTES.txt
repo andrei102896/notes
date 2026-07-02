@@ -1,3 +1,5 @@
+[SYNC MARKER 2026-07-02] Client spec snapshot - NOT current app state. Check docs/DESIGN_SOURCES_STATUS.md for known divergences before relying on this file; code is the final truth.
+
 -------*NOTES:  ATTRIBUTES
 
 

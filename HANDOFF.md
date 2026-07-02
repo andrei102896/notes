@@ -65,10 +65,10 @@ artifact you upload to the Chrome Web Store. (`npm run build` alone produces the
    (`chrome://` pages, the Web Store, and other restricted pages can't be injected — the
    click does nothing there, by design.)
 
-Smoke-test before shipping: toggle on/off, create / edit / minimize / delete a note,
-drag-reorder (multi-select with Cmd/Ctrl- or Shift-click, then drag them together; Cmd/Ctrl-drag
-to drop into a new section), switch subject tabs, navigate within a
-tab and confirm the panel + state persist, and exercise the trial → buy flow.
+Smoke-test before shipping: `npm run test:e2e` covers the basics (toggle, tabs, notes,
+deletes, persistence — see §7); still exercise by hand what it can't: drag-reorder
+(multi-select with Cmd/Ctrl- or Shift-click, then drag them together; Cmd/Ctrl-drag to drop
+into a new section), LINK/ANCHOR on a real page, and the trial → buy flow.
 
 ---
 
@@ -118,8 +118,18 @@ npm run typecheck   # tsc --noEmit
 npm run lint        # eslint .
 ```
 
-Both run automatically on commit via a husky pre-commit hook. **There is no automated test
-suite** — every behavioral change must be verified in a loaded build (see §4).
+Both run automatically on commit via a husky pre-commit hook. There is also an **automated
+e2e suite**:
+
+```bash
+npm run test:e2e          # Playwright: 23 tests (functional + visual baselines)
+npm run test:e2e:update   # refresh the visual baselines after an INTENDED design change
+```
+
+It drives the real extension in a headed Chromium (windows opening per test is expected) against
+an ExtPay-disabled build (`dist-e2e`). What it does NOT cover — trial/paywall, drag & drop,
+rich-text B/I/U, LINK/ANCHOR — must still be verified in a loaded build (see §4).
+Scope + quirks: [`tests/e2e/README.md`](tests/e2e/README.md).
 
 `npm run lint` also emits **non-blocking** `max-lines` warnings for any file over the 300-LOC house
 cap (see [`AGENTS.md`](AGENTS.md) §9). These are informational — they do not fail the gate; a few
@@ -133,5 +143,9 @@ left as-is for now.
 - [`README.md`](README.md) — product summary + local-run instructions.
 - [`AGENTS.md`](AGENTS.md) — full architecture, responsive-sizing notes, and the
   payment/trial code that is **off-limits** for edits.
+- [`tests/e2e/README.md`](tests/e2e/README.md) — the e2e suite: how to run, baseline policy, quirks.
 - `docs/` + `css.txt` + `docs/NN_DASHBOARD.png` — the design source of truth (Figma export +
-  attribute specs). Where docs and the Figma export disagree, **Figma wins**.
+  attribute specs) as **client-provided snapshots**: they are not updated when the app changes.
+  Check [`docs/DESIGN_SOURCES_STATUS.md`](docs/DESIGN_SOURCES_STATUS.md) for known divergences
+  before relying on them. Where docs and the Figma export disagree, **Figma wins**; code is the
+  final truth.

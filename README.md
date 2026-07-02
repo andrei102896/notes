@@ -60,8 +60,10 @@ Everything is stored locally via `chrome.storage.local`; nothing is sent to a se
   localhost dev server and won't run off-machine, so always `pack` for that; after loading,
   refresh the test tab so the content script attaches.
 
-Quality gates: `npm run typecheck` and `npm run lint` (run on commit via husky). There is
-no test suite yet.
+Quality gates: `npm run typecheck` and `npm run lint` (run on commit via husky), plus an
+end-to-end suite: `npm run test:e2e` (Playwright drives the real extension in a headed
+Chromium — windows opening per test is expected; visual baselines refresh via
+`npm run test:e2e:update`). See `tests/e2e/README.md` for scope and quirks.
 
 ## Project layout
 
@@ -77,6 +79,9 @@ no test suite yet.
   `nnStorage*` modules, imported directly where they're used.
 - `src/lib/` — pure helpers (note-list layout + drag geometry, panel sizing math, URL
   comparison, A–Z helpers, HTML sanitizer, cross-navigation anchor handoff).
+- `tests/e2e/` — Playwright functional + visual-regression suite (committed baselines);
+  `docs/DESIGN_SOURCES_STATUS.md` tracks where the client design snapshots (`docs/`,
+  `css.txt`) diverge from the shipped app.
 
 See `AGENTS.md` for the full architecture, the responsive-sizing notes, and the areas that
 are off-limits for changes.
