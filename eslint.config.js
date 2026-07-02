@@ -8,7 +8,13 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: [
+      "dist/**",
+      "dist-e2e/**",
+      "node_modules/**",
+      "test-results/**",
+      "playwright-report/**",
+    ],
   },
   {
     settings: {
@@ -115,6 +121,18 @@ export default tseslint.config(
     files: ["eslint.config.js"],
     rules: {
       "import/no-unresolved": "off",
+    },
+  },
+  {
+    // Playwright fixtures take a `use` callback the react-hooks rule mistakes for a React hook.
+    files: ["tests/e2e/**/*.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
     },
   },
   prettier,

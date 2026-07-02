@@ -3,6 +3,10 @@ node_modules/
 
 # Vite build output / Chrome extension bundle (@crxjs/vite-plugin)
 dist/
+# E2E build (ExtPay disabled) + Playwright artifacts; baselines in tests/e2e/__screenshots__ ARE committed
+dist-e2e/
+test-results/
+playwright-report/
 
 # Vite cache
 .vite/
