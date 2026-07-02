@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { Columns4, Minus, Square } from "lucide-react";
+import { Minus, Square } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,6 +17,7 @@ import {
   RichTextBodyEditor,
   type RichTextBodyEditorHandle,
 } from "@/overlay/RichTextBodyEditor";
+import { TrashIcon } from "@/overlay/TrashIcon";
 import type { NNCopiedNote, NNSyncNote } from "@/types/nnData";
 
 const NOTE_HEADING_MAX_LEN = 50;
@@ -217,7 +218,7 @@ export function Note({
               }}
               className="rounded-none border-0 bg-muted-foreground p-0 text-white hover:bg-muted-foreground"
             >
-              <Columns4 />
+              <TrashIcon />
             </Button>
           </div>
         </div>
