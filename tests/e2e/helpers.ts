@@ -1,4 +1,31 @@
-import { expect, type FrameLocator, type Locator } from "@playwright/test";
+import {
+  expect,
+  type BrowserContext,
+  type FrameLocator,
+  type Locator,
+  type Page,
+} from "@playwright/test";
+
+/** Toggle the overlay in whatever URL the tab is currently on (fixtures' toggleOverlay is pinned to TEST_URL). */
+export async function toggleOverlayForTab(
+  context: BrowserContext,
+  page: Page,
+): Promise<void> {
+  // Content script injects at document_idle; the message is dropped if it isn't listening yet.
+  await page.waitForTimeout(1000);
+  let [worker] = context.serviceWorkers();
+  if (!worker) {
+    worker = await context.waitForEvent("serviceworker", { timeout: 15_000 });
+  }
+  await worker.evaluate(async (url) => {
+    const tabs = await chrome.tabs.query({});
+    const tab = tabs.find((t) => t.url?.startsWith(url));
+    if (!tab?.id) {
+      throw new Error("e2e: test tab not found");
+    }
+    await chrome.tabs.sendMessage(tab.id, { type: "TOGGLE_OVERLAY" });
+  }, page.url());
+}
 
 /** Strip "+" → name dialog → OK. The new tab becomes the active one. */
 export async function createSubjectTab(

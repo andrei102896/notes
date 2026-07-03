@@ -23,10 +23,6 @@ function formatCreatedDateForBox(timestamp: number): string {
   return `${month}/${day}/${year}`;
 }
 
-function trimTrailingSlash(url: string): string {
-  return url.length > 1 && url.endsWith("/") ? url.slice(0, -1) : url;
-}
-
 function toOpenableUrl(value: string): string | null {
   const trimmed = value.trim();
   if (!trimmed) {
@@ -35,7 +31,7 @@ function toOpenableUrl(value: string): string | null {
   try {
     const direct = new URL(trimmed);
     if (direct.protocol === "http:" || direct.protocol === "https:") {
-      return trimTrailingSlash(direct.toString());
+      return direct.toString();
     }
     return null;
   } catch {
@@ -44,7 +40,7 @@ function toOpenableUrl(value: string): string | null {
       if (!withHttps.hostname.includes(".")) {
         return null;
       }
-      return trimTrailingSlash(withHttps.toString());
+      return withHttps.toString();
     } catch {
       return null;
     }
@@ -62,7 +58,9 @@ function normalizeUrlForStorage(value: string): string {
   }
   const parsed = new URL(openable);
   const path = `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  return trimTrailingSlash(`${parsed.host}${path}`);
+  // Keep significant trailing slashes on sub-paths (some servers 404 without them, e.g. audi.com/en/); drop only the bare root slash for a clean homepage.
+  const cleanedPath = path === "/" ? "" : path;
+  return `${parsed.host}${cleanedPath}`;
 }
 
 function normalizeDraftUrl(value: string): string {
@@ -186,22 +184,8 @@ export function NoteUrlEditor({
               return;
             }
             onInteract();
-            const nextValue = event.target.value;
-            const trimmed = nextValue.trim();
-            if (!trimmed) {
-              setDraft("");
-              onSave("");
-            } else if (isValidUrl(trimmed)) {
-              const normalized = normalizeUrlForStorage(trimmed);
-              if (normalized) {
-                setDraft(normalized);
-                onSave(normalized);
-              } else {
-                setDraft(nextValue);
-              }
-            } else {
-              setDraft(nextValue);
-            }
+            // Keep the raw text while typing; normalize + persist on commit (blur/Enter) so slashes and paths aren't stripped mid-keystroke.
+            setDraft(event.target.value);
           }}
           onBlur={isReadOnly ? undefined : commit}
           onFocus={onInteract}

@@ -69,11 +69,23 @@ export function setPendingAnchorForNavigation(
   targetUrl: string,
   anchor: NNAnchorPosition,
 ): void {
+  // Tag the session payload with the target URL: a cross-origin go-to-anchor writes this on the SOURCE origin, where it can't be cleared — the URL guard stops that orphan from scrolling an unrelated same-origin page.
   tabWin.sessionStorage.setItem(
     PENDING_ANCHOR_SESSION_KEY,
-    JSON.stringify(anchor),
+    JSON.stringify({ url: targetUrl, anchor }),
   );
   void chrome.storage.local.set(pendingAnchorStoragePayload(targetUrl, anchor));
+}
+
+/** True when a pending anchor stored for `targetUrl` should fire on `currentUrl` (same href variants the storage keys use). */
+export function pendingAnchorUrlMatches(
+  targetUrl: string,
+  currentUrl: string,
+): boolean {
+  const targetKeys = new Set(pendingAnchorStorageKeysForUrl(targetUrl));
+  return pendingAnchorStorageKeysForUrl(currentUrl).some((key) =>
+    targetKeys.has(key),
+  );
 }
 
 /** New tab (e.g. right-click ANCHOR): only storage — session does not carry across tabs. */

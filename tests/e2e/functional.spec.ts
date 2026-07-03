@@ -97,6 +97,43 @@ test.describe("subject tabs", () => {
     );
   });
 
+  test("a newly created tab scrolls into view when the strip overflows", async ({
+    overlay,
+  }) => {
+    test.setTimeout(60_000);
+    // Enough tabs to overflow the strip; alphabetical sort drops each new one at the bottom (below the fold).
+    const names = Array.from(
+      { length: 16 },
+      (_, i) => `TAB${String(i + 1).padStart(2, "0")}`,
+    );
+    for (const name of names) {
+      await createSubjectTab(overlay, name);
+    }
+    const last = names[names.length - 1];
+    await expect(subjectTab(overlay, last)).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // The active (last-created) tab must be scrolled fully into the strip viewport, not left below the fold.
+    // offsetParent is the strip's relative scroll container; offsetTop/Height are the pre-transform box (rotated triggers).
+    await expect
+      .poll(async () =>
+        subjectTab(overlay, last).evaluate((el) => {
+          const container = el.offsetParent as HTMLElement | null;
+          if (!container) return null;
+          const top = (el as HTMLElement).offsetTop;
+          const bottom = top + (el as HTMLElement).offsetHeight;
+          return {
+            overflowing: container.scrollHeight > container.clientHeight + 1,
+            fullyVisible:
+              top >= container.scrollTop - 1 &&
+              bottom <= container.scrollTop + container.clientHeight + 1,
+          };
+        }),
+      )
+      .toEqual({ overflowing: true, fullyVisible: true });
+  });
+
   test("renames a tab via double-click", async ({ overlay }) => {
     await createSubjectTab(overlay, "ALPHA");
     await dblclickSubjectTab(overlay, "ALPHA");
@@ -122,12 +159,17 @@ test.describe("notes", () => {
       .nth(1)
       .inputValue()
       .catch(() => "");
-    // URL row auto-populates from the host page; date box uses the frozen clock.
+    // URL row auto-populates from the host page.
     expect
       .soft(urlValue.includes("nn-test.local") || urlValue === "")
       .toBeTruthy();
+    // The date is stamped with Date.now() in the content-script realm, which the fixture's frozen clock doesn't reach — so the card shows today's real date. Compute it instead of hardcoding.
+    const now = new Date();
+    const mmdd = `${String(now.getMonth() + 1).padStart(2, "0")}/${String(
+      now.getDate(),
+    ).padStart(2, "0")}`;
     await expect(
-      overlay.locator('[data-slot="card"]').getByText(/07\/02/),
+      overlay.locator('[data-slot="card"]').getByText(mmdd),
     ).toBeVisible();
   });
 

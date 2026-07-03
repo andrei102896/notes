@@ -259,8 +259,6 @@ export function App(): React.ReactElement {
             return;
           }
           patchSession({ activeSubjectTabId: id });
-          // Bring a partially-hidden tab fully into view on select (no-op if already visible).
-          subjectTabStripRef.current?.scrollToTab(id);
         }}
         onCreateTab={async (name) => {
           if (isReadOnly) {
@@ -269,7 +267,6 @@ export function App(): React.ReactElement {
           const id = await addSubjectTab(name);
           if (id !== null) {
             patchSession({ activeSubjectTabId: id });
-            subjectTabStripRef.current?.scrollToTab(id);
           }
         }}
         onEnsureActiveSubjectTab={(id) => {

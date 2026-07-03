@@ -19,8 +19,6 @@ const DESELECT_DEFER_MS = 200;
 export type SubjectTabStripHandle = {
   /** Scroll (cue) to the first tab whose name starts with `letter` — no select (AIR-2). */
   scrollToFirstLetter: (letter: AirLetter) => void;
-  /** Scroll the tab list so the tab with the given id is visible (NN-10). */
-  scrollToTab: (id: string) => void;
 };
 
 /** Scroll the strip so the given trigger is fully in view (NN-10). */
@@ -127,26 +125,26 @@ export const SubjectTabStrip = forwardRef<
           scrollTriggerToTop(root, target);
         }
       },
-      scrollToTab(id: string) {
-        const idx = sortedTabs.findIndex((t) => t.id === id);
-        if (idx < 0) {
-          return;
-        }
-        const root = tabsScrollAreaRef.current;
-        if (root === null) {
-          return;
-        }
-        const triggers = root.querySelectorAll<HTMLElement>(
-          '[data-slot="tabs-trigger"]',
-        );
-        const target = triggers[idx];
-        if (target !== undefined) {
-          scrollTriggerFullyIntoView(root, target);
-        }
-      },
     }),
     [sortedTabs],
   );
+
+  // Reveal the selected tab on any selection change (click, create, or cross-navigation restore) — it may sit below the strip fold. Runs post-commit, so the new tab and its data-state are already in the DOM.
+  useEffect(() => {
+    if (activeSubjectTabId === null) {
+      return;
+    }
+    const root = tabsScrollAreaRef.current;
+    if (root === null) {
+      return;
+    }
+    const target = root.querySelector<HTMLElement>(
+      '[data-slot="tabs-trigger"][data-state="active"]',
+    );
+    if (target !== null) {
+      scrollTriggerFullyIntoView(root, target);
+    }
+  }, [activeSubjectTabId]);
 
   /** Same-tab deselect: Radix skips `onValueChange` when value unchanged; avoid `onClick` vs `onValueChange` ordering (first click was toggling off). */
   const pressStartedOnSelectedIdRef = useRef<string | null>(null);
@@ -219,7 +217,7 @@ export const SubjectTabStrip = forwardRef<
         >
           <div
             ref={tabsScrollAreaRef}
-            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter/scrollToTab. No CSS scroll-snap: Chrome's snap blocks the mouse wheel (it fights discrete notches → freezes after the first notch) and mouse-vs-trackpad can't be reliably detected — so per the client's "smooth first, snapping second" we drop snapping for free, smooth native scrolling on both devices. */
+            /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter and the active-tab reveal effect. No CSS scroll-snap: Chrome's snap blocks the mouse wheel (it fights discrete notches → freezes after the first notch) and mouse-vs-trackpad can't be reliably detected — so per the client's "smooth first, snapping second" we drop snapping for free, smooth native scrolling on both devices. */
             className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
           >
             <TabsList>

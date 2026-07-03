@@ -6,9 +6,9 @@ import {
   PENDING_ANCHOR_SESSION_KEY,
   clearPendingAnchorState,
   pendingAnchorStorageKeysForUrl,
+  pendingAnchorUrlMatches,
   purgeOrphanPendingAnchorKeys,
 } from "@/lib/pendingNavigation";
-import { scrollToAnchorInPage } from "@/messaging/contentPanelBridge";
 
 /** Resolves when the pending anchor scroll finishes; created eagerly by initPendingAnchorScroll so showOverlayWhenReady defers the open until scrolled. */
 let anchorScrollDonePromise: Promise<void> = Promise.resolve();
@@ -19,20 +19,46 @@ export function whenAnchorScrollDone(): Promise<void> {
   return anchorScrollDonePromise;
 }
 
-function restoreScroll(targetY: number): void {
+/** Scroll to the anchor, retrying until the page settles: dynamic pages (video/lazy homepages, e.g. bugatti.com) lay out their target after load, so a single early scroll lands short. */
+function restoreAnchor(payload: {
+  elementSelector: string;
+  scrollY: number;
+}): void {
   let attempts = 0;
-  const maxAttempts = 20;
+  const maxAttempts = 24;
   const intervalMs = 250;
+  let lastY = Number.NaN;
 
-  const timer = window.setInterval(() => {
-    window.scrollTo({ top: targetY, behavior: "auto" });
+  const tick = (): void => {
+    let element: Element | null = null;
+    if (payload.elementSelector) {
+      try {
+        element = document.querySelector(payload.elementSelector);
+      } catch {
+        element = null;
+      }
+    }
+
+    let arrived: boolean;
+    if (element) {
+      element.scrollIntoView({ block: "center", behavior: "auto" });
+      // Settled once re-centering stops moving (page above stopped growing).
+      arrived = attempts >= 1 && Math.abs(window.scrollY - lastY) <= 2;
+    } else {
+      window.scrollTo({ top: payload.scrollY, behavior: "auto" });
+      // Settled once the target Y is actually reachable (page grew tall enough).
+      arrived = Math.abs(window.scrollY - payload.scrollY) <= 2;
+    }
+    lastY = window.scrollY;
     attempts += 1;
 
-    const closeEnough = Math.abs(window.scrollY - targetY) <= 2;
-    if (closeEnough || attempts >= maxAttempts) {
+    if (arrived || attempts >= maxAttempts) {
       window.clearInterval(timer);
     }
-  }, intervalMs);
+  };
+
+  const timer = window.setInterval(tick, intervalMs);
+  tick();
 }
 
 function executePendingAnchorScroll(anchor: unknown): boolean {
@@ -48,14 +74,8 @@ function executePendingAnchorScroll(anchor: unknown): boolean {
     elementSelector: string;
     scrollX: number;
     scrollY: number;
-    pageX: number;
-    pageY: number;
   };
-  if (!payload.elementSelector) {
-    restoreScroll(payload.scrollY);
-  } else {
-    scrollToAnchorInPage(payload);
-  }
+  restoreAnchor(payload);
   return true;
 }
 
@@ -116,13 +136,24 @@ export function initPendingAnchorScroll(): void {
 
   const sessionRaw = sessionStorage.getItem(PENDING_ANCHOR_SESSION_KEY);
   if (sessionRaw) {
+    let session: { url?: unknown; anchor?: unknown };
     try {
-      consumePendingAnchor(JSON.parse(sessionRaw));
+      session = JSON.parse(sessionRaw);
     } catch {
       clearPendingAnchorState(window, window.location.href);
       markAnchorScrollDone();
+      return;
     }
-    return;
+    // Only fire on the page the anchor targets; a key orphaned by a cross-origin go-to-anchor must not scroll an unrelated same-origin page.
+    if (
+      typeof session.url === "string" &&
+      pendingAnchorUrlMatches(session.url, window.location.href)
+    ) {
+      consumePendingAnchor(session.anchor);
+      return;
+    }
+    // Wrong/stale page — drop the session key and fall through to the URL-scoped storage path.
+    sessionStorage.removeItem(PENDING_ANCHOR_SESSION_KEY);
   }
 
   const keys = pendingAnchorStorageKeysForUrl(window.location.href);
