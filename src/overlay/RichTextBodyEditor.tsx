@@ -182,11 +182,47 @@ export const RichTextBodyEditor = forwardRef<
               return;
             }
             const data = event.clipboardData;
-            const doc = editorRef.current?.ownerDocument;
-            if (!data || !doc) {
+            const editor = editorRef.current;
+            const doc = editor?.ownerDocument;
+            if (!data || !editor || !doc) {
               return;
             }
-            // Never let raw clipboard markup reach the DOM: sanitize HTML to the B/I/U subset, else insert plain text (onInput emits).
+            // Pasted image file(s) (e.g. a screenshot) carry no text/html, so read each as a data URL and insert a sanitized <img>.
+            const imageFiles = Array.from(data.items)
+              .filter((it) => it.kind === "file" && it.type.startsWith("image/"))
+              .map((it) => it.getAsFile())
+              .filter((f): f is File => f !== null);
+            if (imageFiles.length > 0) {
+              event.preventDefault();
+              const win = doc.defaultView;
+              const sel = win?.getSelection();
+              const savedRange =
+                sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+              for (const file of imageFiles) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const url =
+                    typeof reader.result === "string" ? reader.result : "";
+                  if (!url) {
+                    return;
+                  }
+                  editor.focus();
+                  if (savedRange && sel) {
+                    sel.removeAllRanges();
+                    sel.addRange(savedRange);
+                  }
+                  doc.execCommand(
+                    "insertHTML",
+                    false,
+                    sanitizeNoteHtml(`<img src="${url}">`),
+                  );
+                  emitValue();
+                };
+                reader.readAsDataURL(file);
+              }
+              return;
+            }
+            // Never let raw clipboard markup reach the DOM: sanitize HTML to the allowed subset (B/I/U + images), else insert plain text (onInput emits).
             event.preventDefault();
             const html = data.getData("text/html");
             if (html) {

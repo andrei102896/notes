@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNNDashboardSession } from "@/hooks/useNNDashboardSession";
-import { firstSubjectTabLetter } from "@/lib/airSubjectTabs";
 import {
   getExtPayClient,
   isExtPayConfigured,
@@ -83,11 +82,6 @@ export function App(): React.ReactElement {
   // Lifted from SubjectTabStrip so the empty-state panel hides while the add-tab dialog is open.
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [, setHighlightedNoteId] = useState<string | null>(null);
-  // Rail highlight follows the SELECTED subject — derived, so it survives remount and clears on deselect.
-  const activeAirLetter = firstSubjectTabLetter(
-    subjectTabsForDisplay.find((t) => t.id === pageSession.activeSubjectTabId)
-      ?.name ?? "",
-  );
   const [trialBannerOpen, setTrialBannerOpen] = useState(false);
   const [trialBannerLoaded, setTrialBannerLoaded] = useState(false);
   const [isUserPaid, setIsUserPaid] = useState(false);
@@ -239,7 +233,6 @@ export function App(): React.ReactElement {
       />
       <AlphabetIndexRollout
         tabs={subjectTabsForDisplay}
-        activeLetter={activeAirLetter}
         onLetterSelect={(letter) => {
           subjectTabStripRef.current?.scrollToFirstLetter(letter);
         }}

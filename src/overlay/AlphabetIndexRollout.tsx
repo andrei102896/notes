@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   AIR_LETTERS,
@@ -10,7 +10,6 @@ import type { SubjectTabStripItem } from "@/types/nnData";
 
 type AlphabetIndexRolloutProps = {
   tabs: SubjectTabStripItem[];
-  activeLetter: AirLetter | null;
   onLetterSelect: (letter: AirLetter) => void;
   className?: string;
 };
@@ -18,11 +17,15 @@ type AlphabetIndexRolloutProps = {
 /** AIR (Alphabetical Index Rollout): A–Z column left of the subject tab strip (AIR-2); letters share column height equally (no scroll), letters with no matching tabs are inert on click. */
 export function AlphabetIndexRollout({
   tabs,
-  activeLetter,
   onLetterSelect,
   className,
 }: AlphabetIndexRolloutProps): React.ReactElement {
   const activeLetters = lettersWithMatchingTabs(tabs);
+
+  // AIR is a one-way street: the highlight is driven ONLY by tapping an AI letter — selecting a subject tab never changes it (client 2026-07-04).
+  const [highlightedLetter, setHighlightedLetter] = useState<AirLetter | null>(
+    null,
+  );
 
   return (
     <div
@@ -34,7 +37,7 @@ export function AlphabetIndexRollout({
     >
       {AIR_LETTERS.map((letter) => {
         const hasMatch = activeLetters.has(letter);
-        const isActive = activeLetter === letter;
+        const isActive = highlightedLetter === letter;
         return (
           <button
             key={letter}
@@ -44,13 +47,14 @@ export function AlphabetIndexRollout({
               if (!hasMatch) {
                 return;
               }
+              setHighlightedLetter(letter);
               onLetterSelect(letter);
             }}
             className={cn(
               "flex h-[var(--air-cell)] w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden border-b border-l border-border text-center font-normal outline-none",
               "text-air-letter leading-none",
               "bg-air-box text-accent-foreground",
-              // Blue only for the selected subject's letter; matching letters get a hover cue.
+              // Blue only for the tapped AI letter (one-way); matching letters get a hover cue.
               hasMatch && "hover:bg-accent",
               isActive && "bg-accent",
             )}

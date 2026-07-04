@@ -4,10 +4,16 @@ Functional + visual-regression coverage for the NN overlay, driven through the r
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
+Specs (8): `functional`, `visual`, `navigation` (single-tab persistence + tab reveal
+after cross-site nav), `anchor` (cross-page fire + late-layout retry), `link`
+(URL trailing-slash + typing), `reorder` (drag-dim cleanup on outside release),
+`air` (A–Z clicked-letter highlight), `image-paste` (paste image → sanitized
+`<img>`; XSS blocked).
+
 ## Run
 
 ```bash
-npm run test:e2e          # build dist-e2e, run all 23 tests
+npm run test:e2e          # build dist-e2e, run all 34 tests
 npm run test:e2e:update   # same, but refresh the visual baselines
 npx playwright test functional   # functional specs only (after a build:e2e)
 ```
@@ -33,6 +39,12 @@ exists to retry after Playwright upgrades).
 means the design changed: if unintended, fix the regression; if intended, rerun
 with `test:e2e:update` and review the new PNGs in the diff.
 
+**Baselines are calibrated to one machine.** Font antialiasing differs across OS /
+hardware, so on another machine every overlay screenshot can show a small (~1–2%)
+diff that exceeds the strict `maxDiffPixelRatio` — that is environmental, not a
+regression. Only refresh baselines (`test:e2e:update`) on the calibration machine,
+and eyeball the PNGs before committing them.
+
 ## Quirks the helpers encode (don't fight them in specs)
 
 - Subject tabs (rotate-90 + translate) paint correctly, but their
@@ -44,5 +56,7 @@ with `test:e2e:update` and review the new PNGs in the diff.
 
 ## Not covered yet (candidates for next specs)
 
-Drag & drop reordering / multi-select drag, rich-text B/I/U, LINK/ANCHOR/COPY/
-PASTE actions, A–Z quick-trigger jumps, trial/paywall flows.
+Full drag & drop reordering + multi-select drag (only the stuck-dim cleanup is
+covered), rich-text B/I/U, COPY/PASTE actions, trial/paywall flows, and LINK/ANCHOR
+against **real** sites (the specs use route-stubbed pages — verify Audi/Bugatti by
+hand). Notes-list scroll-position restore is also unverified.

@@ -122,13 +122,15 @@ Both run automatically on commit via a husky pre-commit hook. There is also an *
 e2e suite**:
 
 ```bash
-npm run test:e2e          # Playwright: 23 tests (functional + visual baselines)
+npm run test:e2e          # Playwright: 34 tests / 8 specs (functional, visual, navigation, anchor, link, reorder, air, image-paste)
 npm run test:e2e:update   # refresh the visual baselines after an INTENDED design change
 ```
 
 It drives the real extension in a headed Chromium (windows opening per test is expected) against
-an ExtPay-disabled build (`dist-e2e`). What it does NOT cover — trial/paywall, drag & drop,
-rich-text B/I/U, LINK/ANCHOR — must still be verified in a loaded build (see §4).
+an ExtPay-disabled build (`dist-e2e`). It covers subject-tab create/persist/scroll, A–Z highlight,
+LINK, anchor navigation, and note-body image paste (against stubbed pages). Still NOT covered —
+trial/paywall, full drag-reorder + multi-select (only the stuck-dim cleanup is), rich-text B/I/U,
+note COPY/PASTE, and LINK/ANCHOR on **real** sites — verify those in a loaded build (see §4).
 Scope + quirks: [`tests/e2e/README.md`](tests/e2e/README.md).
 
 `npm run lint` also emits **non-blocking** `max-lines` warnings for any file over the 300-LOC house

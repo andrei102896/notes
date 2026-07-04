@@ -144,6 +144,12 @@ input[data-subject-name-input] {
   font-weight: inherit;
 }
 
+/* Pasted images fit the note width instead of overflowing. */
+#nn-scroll-bookmarks-overlay-host [data-note-body] img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Crosshair cursor during anchor pick mode */
 body.nn-picking-anchor,
 body.nn-picking-anchor * {

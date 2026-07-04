@@ -1,7 +1,26 @@
-/** Note-body sanitizer: raw HTML re-injected via innerHTML is a stored-XSS vector, so at every trust boundary (render/save/paste) an inert DOMParser tree is walked down to a no-attribute allowlist (B/I/U formatting only). */
+/** Note-body sanitizer: raw HTML re-injected via innerHTML is a stored-XSS vector, so at every trust boundary (render/save/paste) an inert DOMParser tree is walked down to an allowlist — B/I/U formatting (no attributes) plus <img> with a scheme-validated src. */
 
-/** Formatting tags we keep; everything else is unwrapped to its text. */
-const ALLOWED_TAGS = new Set(["B", "STRONG", "I", "EM", "U", "P", "DIV", "BR"]);
+/** Formatting tags we keep; everything else is unwrapped to its text. IMG is kept but its src is scheme-validated (see below). */
+const ALLOWED_TAGS = new Set([
+  "B",
+  "STRONG",
+  "I",
+  "EM",
+  "U",
+  "P",
+  "DIV",
+  "BR",
+  "IMG",
+]);
+
+/** Allow only inline raster data-URLs and http(s) images — blocks javascript:, data:text/html, and scriptable svg. */
+function isSafeImageSrc(src: string): boolean {
+  const s = src.trim();
+  if (/^https?:\/\//i.test(s)) {
+    return true;
+  }
+  return /^data:image\/(png|jpe?g|gif|webp|avif|bmp)[;,]/i.test(s);
+}
 
 /** Tags removed together with their contents (never just unwrapped). */
 const DROP_WITH_CONTENT = new Set([
@@ -52,6 +71,20 @@ function sanitizeChildren(parent: Node): void {
 
     if (!ALLOWED_TAGS.has(tag)) {
       unwrap(el);
+      continue;
+    }
+
+    if (tag === "IMG") {
+      // Keep a scheme-validated src only; strip everything else (onerror, srcset, styles…). Unsafe/missing src → drop the image.
+      const rawSrc = el.getAttribute("src") ?? "";
+      for (const attr of Array.from(el.attributes)) {
+        el.removeAttribute(attr.name);
+      }
+      if (isSafeImageSrc(rawSrc)) {
+        el.setAttribute("src", rawSrc);
+      } else {
+        el.remove();
+      }
       continue;
     }
 
