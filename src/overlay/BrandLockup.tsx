@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 /** Brand-cluster NN mark (white NN) — NOT the off-limits payment logo. */
 export function BrandLogo({
   className,
-  viewBox = "0 0 63 30",
+  // Origin shifted so the glyph ink centroid (31.40, 13.66) sits at the viewBox center — the paths themselves are drawn off-center vertically.
+  viewBox = "-0.0993 -1.3364 63 30",
 }: {
   className?: string;
   viewBox?: string;
@@ -37,13 +38,14 @@ export function BrandLockup(): React.ReactElement {
     <>
       <div className="flex items-stretch border-2 border-mn-stroke bg-accent">
         <span className="flex items-center bg-logo-box [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]">
-          <BrandLogo />
+          {/* The visible dark box = this span + the row's 2px left border (there's no border on its right, where the blue bar begins). Nudge the mark left by half that border so it centers in the box the eye sees, not just the span. */}
+          <BrandLogo className="-translate-x-px" />
         </span>
         <div className="flex items-center justify-center px-2">
-          {/* pt is a layout offset (not relative-top) so caps stay crisp at fractional DPR; 0.22em ≈ the prior ~0.11em downward optical nudge. Windows-only 1px bottom pad offsets DirectWrite's heavier vertical metrics. */}
+          {/* pl offsets the 0.1em trailing track (tracking-widest) so caps center horizontally, like the Chrome Extension line below. pt is a downward optical nudge (leading-none leaves caps high in the line box); 0.11em centers them on Mac. Windows-only 1px bottom pad offsets DirectWrite's heavier vertical metrics. */}
           <span
-            className="pt-[0.22em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground"
-            style={{ paddingBottom: IS_WINDOWS ? "1px" : undefined }}
+            className="pl-[0.1em] pt-[0.11em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground"
+            style={{ paddingTop: IS_WINDOWS ? "2px" : undefined }}
           >
             Notes for Net
           </span>

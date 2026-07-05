@@ -205,7 +205,8 @@ export function NoteUrlEditor({
       </div>
 
       <div className="flex h-9 items-stretch">
-        <ButtonGroup>
+        {/* border-r closes the action group with a divider after PASTE, mirroring the B/I/U group's border-l (like the URL row's bordered URL/date boxes flanking the input). */}
+        <ButtonGroup className="border-r border-black">
           <Button
             variant="secondary"
             aria-label="Navigate to URL"
@@ -235,7 +236,7 @@ export function NoteUrlEditor({
               clearPendingAnchorState(tabWin, target);
               openInNewTab(target);
             }}
-            className="h-9 w-12 shrink-0 bg-note-action px-0 font-semibold text-md text-white hover:bg-note-action/90"
+            className="h-9 w-12 shrink-0 bg-note-action px-0 font-normal text-md text-white hover:bg-note-action/90"
           >
             LINK
           </Button>
@@ -327,7 +328,7 @@ export function NoteUrlEditor({
               openInNewTab(targetUrl);
             }}
             className={cn(
-              "h-9 px-2 font-semibold text-md",
+              "h-9 px-2 font-normal text-md",
               anchor || isPicking
                 ? "bg-accent text-white hover:bg-accent/90"
                 : "bg-background text-black hover:bg-muted border border-white",
@@ -352,7 +353,7 @@ export function NoteUrlEditor({
               }, 1500);
             }}
             className={cn(
-              "h-9 bg-note-action px-2 text-md font-semibold text-white transition-colors hover:bg-note-action/90",
+              "h-9 bg-note-action px-2 text-md font-normal text-white transition-colors hover:bg-note-action/90",
               isCopyFlashing && "bg-accent hover:bg-accent",
             )}
           >
@@ -366,7 +367,7 @@ export function NoteUrlEditor({
                 onInteract();
                 onPasteNote?.();
               }}
-              className="h-9 px-2 text-md font-semibold text-black hover:bg-white bg-white"
+              className="h-9 px-2 text-md font-normal text-black hover:bg-white bg-white"
             >
               PASTE
             </Button>
@@ -399,7 +400,7 @@ export function NoteUrlEditor({
                   // Ignore clipboard permission failures silently.
                 }
               }}
-              className="h-9 px-2 text-md text-black hover:bg-white bg-white font-semibold"
+              className="h-9 px-2 text-md text-black hover:bg-white bg-white font-normal"
             >
               PASTE
             </Button>

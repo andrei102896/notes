@@ -4,16 +4,18 @@ Functional + visual-regression coverage for the NN overlay, driven through the r
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
-Specs (8): `functional`, `visual`, `navigation` (single-tab persistence + tab reveal
+Specs (10): `functional`, `visual`, `navigation` (single-tab persistence + tab reveal
 after cross-site nav), `anchor` (cross-page fire + late-layout retry), `link`
 (URL trailing-slash + typing), `reorder` (drag-dim cleanup on outside release),
 `air` (A–Z clicked-letter highlight), `image-paste` (paste image → sanitized
-`<img>`; XSS blocked).
+`<img>`; XSS blocked), `brand` (NN glyph + header text centered in their boxes —
+geometric, not a screenshot), `note-actions` (action labels stay Fjalla Regular;
+divider closes the group after PASTE).
 
 ## Run
 
 ```bash
-npm run test:e2e          # build dist-e2e, run all 34 tests
+npm run test:e2e          # build dist-e2e, run all 37 tests
 npm run test:e2e:update   # same, but refresh the visual baselines
 npx playwright test functional   # functional specs only (after a build:e2e)
 ```
