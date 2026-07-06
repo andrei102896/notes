@@ -69,7 +69,7 @@ test.describe("temporary persistence across single-tab navigation", () => {
     ).toHaveCount(0);
   });
 
-  test("a restored bottom tab is revealed (scrolled into view), not just highlighted", async ({
+  test("the strip scroll position is preserved on reopen (selected tab is not scrolled to the fold)", async ({
     context,
   }) => {
     test.setTimeout(90_000);
@@ -94,37 +94,48 @@ test.describe("temporary persistence across single-tab navigation", () => {
       await createSubjectTab(overlayFrame(page), name);
     }
     const last = names[names.length - 1];
-    await expect(subjectTab(overlayFrame(page), last)).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
 
-    await toggleOverlayForCurrentTab(context, page); // minimize
-    await page.goto(TESLA_URL, { waitUntil: "load" }); // cross-site hard nav
-    await toggleOverlayForCurrentTab(context, page); // maximize
-    await waitForOverlay(page);
-
-    // Selection restores (highlight) — this already works.
-    await expect(subjectTab(overlayFrame(page), last)).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    // The restored tab must also be scrolled into the strip viewport ("visibly positioned"), not left below the fold.
+    // Creating an off-screen tab still reveals it (behavior kept for genuine selection changes).
     await expect
       .poll(async () =>
         subjectTab(overlayFrame(page), last).evaluate((el) => {
-          const container = el.offsetParent as HTMLElement | null;
-          if (!container) return null;
+          const c = el.offsetParent as HTMLElement;
           const top = (el as HTMLElement).offsetTop;
           const bottom = top + (el as HTMLElement).offsetHeight;
-          return {
-            overflowing: container.scrollHeight > container.clientHeight + 1,
-            fullyVisible:
-              top >= container.scrollTop - 1 &&
-              bottom <= container.scrollTop + container.clientHeight + 1,
-          };
+          return top >= c.scrollTop - 1 && bottom <= c.scrollTop + c.clientHeight + 1;
         }),
       )
-      .toEqual({ overflowing: true, fullyVisible: true });
+      .toBe(true);
+
+    // Scroll the strip to the middle so the selected bottom tab is now below the fold; let the
+    // debounced session write land.
+    const savedTop = await subjectTab(overlayFrame(page), last).evaluate((el) => {
+      const c = el.offsetParent as HTMLElement;
+      c.scrollTop = Math.round((c.scrollHeight - c.clientHeight) / 2);
+      return c.scrollTop;
+    });
+    expect(savedTop).toBeGreaterThan(1);
+    await page.waitForTimeout(400); // > the strip-scroll save debounce
+
+    await toggleOverlayForCurrentTab(context, page); // minimize
+    await page.goto(TESLA_URL, { waitUntil: "load" }); // cross-site hard nav → remount
+    await toggleOverlayForCurrentTab(context, page); // maximize
+    await waitForOverlay(page);
+
+    await expect(subjectTab(overlayFrame(page), last)).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // Strip returns to where it was left (± subpixel) — NOT scrolled to reveal the selected tab
+    // (the old bug scrolled it to the bottom, i.e. ~2×savedTop).
+    await expect
+      .poll(async () =>
+        subjectTab(overlayFrame(page), last).evaluate(
+          (el, saved) =>
+            Math.abs((el.offsetParent as HTMLElement).scrollTop - saved) <= 1.5,
+          savedTop,
+        ),
+      )
+      .toBe(true);
   });
 });

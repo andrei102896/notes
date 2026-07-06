@@ -4,8 +4,8 @@ Functional + visual-regression coverage for the NN overlay, driven through the r
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
-Specs (10): `functional`, `visual`, `navigation` (single-tab persistence + tab reveal
-after cross-site nav), `anchor` (cross-page fire + late-layout retry), `link`
+Specs (10): `functional`, `visual`, `navigation` (single-tab persistence + subject-tab
+strip scroll restore after cross-site nav), `anchor` (cross-page fire + late-layout retry), `link`
 (URL trailing-slash + typing), `reorder` (drag-dim cleanup on outside release),
 `air` (A–Z clicked-letter highlight), `image-paste` (paste image → sanitized
 `<img>`; XSS blocked), `brand` (NN glyph + header text centered in their boxes —

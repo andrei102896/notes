@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSubjectTabStripScroll } from "@/hooks/useSubjectTabStripScroll";
 import { indexOfFirstTabForLetter, type AirLetter } from "@/lib/airSubjectTabs";
 import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
 import { SubjectTabAddDialog } from "@/overlay/SubjectTabAddDialog";
@@ -20,31 +21,6 @@ export type SubjectTabStripHandle = {
   /** Scroll (cue) to the first tab whose name starts with `letter` — no select (AIR-2). */
   scrollToFirstLetter: (letter: AirLetter) => void;
 };
-
-/** Scroll the strip so the given trigger is fully in view (NN-10). */
-function scrollTriggerFullyIntoView(
-  container: HTMLDivElement,
-  trigger: HTMLElement,
-): boolean {
-  const triggerTop = trigger.offsetTop;
-  const triggerBottom = triggerTop + trigger.offsetHeight;
-  const viewportTop = container.scrollTop;
-  const viewportBottom = viewportTop + container.clientHeight;
-
-  if (triggerTop < viewportTop) {
-    container.scrollTo({ top: triggerTop, behavior: "smooth" });
-    return true;
-  }
-
-  if (triggerBottom > viewportBottom) {
-    container.scrollTo({
-      top: triggerBottom - container.clientHeight,
-      behavior: "smooth",
-    });
-    return true;
-  }
-  return false;
-}
 
 /** Pin a trigger to the TOP of the strip so a clicked A–Z letter's tabs "cue up" from the top (AIR-2); offsetTop is the pre-transform box so rotated triggers still align. Returns whether it actually scrolled. */
 function scrollTriggerToTop(
@@ -103,6 +79,11 @@ export const SubjectTabStrip = forwardRef<
   );
 
   const tabsScrollAreaRef = useRef<HTMLDivElement>(null);
+  const { onScroll: handleStripScroll } = useSubjectTabStripScroll({
+    scrollRef: tabsScrollAreaRef,
+    activeSubjectTabId,
+    tabCount: sortedTabs.length,
+  });
 
   useImperativeHandle(
     ref,
@@ -128,23 +109,6 @@ export const SubjectTabStrip = forwardRef<
     }),
     [sortedTabs],
   );
-
-  // Reveal the selected tab on any selection change (click, create, or cross-navigation restore) — it may sit below the strip fold. Runs post-commit, so the new tab and its data-state are already in the DOM.
-  useEffect(() => {
-    if (activeSubjectTabId === null) {
-      return;
-    }
-    const root = tabsScrollAreaRef.current;
-    if (root === null) {
-      return;
-    }
-    const target = root.querySelector<HTMLElement>(
-      '[data-slot="tabs-trigger"][data-state="active"]',
-    );
-    if (target !== null) {
-      scrollTriggerFullyIntoView(root, target);
-    }
-  }, [activeSubjectTabId]);
 
   /** Same-tab deselect: Radix skips `onValueChange` when value unchanged; avoid `onClick` vs `onValueChange` ordering (first click was toggling off). */
   const pressStartedOnSelectedIdRef = useRef<string | null>(null);
@@ -217,6 +181,7 @@ export const SubjectTabStrip = forwardRef<
         >
           <div
             ref={tabsScrollAreaRef}
+            onScroll={handleStripScroll}
             /* relative: be the offsetParent so triggers' offsetTop is container-relative for scrollToFirstLetter and the active-tab reveal effect. No CSS scroll-snap: Chrome's snap blocks the mouse wheel (it fights discrete notches → freezes after the first notch) and mouse-vs-trackpad can't be reliably detected — so per the client's "smooth first, snapping second" we drop snapping for free, smooth native scrolling on both devices. */
             className="relative mx-auto flex min-h-0 min-w-10 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain bg-muted hidden-scrollbar"
           >

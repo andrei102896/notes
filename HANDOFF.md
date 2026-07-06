@@ -122,13 +122,14 @@ Both run automatically on commit via a husky pre-commit hook. There is also an *
 e2e suite**:
 
 ```bash
-npm run test:e2e          # Playwright: 34 tests / 8 specs (functional, visual, navigation, anchor, link, reorder, air, image-paste)
+npm run test:e2e          # Playwright: 37 tests / 10 specs (functional, visual, navigation, anchor, link, reorder, air, image-paste, brand, note-actions)
 npm run test:e2e:update   # refresh the visual baselines after an INTENDED design change
 ```
 
 It drives the real extension in a headed Chromium (windows opening per test is expected) against
 an ExtPay-disabled build (`dist-e2e`). It covers subject-tab create/persist/scroll, A–Z highlight,
-LINK, anchor navigation, and note-body image paste (against stubbed pages). Still NOT covered —
+LINK, anchor navigation, note-body image paste, brand-mark/header-text centering, and note-action
+styling (against stubbed pages). Still NOT covered —
 trial/paywall, full drag-reorder + multi-select (only the stuck-dim cleanup is), rich-text B/I/U,
 note COPY/PASTE, and LINK/ANCHOR on **real** sites — verify those in a loaded build (see §4).
 Scope + quirks: [`tests/e2e/README.md`](tests/e2e/README.md).

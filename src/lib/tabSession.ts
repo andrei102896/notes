@@ -7,6 +7,8 @@ export type TabSessionState = {
   activeSubjectTabId: string | null;
   /** Last notes-list scroll offset (px), restored after a same-tab navigation; absent until set. */
   notesScrollTop?: number;
+  /** Last subject-tab strip scroll offset (px), restored after a same-tab navigation so the selected tab stays where it was; absent until set. */
+  subjectTabScrollTop?: number;
 };
 
 export const DEFAULT_TAB_SESSION: TabSessionState = {
