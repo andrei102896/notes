@@ -15,6 +15,8 @@ let overlayRoot: Root | null = null;
 let hideOverlayTimer: number | null = null;
 let overlayShellSlideOpen = false;
 let contextWatchTimer: number | null = null;
+/** The shell THIS content-script instance created; used so an orphaned instance never removes a shell a newer instance owns. */
+let ownedShell: HTMLDivElement | null = null;
 
 /** After uninstall/disable/update the script is orphaned and `chrome.runtime.id` goes undefined — "extension gone". */
 function isExtensionContextValid(): boolean {
@@ -43,7 +45,13 @@ function teardownOrphanedOverlay(): void {
   }
   overlayRoot = null;
   overlayShellSlideOpen = false;
-  document.getElementById(OVERLAY_SHELL_ID)?.remove();
+  // Only tear down the shell this instance created: after a reload/update a fresh content script
+  // re-creates + owns it, and this orphaned instance must not remove that live overlay.
+  const current = document.getElementById(OVERLAY_SHELL_ID);
+  if (current !== null && current === ownedShell) {
+    current.remove();
+  }
+  ownedShell = null;
 }
 
 /** Polls for extension-context loss while the overlay is mounted (idempotent). */
@@ -68,6 +76,7 @@ function ensureOverlayMounted(): HTMLDivElement {
 
   const shell = document.createElement("div");
   shell.id = OVERLAY_SHELL_ID;
+  ownedShell = shell;
   shell.setAttribute("aria-hidden", "true");
   configureOverlayShell(shell);
 
@@ -202,8 +211,11 @@ export function showOverlayWhenReady(): void {
   });
 }
 
-/** `animate:false` hides instantly to correct a stale open-hint when the session says closed. */
-export function hideOverlay({ animate = true }: { animate?: boolean } = {}): void {
+/** `animate:false` hides instantly to correct a stale open-hint; `persist:false` is a transient hide (anchor pick) that keeps the saved open state so a navigation still restores NN. */
+export function hideOverlay({
+  animate = true,
+  persist = true,
+}: { animate?: boolean; persist?: boolean } = {}): void {
   removeLoadingVeil();
   const shell = document.getElementById(OVERLAY_SHELL_ID);
   if (!shell) {
@@ -216,8 +228,10 @@ export function hideOverlay({ animate = true }: { animate?: boolean } = {}): voi
   }
 
   overlayShellSlideOpen = false;
-  patchTabSession({ open: false });
-  writeOpenHint(false);
+  if (persist) {
+    patchTabSession({ open: false });
+    writeOpenHint(false);
+  }
 
   if (!animate) {
     withoutTransition(shell, () => {

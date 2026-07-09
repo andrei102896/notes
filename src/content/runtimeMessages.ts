@@ -46,11 +46,12 @@ window.addEventListener(
     const customEvent = event as CustomEvent<OverlayVisibilityEventDetail>;
     const isVisibleRequest = Boolean(customEvent.detail?.visible);
 
+    // Anchor-pick transient toggle: never persist, so a navigation during/after the pick still restores NN as open.
     if (isVisibleRequest) {
-      showOverlay();
+      showOverlay({ persist: false });
       return;
     }
 
-    hideOverlay();
+    hideOverlay({ persist: false });
   },
 );

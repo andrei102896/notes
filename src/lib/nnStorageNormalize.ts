@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/generateId";
 import { pruneEmptyNoteGroups } from "@/lib/nnNoteLayout";
 import {
   DEFAULT_INDEX,
@@ -59,14 +60,14 @@ export function migrateSubjectTabs(raw: unknown): NNSubjectTab[] {
   return raw.map((item) => {
     if (!item || typeof item !== "object") {
       return {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: "",
         createdAt: Date.now(),
       };
     }
     const t = item as Record<string, unknown>;
     return {
-      id: String(t.id ?? crypto.randomUUID()),
+      id: String(t.id ?? generateId()),
       name: String(t.name ?? ""),
       createdAt: typeof t.createdAt === "number" ? t.createdAt : Date.now(),
     };
@@ -130,7 +131,7 @@ export function coerceNoteListLayout(v: unknown): NNNoteListLayout | null {
     const id =
       typeof gr.id === "string" && gr.id.length > 0
         ? gr.id
-        : crypto.randomUUID();
+        : generateId();
     const ids = Array.isArray(gr.noteIds)
       ? gr.noteIds.map((x) => String(x)).filter((s) => s.length > 0)
       : [];

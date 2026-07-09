@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/generateId";
 import {
   cloneNoteListLayout,
   flattenLayoutNoteIds,
@@ -29,7 +30,7 @@ export async function addNote(input: {
 }): Promise<NNSyncNote> {
   const index = await getIndex();
   const newNote: NNSyncNote = {
-    id: crypto.randomUUID(),
+    id: generateId(),
     subjectTabId: input.subjectTabId,
     url: input.url,
     heading: "",

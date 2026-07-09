@@ -10,6 +10,7 @@ import {
   DashboardContent,
   type DashboardContentHandle,
 } from "@/overlay/DashboardContent";
+import { DashboardFooter } from "@/overlay/DashboardFooter";
 import { DashboardHeader } from "@/overlay/DashboardHeader";
 import { PaywallDialog } from "@/overlay/PaywallDialog";
 import {
@@ -221,7 +222,7 @@ export function App(): React.ReactElement {
   return (
     <main
       id="nn-scroll-bookmarks-overlay-host"
-      className="relative flex h-full w-full min-w-0 flex-row justify-end"
+      className="relative flex h-full w-full min-w-0 flex-row justify-end border-[3px] border-[#282828]"
     >
       <PaywallDialog
         open={trialBannerOpen && (trialDaysLeft !== null || isReadOnly)}
@@ -361,6 +362,7 @@ export function App(): React.ReactElement {
             return commitNoteListLayoutForCurrentView(layout);
           }}
         />
+        <DashboardFooter />
       </div>
 
     </main>

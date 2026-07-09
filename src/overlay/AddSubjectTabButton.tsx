@@ -27,7 +27,7 @@ export function AddSubjectTabButton({
       size="icon"
       /* One A–Z cell tall (var(--air-cell)); width = w-10 (size icon) in the strip, squared in the modal via className. */
       className={cn(
-        "relative z-30 h-[var(--air-cell)] shrink-0 border-border bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100",
+        "relative z-30 h-[var(--air-cell)] shrink-0 border-2 border-border bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100",
         className,
       )}
       type="button"

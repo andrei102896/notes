@@ -220,8 +220,8 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  /* first:border-l-0 clears the line above the first subject; -translate-y-px lifts the top-edge line by 1px onto the A–Z cell's bottom border. pl-2.5 indents the label start (~10px @ ref, post-rotation = gap at the cell top); pr-1 + tracking-tight keep max-length names from clipping where the renderer runs wide (Windows DirectWrite). */
-                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 justify-start leading-tight tracking-tight pl-2.5 pr-1 rotate-90 translate-x-[2.5rem] -translate-y-px origin-top-left first:border-l-0"
+                  /* Every tab keeps its border-l (post-rotation = the 1px white line at the tab's visual TOP), incl. the first — that's the separator between the + button and the first subject. No y-nudge: tabs align to the A–Z cells' border-t lines. pl-2.5 indents the label start (~10px @ ref, post-rotation = gap at the cell top); pr-1 + tracking-tight keep max-length names from clipping where the renderer runs wide (Windows DirectWrite). pt centers the 1.875rem label line across the w-10 (2.5rem) strip thickness — base items-start pins it to the visual-right edge, so pt=(2.5-1.875)/2 balances the two sides. */
+                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 justify-start leading-tight tracking-tight pl-2.5 pr-1 pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left"
                 >
                   {tab.name.toUpperCase()}
                 </TabsTrigger>

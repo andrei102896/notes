@@ -61,13 +61,38 @@ body {
   --radius-md: calc(0.5rem - 2px);
   --radius-lg: 0.5rem;
   --text-shadow-lg: 0 0 6px #000000;
-  --shadow-air: -4px 0 5px 0 rgba(0, 0, 0, 0.25); /* A–Z shadow, cast to the LEFT (doc 4 / Figma "AI SHADOW") */
+  --shadow-air: 0px 4px 13px 4px rgba(26, 26, 26, 0.45); /* overall A–Z column drop shadow (Figma "AI SHADOW") */
+  --shadow-air-cell:
+    inset 0 9px 8px -5px rgba(0, 0, 0, 0.38),
+    inset 0 -2px 1px -1px rgba(255, 255, 255, 0.45); /* A–Z box bevel: dark shadow at the TOP + light edge at the bottom (Figma top-weighted inset direction) */
   --border-color-muted: #666666;
 }
 
 .nn-dashboard-content-frosted {
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(14px);
+}
+
+/* Blue "metal" bar (Figma TOP/BTTM METAL BAR DB): accent base + top light-blue hilite + inset bottom depth. ID-scoped so it beats shared bg-air-box/shadow-* utilities without recoloring modals or the A–Z token. */
+#nn-scroll-bookmarks-overlay-host .nn-metal-bar {
+  background:
+    linear-gradient(to bottom, #9ee2ff 0, rgba(158, 226, 255, 0) 40%),
+    var(--color-accent);
+  box-shadow: inset 0 -16px 12px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* A–Z index cells: gray metallic gradient (Figma "Rectangle 1–27" #8B8B8B, rendered as a light-top/dark-bottom bevel). Tapped (aria-pressed) or matching-hover cells go blue metallic (Figma Rectangle 4). */
+#nn-scroll-bookmarks-overlay-host [data-air-cell] {
+  background: linear-gradient(to bottom, #505050 0%, #7c7c7c 55%, #9d9d9d 100%);
+}
+#nn-scroll-bookmarks-overlay-host [data-air-cell][data-air-match]:hover,
+#nn-scroll-bookmarks-overlay-host [data-air-cell][aria-pressed="true"] {
+  background: linear-gradient(to bottom, #14709a 0%, #29abe2 55%, #5bbfef 100%);
+}
+
+/* Subject tabs: dark metallic sheen (Figma #3F3F3F). Rotated 90°, so element "to right" reads as a vertical light-top→dark-bottom sheen. Active tab keeps its solid blue (!bg-accent). background-image (NOT the `background` shorthand) so the base bg-subject-tab color stays underneath — else activating drops the gradient to a transparent color for a frame and the tab flickers. */
+#nn-scroll-bookmarks-overlay-host [data-slot="tabs-trigger"]:not([data-state="active"]) {
+  background-image: linear-gradient(to right, #262626 0%, #383838 55%, #4d4d4d 100%);
 }
 
 /* "This Tab Notes" label: gray ribbon with a pointed right edge toward the Min control. */

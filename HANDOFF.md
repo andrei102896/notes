@@ -122,7 +122,7 @@ Both run automatically on commit via a husky pre-commit hook. There is also an *
 e2e suite**:
 
 ```bash
-npm run test:e2e          # Playwright: 37 tests / 10 specs (functional, visual, navigation, anchor, link, reorder, air, image-paste, brand, note-actions)
+npm run test:e2e          # Playwright: 40 tests / 12 specs (functional, visual, navigation, anchor, anchor-persist, http-context, link, reorder, air, image-paste, brand, note-actions)
 npm run test:e2e:update   # refresh the visual baselines after an INTENDED design change
 ```
 

@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/generateId";
 import {
   CONTENT_PANEL_PROTOCOL_VERSION,
   type AnchorPickPayload,
@@ -283,7 +284,7 @@ export function registerContentPanelHost(): () => void {
 }
 
 function newRequestId(): string {
-  return crypto.randomUUID();
+  return generateId();
 }
 
 export type AnchorPickSession = {

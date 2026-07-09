@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/generateId";
 import { removeNoteIdsFromIndex } from "@/lib/nnStorageBuilders";
 import { layoutStorageKey, noteStorageKey } from "@/lib/nnSyncKeys";
 import { clampSubjectTabName } from "@/lib/subjectTabName";
@@ -21,7 +22,7 @@ export async function addSubjectTab(
   }
   const meta = await getMeta();
   const newTab: NNSubjectTab = {
-    id: crypto.randomUUID(),
+    id: generateId(),
     name: trimmed,
     createdAt: Date.now(),
   };

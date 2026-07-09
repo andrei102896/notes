@@ -53,10 +53,10 @@ export function DashboardHeader({
 
   return (
     <header className="sticky top-0 z-20 flex h-auto flex-col bg-air-box">
-      {/* py-0: fixed --air-cell height already sets the band; the shared bar's default vertical padding would squeeze the cluster. */}
-      <BrandHeaderBar className="relative z-[1] h-[var(--air-cell)] border-b border-black py-0" />
-      {/* One white frame around the whole strip: bg-background is the 3px surround (padding) and dividers (gap); no button has its own border. */}
-      <div className="flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
+      {/* nn-metal-bar: Figma TOP METAL BAR (blue metallic) on the brand band only; the id-scoped rule overrides the shared band's bg/shadow for the dashboard header, leaving modals/trial bar gray. py-0: the --air-cell height already sets the band. */}
+      <BrandHeaderBar className="nn-metal-bar relative z-[1] h-[var(--air-cell)] border-b border-black py-0" />
+      {/* One white frame around the whole strip: bg-background is the 3px surround (padding, incl. the white separator line under the metal band) and dividers (gap); no button has its own border. relative: positions the nav-bar hilite. */}
+      <div className="relative flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
         <Button
           variant="default"
           size="sm"
@@ -73,7 +73,7 @@ export function DashboardHeader({
         </Button>
 
         {/* Nav bar fills the slack (flex-1 → basis 0 beats w-fit); Min/Max/Delete grow equally so the gap reads as distance between them. */}
-        <ButtonGroup className="flex-1 items-stretch gap-0.5 bg-muted [&_button]:h-full [&_button]:flex-1 [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
+        <ButtonGroup className="flex-1 items-stretch gap-0.5 bg-[#b7b5b5] [&_button]:h-full [&_button]:flex-1 [&_button]:px-2 [&_button]:text-navmin [&_button]:uppercase [&_button]:text-mintext">
           <ButtonGroupText className="nn-tab-notes-ribbon shrink-0 whitespace-nowrap rounded-none bg-ribbon pr-4 text-navribbon text-accent-foreground">
             This Tab Notes
           </ButtonGroupText>
@@ -134,6 +134,12 @@ export function DashboardHeader({
             <BrandLogo />
           </div>
         )}
+
+        {/* WHITE HILITE ON NAV BAR (Figma): the soft translucent "fog", pinned to the TOP of the nav row. clip-path clips the upward blur at the seam so it is never seen on row 1's bottom. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-4 bg-[rgba(217,217,217,0.63)] blur-[5px] [clip-path:inset(0_0_-20px_0)]"
+        />
       </div>
 
       <SubjectTabDeleteConfirmDialog

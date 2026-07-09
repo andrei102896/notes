@@ -30,14 +30,16 @@ export function AlphabetIndexRollout({
   return (
     <div
       className={cn(
-        "flex h-full w-10 shrink-0 flex-col overflow-hidden border-r border-border bg-air-box shadow-air",
+        "flex h-full w-10 shrink-0 flex-col overflow-hidden bg-air-box shadow-air",
         className,
       )}
       aria-label="Alphabetical index"
     >
-      {AIR_LETTERS.map((letter) => {
+      {AIR_LETTERS.map((letter, index) => {
         const hasMatch = activeLetters.has(letter);
         const isActive = highlightedLetter === letter;
+        const isFirst = index === 0;
+        const isLast = index === AIR_LETTERS.length - 1;
         return (
           <button
             key={letter}
@@ -50,13 +52,16 @@ export function AlphabetIndexRollout({
               setHighlightedLetter(letter);
               onLetterSelect(letter);
             }}
+            data-air-cell
+            data-air-match={hasMatch || undefined}
             className={cn(
-              "flex h-[var(--air-cell)] w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden border-b border-l border-border text-center font-normal outline-none",
+              // border-x + border-t (not full border) so adjacent cells share ONE 1px white line — no 2px doubling at the vertical junction; the first cell drops border-t so A sits flush at the top (per design); the last cell adds border-b for the column's bottom edge.
+              "flex h-[var(--air-cell)] w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden border-x border-white text-center font-normal outline-none",
+              !isFirst && "border-t",
+              isLast && "border-b",
               "text-air-letter leading-none",
-              "bg-air-box text-accent-foreground",
-              // Blue only for the tapped AI letter (one-way); matching letters get a hover cue.
-              hasMatch && "hover:bg-accent",
-              isActive && "bg-accent",
+              // Background gradient (gray → blue when tapped/matching-hover) is in styles.css, keyed on data-air-cell / data-air-match / aria-pressed.
+              "text-accent-foreground shadow-air-cell",
             )}
             aria-pressed={isActive}
           >

@@ -171,7 +171,7 @@ export function NoteUrlEditor({
   return (
     <div className="bg-background">
       <div className="flex items-stretch border-b border-black">
-        <div className="flex h-5 w-12 shrink-0 items-center justify-center border-r border-black bg-note-field font-ui text-note-meta font-bold leading-none">
+        <div className="flex h-5 w-12 shrink-0 items-center justify-center border-r border-black bg-note-field font-ui text-note-meta font-bold">
           URL
         </div>
 
@@ -199,7 +199,7 @@ export function NoteUrlEditor({
           }}
           className="h-5 min-w-0 flex-1 rounded-none border-0 bg-note-field px-2 font-ui text-note-meta font-bold shadow-none focus-visible:ring-0"
         />
-        <div className="flex h-5 w-26 shrink-0 items-center justify-center border-l border-black bg-note-field px-2 font-ui text-note-meta font-bold leading-none">
+        <div className="flex h-5 w-26 shrink-0 items-center justify-center border-l border-black bg-note-field font-ui text-note-meta font-bold">
           {formatCreatedDateForBox(createdAt)}
         </div>
       </div>
@@ -423,10 +423,10 @@ export function NoteUrlEditor({
               onApplyFormat?.("bold");
             }}
             className={cn(
-              "h-full flex-1 rounded-none border-0 border-r border-black p-0 text-md font-bold",
+              "h-full flex-1 rounded-none border-0 border-r border-black p-0 font-ui text-md font-bold",
               formatState?.bold
                 ? "bg-accent text-white"
-                : "bg-note text-primary",
+                : "bg-note text-black",
             )}
           >
             B
@@ -444,10 +444,10 @@ export function NoteUrlEditor({
               onApplyFormat?.("italic");
             }}
             className={cn(
-              "h-full flex-1 rounded-none border-0 border-r border-black p-0 text-md italic",
+              "h-full flex-1 rounded-none border-0 border-r border-black p-0 font-ui text-md font-medium italic",
               formatState?.italic
                 ? "bg-accent text-white"
-                : "bg-note text-primary",
+                : "bg-note text-black",
             )}
           >
             I
@@ -465,10 +465,10 @@ export function NoteUrlEditor({
               onApplyFormat?.("underline");
             }}
             className={cn(
-              "h-full flex-1 rounded-none border-0 p-0 text-md underline",
+              "h-full flex-1 rounded-none border-0 p-0 font-ui text-md font-bold underline",
               formatState?.underline
                 ? "bg-accent text-white"
-                : "bg-note text-primary",
+                : "bg-note text-black",
             )}
           >
             U

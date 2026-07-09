@@ -102,7 +102,14 @@ export function Note({
       className={cn(
         "border-[6px] bg-note p-0",
         isSelected && "ring-2 ring-primary ring-offset-2",
-        matchesCurrentPage ? "border-accent" : "border-border",
+        matchesCurrentPage
+          ? cn(
+              "border-accent",
+              expanded
+                ? "shadow-[0px_0px_12.2px_8px_rgba(0,0,0,0.33)]"
+                : "shadow-[0px_4px_12px_8.2px_rgba(0,0,0,0.33)]",
+            )
+          : "border-border",
       )}
     >
       <Collapsible

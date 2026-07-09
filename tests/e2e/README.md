@@ -1,13 +1,20 @@
 # E2E suite (Playwright)
 
+> The 6 `__screenshots__/visual.spec.ts/*.png` baselines are the **current "metal" design**,
+> regenerated on client sign-off (2026-07-08). Refresh them with `npm run test:e2e:update` (calibration
+> machine only) after an intended design change.
+
 Functional + visual-regression coverage for the NN overlay, driven through the real
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
-Specs (10): `functional`, `visual`, `navigation` (single-tab persistence + subject-tab
-strip scroll restore after cross-site nav), `anchor` (cross-page fire + late-layout retry), `link`
-(URL trailing-slash + typing), `reorder` (drag-dim cleanup on outside release),
-`air` (A–Z clicked-letter highlight), `image-paste` (paste image → sanitized
+Specs (12): `functional`, `visual`, `navigation` (single-tab persistence + subject-tab
+strip scroll restore after cross-site nav), `anchor` (cross-page fire + late-layout retry),
+`anchor-persist` (overlay stays visible after an anchor pick — the host shell, not just the
+iframe button), `http-context` (create tab + note on a plain-http non-secure page — the
+`generateId` randomUUID→getRandomValues fallback), `link` (URL trailing-slash + typing),
+`reorder` (drag-dim cleanup on outside release), `air` (A–Z clicked-letter highlight),
+`image-paste` (paste image → sanitized
 `<img>`; XSS blocked), `brand` (NN glyph + header text centered in their boxes —
 geometric, not a screenshot), `note-actions` (action labels stay Fjalla Regular;
 divider closes the group after PASTE).
@@ -15,7 +22,7 @@ divider closes the group after PASTE).
 ## Run
 
 ```bash
-npm run test:e2e          # build dist-e2e, run all 37 tests
+npm run test:e2e          # build dist-e2e, run all 40 tests
 npm run test:e2e:update   # same, but refresh the visual baselines
 npx playwright test functional   # functional specs only (after a build:e2e)
 ```

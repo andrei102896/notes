@@ -1,19 +1,8 @@
-/* [SYNC MARKER 2026-07-02] Figma CSS export snapshot - NOT current app state. Known divergences: docs/DESIGN_SOURCES_STATUS.md; code is the final truth. */
-/* [SUPERSEDED 2026-07-07] For the overlay chrome (header, A–Z rail, subject tabs, note shadow, footer) the CURRENT design is docs/desired-look.txt (the "metal" redesign). This file is only still authoritative for parts desired-look.* does not cover. */
-
-/* NN_DASHBOARD FULL */
-
-position: absolute;
-width: 1008px;
-height: 1003px;
-
-
-
 /* MN */
 
 position: absolute;
-width: 1008px;
-height: 1003px;
+width: 691px;
+height: 1004px;
 
 
 
@@ -33,14 +22,14 @@ backdrop-filter: blur(4.7px);
 
 position: absolute;
 width: 40px;
-height: 951px;
+height: 949px;
 
 
 
 /* TAB_BAGS */
 
 position: absolute;
-width: 110px;
+width: 108px;
 height: 40px;
 
 background: #3F3F3F;
@@ -107,8 +96,8 @@ transform: rotate(-90deg);
 /* WORDS_CHAIR */
 
 position: absolute;
-width: 94px;
-height: 32px;
+width: 71.45px;
+height: 31.66px;
 
 font-family: 'Fjalla One';
 font-style: normal;
@@ -297,6 +286,789 @@ width: 610.2px;
 height: 908.6px;
 
 background: #FEFEFE;
+
+
+/* Rectangle 65 */
+
+position: absolute;
+visibility: hidden;
+width: 210px;
+height: 446px;
+
+background: #D9D9D9;
+
+
+/* AI ALL */
+
+position: absolute;
+width: 37.46px;
+height: 947px;
+
+
+
+/* AI BOXES + LETTERS */
+
+position: absolute;
+width: 37.46px;
+height: 947px;
+
+
+
+/* AI SHADOW */
+
+position: absolute;
+width: 22px;
+height: 947px;
+
+background: #000000;
+box-shadow: 0px 4px 15.8px 9px rgba(26, 26, 26, 0.49);
+
+
+/* AI LETTERS + BOXES */
+
+position: absolute;
+width: 36.46px;
+height: 945.76px;
+
+
+
+/* Rectangle 26 */
+
+position: absolute;
+visibility: hidden;
+width: 35.17px;
+height: 34.73px;
+
+background: #DDDDDD;
+border: 0.3px solid #000000;
+
+
+/* Rectangle 27 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 25 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 23 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 17 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 20 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 14 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 22 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 16 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 19 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 24 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 21 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 15 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 18 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 13 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 12 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 10 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 11 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 9 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 8 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 6 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 7 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 5 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 4 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #29ABE2;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 3 */
+
+position: absolute;
+width: 36.46px;
+height: 36.73px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 2 */
+
+position: absolute;
+width: 36.46px;
+height: 35.76px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Rectangle 1 */
+
+position: absolute;
+width: 36px;
+height: 37px;
+
+background: #8B8B8B;
+border: 1px solid #FFFFFF;
+box-shadow: 0px 23px 20.4px -3px rgba(0, 0, 0, 0.4), inset 0px 20px 7.2px 47px rgba(0, 0, 0, 0.12);
+
+
+/* Z */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* Y */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* X */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* W */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* V */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* U */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* T */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* S */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* R */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* Q */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* P */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* N */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* M */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* L */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* K */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* J */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* I */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* H */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* G */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* F */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* E */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* D */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* C */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* B */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* A */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
+
+
+/* O */
+
+position: absolute;
+width: 13.53px;
+height: 25.9px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 26px;
+line-height: 33px;
+
+color: #FFFFFF;
+
+transform: rotate(90deg);
 
 
 /* NOTE_06_COLLAPSED */
@@ -881,6 +1653,65 @@ height: 0px;
 border: 2px solid #000000;
 
 
+/* BOX_LINK */
+
+box-sizing: border-box;
+
+position: absolute;
+visibility: hidden;
+width: 43px;
+height: 40px;
+
+background: #000000;
+border: 0.3px solid #000000;
+
+
+/* LINK */
+
+position: absolute;
+visibility: hidden;
+width: 28px;
+height: 21px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 20px;
+/* identical to box height */
+
+color: #FFFFFF;
+
+
+
+/* BOX_ANCHOR */
+
+position: absolute;
+visibility: hidden;
+width: 60px;
+height: 38px;
+
+background: #29ABE2;
+
+
+/* ANCHOR */
+
+position: absolute;
+visibility: hidden;
+width: 49.89px;
+height: 20.82px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 20px;
+/* identical to box height */
+
+color: #FFFFFF;
+
+
+
 /* NOTE_04_COLLAPSED */
 
 position: absolute;
@@ -1216,114 +2047,131 @@ height: 16.92px;
 border: 2px solid #FFFFFF;
 
 
-/* Vector 6 */
+/* CONCEPT: LINK ANCHOR MIN NOTE */
 
 position: absolute;
 visibility: hidden;
-width: 0px;
-height: 34.31px;
-
-border: 0.5px solid #000000;
+width: 54px;
+height: 40px;
 
 
-/* Rectangle 30 */
+
+/* BOX_LINK */
 
 box-sizing: border-box;
 
 position: absolute;
-visibility: hidden;
-width: 34.54px;
-height: 34.8px;
+width: 27px;
+height: 40px;
 
-background: #D9D9D9;
+background: #000000;
 border: 0.3px solid #000000;
 
 
-/* Rectangle 31 */
-
-box-sizing: border-box;
+/* L */
 
 position: absolute;
-visibility: hidden;
-width: 34.54px;
-height: 34.8px;
+width: 15px;
+height: 33px;
 
-background: #D9D9D9;
-border: 0.3px solid #000000;
-
-
-/* Rectangle 32 */
-
-box-sizing: border-box;
-
-position: absolute;
-visibility: hidden;
-width: 34.54px;
-height: 34.8px;
-
-background: #D9D9D9;
-border: 0.3px solid #000000;
-
-
-/* B */
-
-position: absolute;
-visibility: hidden;
-width: 13.43px;
-height: 16.43px;
-
-font-family: 'Myriad Pro';
+font-family: 'Fjalla One';
 font-style: normal;
-font-weight: 700;
-font-size: 16px;
-line-height: 19px;
+font-weight: 400;
+font-size: 28px;
+line-height: 35px;
 
-color: #000000;
-
-
-
-/* I */
-
-position: absolute;
-visibility: hidden;
-width: 9.59px;
-height: 14.5px;
-
-font-family: 'Myriad Pro';
-font-style: italic;
-font-weight: 600;
-font-size: 16px;
-line-height: 19px;
-
-color: #000000;
+color: #FFFFFF;
 
 
 
-/* U */
+/* LINK */
 
 position: absolute;
 visibility: hidden;
-width: 10.55px;
-height: 14.5px;
+width: 31px;
+height: 20.67px;
 
-font-family: 'Myriad Pro';
+font-family: 'Fjalla One';
 font-style: normal;
-font-weight: 700;
-font-size: 16px;
+font-weight: 400;
+font-size: 15px;
+line-height: 19px;
+
+color: #FFFFFF;
+
+
+
+/* BOX_ANCHOR */
+
+position: absolute;
+width: 27px;
+height: 39px;
+
+background: #29ABE2;
+
+
+/* A */
+
+position: absolute;
+width: 15px;
+height: 30px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 38px;
+
+color: #FFFFFF;
+
+
+
+/* ANCHOR */
+
+position: absolute;
+visibility: hidden;
+width: 49.89px;
+height: 20.82px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 15px;
 line-height: 19px;
 
 color: #000000;
 
 
 
-/* Vector 7 */
+/* BOX_LINK */
+
+box-sizing: border-box;
 
 position: absolute;
 visibility: hidden;
-width: 10.07px;
-height: 0px;
+width: 43px;
+height: 40px;
 
-border: 2px solid #000000;
+background: #000000;
+border: 0.3px solid #000000;
+
+
+/* LINK */
+
+position: absolute;
+visibility: hidden;
+width: 28px;
+height: 21px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 20px;
+/* identical to box height */
+
+color: #FFFFFF;
+
 
 
 /* NOTE_03_EXPANDED */
@@ -1355,18 +2203,6 @@ width: 496.03px;
 height: 34.8px;
 
 background: #FEFEFE;
-border: 0.3px solid #000000;
-
-
-/* BOX_LINK */
-
-box-sizing: border-box;
-
-position: absolute;
-width: 47.97px;
-height: 34.8px;
-
-background: #000000;
 border: 0.3px solid #000000;
 
 
@@ -1413,17 +2249,29 @@ color: #000000;
 /* 05/ 12/ 2026 */
 
 position: absolute;
-width: 71px;
-height: 20.3px;
+width: 72px;
+height: 20px;
 
-font-family: 'Fjalla One';
+font-family: 'Inter';
 font-style: normal;
-font-weight: 400;
-font-size: 13px;
-line-height: 16px;
+font-weight: 700;
+font-size: 11px;
+line-height: 13px;
 
 color: #000000;
 
+
+
+/* BOX_LINK */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 47.97px;
+height: 34.8px;
+
+background: #000000;
+border: 0.3px solid #000000;
 
 
 /* LINK */
@@ -1754,7 +2602,7 @@ font-weight: 400;
 font-size: 18px;
 line-height: 23px;
 
-color: #000000;
+color: #464646;
 
 
 
@@ -1791,7 +2639,8 @@ width: 555.52px;
 height: 50.26px;
 
 background: #D9D9D9;
-border: 6px solid #000000;
+border: 6px solid #29ABE2;
+box-shadow: 0px 4px 12px 8.2px rgba(0, 0, 0, 0.33);
 
 
 /* BOX_LINK_ANCHOR ETC */
@@ -2001,7 +2850,7 @@ height: 38.66px;
 background: #666666;
 
 
-/* TRIBE SIGNS WOOD $199 */
+/* SECRET LAB WOOD $199 */
 
 position: absolute;
 width: 368px;
@@ -2237,6 +3086,7 @@ height: 277.41px;
 
 background: #D9D9D9;
 border: 6px solid #29ABE2;
+box-shadow: 0px 0px 12.2px 8px rgba(0, 0, 0, 0.33);
 
 
 /* BOX_LINK_ANCHOR ETC */
@@ -2303,17 +3153,17 @@ color: #000000;
 
 
 
-/* zzzzzzzzz */
+/* DATE */
 
 position: absolute;
-width: 69px;
+width: 77px;
 height: 21px;
 
-font-family: 'Fjalla One';
+font-family: 'Inter';
 font-style: normal;
-font-weight: 400;
-font-size: 13px;
-line-height: 16px;
+font-weight: 700;
+font-size: 11px;
+line-height: 13px;
 
 color: #000000;
 
@@ -2363,6 +3213,15 @@ color: #FFFFFF;
 
 
 
+/* BOX_ANCHOR */
+
+position: absolute;
+width: 60px;
+height: 38px;
+
+background: #29ABE2;
+
+
 /* ANCHOR */
 
 position: absolute;
@@ -2375,7 +3234,7 @@ font-weight: 400;
 font-size: 15px;
 line-height: 19px;
 
-color: #000000;
+color: #FFFFFF;
 
 
 
@@ -2621,7 +3480,7 @@ color: #000000;
 /* U_UNDERLINE */
 
 position: absolute;
-width: 9px;
+width: 10.07px;
 height: 0px;
 
 border: 2px solid #000000;
@@ -2633,7 +3492,7 @@ position: absolute;
 width: 10.55px;
 height: 14.5px;
 
-font-family: 'Inter';
+font-family: 'Myriad Pro';
 font-style: normal;
 font-weight: 700;
 font-size: 16px;
@@ -2664,7 +3523,7 @@ font-weight: 400;
 font-size: 18px;
 line-height: 23px;
 
-color: #000000;
+color: #464646;
 
 
 
@@ -2684,115 +3543,174 @@ color: #000000;
 
 
 
-/* SPACE CREATED  LEFT CLICK + CMD/ CTRL */
+/* Star 1 */
+
+box-sizing: border-box;
 
 position: absolute;
-width: 632px;
-height: 154px;
+visibility: hidden;
+width: 21px;
+height: 21px;
 
-
-
-/* Vector 32 */
-
-position: absolute;
-width: 353px;
-height: 0px;
-
-border: 2px solid #000000;
-
-
-/* Rectangle 35 */
-
-position: absolute;
-width: 279px;
-height: 154px;
-
-background: #3F3F3F;
-
-
-/* SCROLL BAR */
-
-position: absolute;
-width: 255px;
-height: 126px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 20px;
-line-height: 25px;
-
-color: #FFFFFF;
-
-
-
-/* SCROLL BAR */
-
-position: absolute;
-width: 168.5px;
-height: 55px;
-
-
-
-/* Vector 32 */
-
-position: absolute;
-width: 53px;
-height: 0px;
-
-border: 2px solid #000000;
-
-
-/* Rectangle 35 */
-
-position: absolute;
-width: 116px;
-height: 55px;
-
-background: #3F3F3F;
-
-
-/* SCROLL BAR */
-
-position: absolute;
-width: 93px;
-height: 27px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 20px;
-line-height: 25px;
-
-color: #FFFFFF;
-
+background: #29ABE2;
+border: 1px solid #FFFFFF;
 
 
 /* NN_SCROLL BAR */
 
 position: absolute;
 width: 7px;
-height: 844px;
+height: 806px;
 
 background: #686868;
 border-radius: 6px;
 
 
-/* BLUR_BTTM_DB */
+/* BTTM METAL BAR DB */
 
 position: absolute;
-visibility: hidden;
 width: 606px;
 height: 35px;
 
-background: rgba(41, 171, 226, 0.46);
+background: #29ABE2;
+box-shadow: inset 0px -15px 13.8px 3px rgba(0, 0, 0, 0.46);
+backdrop-filter: blur(3.6px);
+/* Note: backdrop-filter has minimal browser support */
+
+
+/* WHITE HILITE ON TOP BAR */
+
+position: absolute;
+width: 606px;
+height: 10px;
+
+background: #9EE2FF;
+filter: blur(2.95px);
+
+
+/* NN COPYRIGHT BTTM BAR */
+
+position: absolute;
+width: 181px;
+height: 14px;
+
+
+
+/* C 2026 NOTES FOR NET */
+
+position: absolute;
+width: 178px;
+height: 12px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 10px;
+line-height: 12px;
+letter-spacing: 0.25em;
+
+color: #FFFFFF;
+
+
+
+/* Ellipse 1 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 14px;
+height: 14px;
+
+border: 1px solid #FFFFFF;
+
+
+/* UI LOGO + BOX_NAV_BAR */
+
+position: absolute;
+width: 64px;
+height: 38px;
+
+
+
+/* BOX_NN */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 64px;
+height: 38px;
+
+background: #29ABE2;
+border: 3px solid #FFFFFF;
+
+
+/* N_RIGHT */
+
+position: absolute;
+width: 22px;
+height: 19px;
+
+background: #FFFFFF;
+
+
+/* N_LEFT */
+
+position: absolute;
+width: 22px;
+height: 19px;
+
+background: #FFFFFF;
 
 
 /* NAV_BAR_ALL */
 
 position: absolute;
 width: 609px;
-height: 44px;
+height: 42px;
+
+
+
+/* BOX_THIS TAB...MIN MAX DELETE */
+
+position: absolute;
+width: 305px;
+height: 38px;
+
+background: #B7B5B5;
+
+
+/* BOX_THIS TAB NOTES */
+
+position: absolute;
+width: 120px;
+height: 38px;
+
+background: #565656;
+
+
+/* ARROW THIS TAB NOTES */
+
+position: absolute;
+width: 40px;
+height: 18px;
+
+background: #565656;
+transform: rotate(90deg);
+
+
+/* WORDS_MIN MAX DELETE */
+
+position: absolute;
+width: 151px;
+height: 25px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 21px;
+line-height: 26px;
+
+color: #252525;
 
 
 
@@ -2848,77 +3766,6 @@ color: #FFFFFF;
 
 
 
-/* BOX_THIS TAB NOTES */
-
-position: absolute;
-width: 305px;
-height: 38px;
-
-background: #B7B5B5;
-
-
-/* BOX_THIS TAB NOTES */
-
-position: absolute;
-width: 120px;
-height: 37px;
-
-background: #565656;
-
-
-/* Polygon 1 */
-
-position: absolute;
-width: 44px;
-height: 18px;
-
-background: #565656;
-transform: rotate(90deg);
-
-
-/* WORDS_THIS TAB NOTES */
-
-position: absolute;
-width: 107px;
-height: 22px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 18px;
-line-height: 23px;
-
-color: #FFFFFF;
-
-
-
-/* BORDER_THIS TAB NOTES */
-
-box-sizing: border-box;
-
-position: absolute;
-visibility: hidden;
-width: 135.28px;
-height: 27.06px;
-
-
-
-/* WORDS_MIN MAX DELETE */
-
-position: absolute;
-width: 151px;
-height: 25px;
-
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-font-size: 21px;
-line-height: 26px;
-
-color: #252525;
-
-
-
 /* WHITE LINE_NAV_BAR_BTTM */
 
 position: absolute;
@@ -2937,63 +3784,60 @@ height: 0px;
 border: 4px solid #FFFFFF;
 
 
-/* NOISE BLURRED */
+/* WORDS_THIS TAB NOTES */
 
 position: absolute;
-width: 596px;
+width: 105px;
+height: 22px;
+
+font-family: 'Fjalla One';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 23px;
+
+color: #FFFFFF;
+
+
+
+/* WHITE HILITE ON NAV BAR */
+
+position: absolute;
+width: 606px;
 height: 16px;
 
-background: #014461;
-opacity: 0.79;
+background: rgba(217, 217, 217, 0.63);
+filter: blur(2.95px);
 
 
-/* UI LOGO + BOX_NAV_BAR */
-
-position: absolute;
-width: 64px;
-height: 38px;
-
-
-
-/* BOX_NN */
-
-box-sizing: border-box;
+/* TOP METAL BAR DB */
 
 position: absolute;
-width: 64px;
-height: 38px;
-
-background: #29ABE2;
-border: 3px solid #FFFFFF;
-
-
-/* N_RIGHT */
-
-position: absolute;
-width: 22px;
-height: 19px;
-
-background: #FFFFFF;
-
-
-/* N_LEFT */
-
-position: absolute;
-width: 22px;
-height: 19px;
-
-background: #FFFFFF;
-
-
-/* TOP BAR_DB */
-
-position: absolute;
-width: 605px;
+width: 606px;
 height: 36px;
 
-background: #686868;
-box-shadow: 0px 9px 6.6px rgba(0, 0, 0, 0.61);
-border-radius: 0px;
+background: #29ABE2;
+border: 1px solid #000000;
+box-shadow: inset 0px -18px 11.2px 3px rgba(0, 0, 0, 0.45);
+
+
+/* WHITE HILITE ON TOP BAR */
+
+position: absolute;
+width: 606px;
+height: 14px;
+
+background: #9EE2FF;
+filter: blur(2.95px);
+
+
+/* Vector 49 */
+
+position: absolute;
+width: 607px;
+height: 0px;
+
+border: 3px solid #000000;
 
 
 /* MN_STROKE_DB */
@@ -3001,17 +3845,128 @@ border-radius: 0px;
 box-sizing: border-box;
 
 position: absolute;
-width: 688px;
+width: 691px;
 height: 952px;
 
 border: 3px solid #282828;
 
 
+/* LOGO HEADER BIG ALL */
+
+position: absolute;
+width: 337px;
+height: 22.65px;
+
+
+
+/* TOP_BAR_CHROME EXT + BOX */
+
+position: absolute;
+width: 162px;
+height: 20px;
+
+
+
+/* CHR EXT BOX */
+
+position: absolute;
+width: 157px;
+height: 20px;
+
+background: #3C3C3C;
+
+
+/* CHROME EXTENSION */
+
+position: absolute;
+width: 154px;
+height: 12px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 12px;
+letter-spacing: 0.25em;
+
+color: #FFFFFF;
+
+
+
+/* TOP_BAR_DB_LOGO_NN */
+
+position: absolute;
+width: 168.69px;
+height: 22.65px;
+
+
+
+/* NN BIG BOX */
+
+position: absolute;
+width: 168.69px;
+height: 21.74px;
+
+background: #29ABE2;
+border: 2px solid #282828;
+
+
+/* LOGO BOX */
+
+position: absolute;
+width: 44.34px;
+height: 22.65px;
+
+background: #2C2C2C;
+
+
+/* LOGO */
+
+position: absolute;
+width: 33.91px;
+height: 14.78px;
+
+
+
+/* Vector */
+
+position: absolute;
+width: 16.15px;
+height: 14.78px;
+
+background: #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+width: 16.15px;
+height: 14.78px;
+
+background: #FFFFFF;
+
+
+/* TOP_BAR_NOTES FOR NET */
+
+position: absolute;
+width: 105px;
+height: 13px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 13px;
+line-height: 16px;
+
+color: #FFFFFF;
+
+
+
 /* ADD SUB TAB  ALL */
 
 position: absolute;
-width: 42.9px;
-height: 53px;
+width: 43.9px;
+height: 54px;
 
 
 
@@ -3043,142 +3998,11 @@ color: #FFFFFF;
 
 
 
-/* TOP_BAR_CHROME EXT + BOX */
+/* Vector 48 */
 
 position: absolute;
-width: 101px;
-height: 16px;
+visibility: hidden;
+width: 0px;
+height: 36px;
 
-
-
-/* CHR EXT BOX */
-
-position: absolute;
-width: 101px;
-height: 16px;
-
-background: #1E1D1D;
-
-
-/* CHROME EXTENSION */
-
-position: absolute;
-width: 94px;
-height: 9px;
-
-font-family: 'Inter';
-font-style: normal;
-font-weight: 600;
-font-size: 9px;
-line-height: 11px;
-
-color: #FFFFFF;
-
-
-
-/* TOP_BAR_DB_LOGO_NN */
-
-position: absolute;
-width: 146px;
-height: 19.61px;
-
-
-
-/* NN BIG BOX */
-
-position: absolute;
-width: 146px;
-height: 18.81px;
-
-background: #29ABE2;
-border: 2px solid #282828;
-
-
-/* LOGO BOX */
-
-position: absolute;
-width: 38.38px;
-height: 19.61px;
-
-background: #2C2C2C;
-
-
-/* LOGO */
-
-position: absolute;
-width: 29.35px;
-height: 12.79px;
-
-
-
-/* Vector */
-
-position: absolute;
-width: 13.97px;
-height: 12.79px;
-
-background: #FFFFFF;
-
-
-/* Vector */
-
-position: absolute;
-width: 13.97px;
-height: 12.79px;
-
-background: #FFFFFF;
-
-
-/* TOP_BAR_NOTES FOR NET */
-
-position: absolute;
-width: 97px;
-height: 13px;
-
-font-family: 'Inter';
-font-style: normal;
-font-weight: 700;
-font-size: 12px;
-line-height: 15px;
-
-color: #FFFFFF;
-
-
-/* =====================================================================
-   MODALS — Figma reference (distilled from the modal frame exports).
-   Header bar + chrome-ext bar + NN top-bar logo are identical across all
-   four frames (see the dashboard sections above) and are omitted here.
-   Shared frame:
-     MODAL BG    577 wide, border 7px #29ABE2, bg #3C3C3C   (height varies)
-     HEADER BOX  575 x 42, bg #686868, shadow 0 4px 6.5px rgba(0,0,0,.25)
-     watermark   "UI LOGO + BOX_NAV_BAR" 401.78 x 97, opacity 0.03
-                 (centered; ~71% of the 563px inner width, ~45% height in
-                  the 214 modal → shrunk with padding around it)
-     BOX_NN      559 x 194 guide box (hidden) — watermark safe area
-   Buttons (OK / CANCEL): 109.11 x 39.34, border 0.5px #FFFFFF, Fjalla 24/30
-     CANCEL  bg #FFFFFF, text #4D4D4D
-     OK      bg #29ABE2 (add) | #E22929 (delete), text #E0E0E0
-   ===================================================================== */
-
-/* MODAL — ADD SUBJECT TAB (short) */
-/* MODAL BG 577 x 214 */
-/* TAB BOX (input) 109 x 39, bg #515151, border 0.5px #FFFFFF */
-/* label "ADD SUBJECT TAB" Fjalla 24/30 #E0E0E0 */
-/* OK box bg #29ABE2 (blue) */
-
-/* MODAL — DELETE: NOTE / SUB TAB UNIVERSAL (short) */
-/* MODAL BG 577 x 214 */
-/* text "THIS CANNOT BE UNDONE: PROCEED?" Fjalla 24/30 #E0E0E0, centered */
-/* OK box bg #E22929 (red) */
-
-/* MODAL — SELECT OR CREATE A SUBJECT TAB / empty state (tall) */
-/* MODAL BG 577 x 252 */
-/* text "SELECT OR CREATE A SUBJECT TAB TO VIEW, EDIT OR ADD NOTES TO" */
-/*   Fjalla 24/30, centered; SELECT / CREATE / SUBJECT TAB accent #29ABE2 */
-
-/* MODAL — ADDING FIRST SUBJECT TAB / empty state (tall) — SPRINT 2, NOT BUILT */
-/* MODAL BG 577 x 252 */
-/* text "CREATE A SUBJECT TAB BY PRESSING [+]" Fjalla 24/30 #29ABE2 */
-/* [OUTDATED 2026-07-02] The "+" ships as an inline SVG vector (AddSubjectTabButton.tsx, 24x24 viewBox, height 0.58*--air-cell) - NOT a Fjalla font glyph. See docs/DESIGN_SOURCES_STATUS.md. */
-/* + button: Rectangle 41 x 39 bg #29ABE2 border 2px #000, "+" Fjalla 55.77 #FFF */
-
+border: 1px solid #FFFFFF;
