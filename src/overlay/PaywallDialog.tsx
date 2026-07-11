@@ -9,7 +9,6 @@ export type PaywallDialogProps = {
   trialDaysLeft: number | null;
   trialUnit?: "days" | "minutes";
   onBuy: () => void;
-  // onLogin: () => void;
 };
 
 export function PaywallDialog({
@@ -18,7 +17,6 @@ export function PaywallDialog({
   trialDaysLeft,
   trialUnit = "days",
   onBuy,
-  // onLogin,
 }: PaywallDialogProps): React.ReactElement {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,21 +40,6 @@ export function PaywallDialog({
               : "TRIAL ENDED"}
           </span>
         </div>
-
-        {/* Restore a prior purchase on a fresh install — opens the ExtPay login page. */}
-        {/* <button
-          className="flex h-full shrink-0 cursor-pointer items-center justify-center px-3"
-          onClick={() => {
-            onLogin();
-            onOpenChange(false);
-          }}
-          aria-label="Log in to restore purchase"
-          type="button"
-        >
-          <span className="text-[1rem] uppercase leading-none text-[#646464] underline">
-            Log in
-          </span>
-        </button> */}
 
         <button
           className="flex h-full shrink-0 cursor-pointer items-center justify-center bg-accent px-3.5"

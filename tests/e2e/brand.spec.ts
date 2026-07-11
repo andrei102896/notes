@@ -50,9 +50,8 @@ test.describe("brand mark centering", () => {
     expect(Math.abs(gaps.top - gaps.bottom)).toBeLessThan(0.4);
   });
 
-  // Uppercase caps with letter-spacing leave a trailing track after the last glyph; each line adds
-  // pl = its tracking so the visible caps sit with equal gaps in their box. Guards those pl values.
-  // Horizontal only — vertical cap centering is optical/font-metric-dependent and not asserted here.
+  // Letter-spaced caps leave a trailing track after the last glyph; each line adds pl = its tracking so caps
+  // sit with equal gaps. Guards those pl values (horizontal only; vertical cap centering isn't asserted).
   test("brand text lines have equal horizontal gaps in their boxes", async ({ overlay }) => {
     const gaps = await overlay.locator("header").evaluate((h) => {
       const measure = (span: HTMLElement) => {

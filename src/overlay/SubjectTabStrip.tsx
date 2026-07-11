@@ -229,12 +229,6 @@ export const SubjectTabStrip = forwardRef<
             </TabsList>
           </div>
         </Tabs>
-
-        {/* Bottom spacer (1 air-cell): scroll viewport = 24 cells (8×3) so the last tab aligns with the A–Z box rows. */}
-        {/* <div
-          aria-hidden
-          className="nn-dashboard-content-frosted h-[var(--air-cell)] w-full shrink-0"
-        /> */}
       </div>
     </>
   );

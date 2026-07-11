@@ -210,15 +210,6 @@ export function App(): React.ReactElement {
     getExtPayClient().openPaymentPage();
   }, []);
 
-  // Restore an existing purchase after reinstall — ExtPay matches the account by Stripe email.
-  // Log-in / restore-purchase flow removed from the paywall UI for now; kept for future revival.
-  /* const openLoginPage = useCallback(() => {
-    if (!isExtPayConfigured) {
-      return;
-    }
-    getExtPayClient().openLoginPage();
-  }, []); */
-
   return (
     <main
       id="nn-scroll-bookmarks-overlay-host"
@@ -230,7 +221,6 @@ export function App(): React.ReactElement {
         trialDaysLeft={trialDaysLeft}
         trialUnit={TRIAL_UNIT}
         onBuy={openPaymentPage}
-        // onLogin={openLoginPage}
       />
       <AlphabetIndexRollout
         tabs={subjectTabsForDisplay}

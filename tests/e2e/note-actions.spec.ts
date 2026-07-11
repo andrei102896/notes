@@ -1,9 +1,8 @@
 import { expect, test } from "./fixtures";
 import { addNote, createSubjectTab } from "./helpers";
 
-/** Fjalla One loads only weight 400, so a bold utility (font-semibold/bold) faux-bolds the action
- * labels instead of using a real face — they must stay Regular. And the action button-group needs a
- * divider after PASTE, mirroring the B/I/U group's left border (like the URL/date row above). */
+/** Fjalla One ships only weight 400, so a bold utility faux-bolds the action labels — they must stay Regular;
+ * and the action group needs a divider after PASTE, mirroring the B/I/U group's left border. */
 test.describe("note action row", () => {
   test("LINK/ANCHOR/COPY/PASTE are Fjalla Regular, and a divider closes the group after PASTE", async ({
     overlay,

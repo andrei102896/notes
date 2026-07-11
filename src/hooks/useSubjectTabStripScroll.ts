@@ -24,9 +24,8 @@ function scrollTriggerFullyIntoView(
   }
 }
 
-/** Persists the subject-tab strip scroll and, on a cross-navigation reopen, RESTORES it so the selected
- * tab stays where it was (PERSISTENCE) rather than being revealed to the fold. Genuine selection changes
- * after mount (e.g. creating an off-screen tab) still reveal the active tab. Returns the scroll handler. */
+/** Persists strip scroll and RESTORES it on a cross-navigation reopen (PERSISTENCE) so the selected tab stays
+ * put; genuine post-mount selection changes (e.g. an off-screen new tab) still reveal the active tab. */
 export function useSubjectTabStripScroll({
   scrollRef,
   activeSubjectTabId,

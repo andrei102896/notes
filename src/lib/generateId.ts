@@ -1,6 +1,5 @@
-/** RFC-4122 v4 id. Prefers crypto.randomUUID but falls back to getRandomValues, because randomUUID is
- * secure-context-only (undefined on http:// pages) while getRandomValues is not — so tab/note ids still
- * mint on plain-http sites where the overlay also runs. */
+/** RFC-4122 v4 id; falls back to getRandomValues because crypto.randomUUID is secure-context-only
+ * (undefined on http://), so tab/note ids still mint on the plain-http pages where the overlay runs. */
 export function generateId(): string {
   if (typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();

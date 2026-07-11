@@ -1,10 +1,8 @@
 import { expect, test } from "./fixtures";
 import { addNote, createSubjectTab, noteTitles, toggleOverlayForTab } from "./helpers";
 
-/** The overlay also runs on plain-http pages, but `crypto.randomUUID` (used to mint tab/note ids) is
- * secure-context-only → undefined on http, so it threw and the create silently failed (add-tab dialog
- * never closed). `generateId` falls back to `getRandomValues`, which is not gated. The rest of the suite
- * uses https, which hides this — so this spec deliberately drives a NON-secure http host. */
+/** `crypto.randomUUID` is secure-context-only (undefined on http → threw, so create silently failed); `generateId`
+ * falls back to `getRandomValues`. The rest of the suite is https, so this spec drives a non-secure http host. */
 const HTTP_URL = "http://nn-http-test.local/";
 
 test("tabs and notes can be created on a plain-http (non-secure) page", async ({
