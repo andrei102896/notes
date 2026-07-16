@@ -62,36 +62,39 @@ export function SubjectTabRenameDialog({
       open={open}
       onOpenChange={onOpenChange}
       title="Rename subject tab"
-      widthClassName="w-[30rem]"
+      bodyClassName="px-12"
     >
-      <label
-        htmlFor={fieldId}
-        className="text-subject-label uppercase leading-none text-modal-foreground"
-      >
-        Rename subject tab
-      </label>
+      <div className="flex items-end gap-3">
+        {/* Label + input stacked; items-center centers the narrower box under the label (mirrors SubjectTabAddDialog / Figma). */}
+        <div className="flex flex-col items-center gap-4">
+          <label
+            htmlFor={fieldId}
+            className="text-subject-label uppercase leading-none text-modal-foreground"
+          >
+            Rename subject tab
+          </label>
+          <Input
+            id={fieldId}
+            ref={inputRef}
+            data-subject-name-input
+            className="h-[2.46rem] w-28 border-[0.5px] border-white bg-[#515151] px-2 text-center uppercase leading-none text-white"
+            value={draft}
+            maxLength={SUBJECT_TAB_NAME_MAX_LEN}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === " ") {
+                e.stopPropagation();
+              }
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void submit();
+              }
+            }}
+            aria-label="Subject tab name"
+          />
+        </div>
 
-      <div className="flex items-stretch gap-3">
-        <Input
-          id={fieldId}
-          ref={inputRef}
-          className="h-auto w-44 min-w-0 border-white bg-note-field"
-          value={draft}
-          maxLength={SUBJECT_TAB_NAME_MAX_LEN}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === " ") {
-              e.stopPropagation();
-            }
-            if (e.key === "Enter") {
-              e.preventDefault();
-              void submit();
-            }
-          }}
-          aria-label="Subject tab name"
-        />
-
-        <div className="ml-auto flex gap-3">
+        <div className="ml-auto flex h-fit gap-3 self-end">
           <ModalCancelButton onClick={() => onOpenChange(false)}>
             Cancel
           </ModalCancelButton>
