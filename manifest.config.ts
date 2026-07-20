@@ -4,7 +4,7 @@ export default defineManifest({
   manifest_version: 3,
   name: "NOTES FOR NET: Fast Precise Webpage Bookmarking Tool",
   description: "Bookmark and notate webpages with notes in subject tabs, a quick launch dashboard, one click links and exact position anchors.",
-  version: "1.0.1",
+  version: "1.0.2",
   permissions: ["storage", "scripting", "unlimitedStorage"],
   host_permissions: ["<all_urls>"],
   icons: {

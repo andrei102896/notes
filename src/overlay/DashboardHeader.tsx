@@ -6,7 +6,7 @@ import {
   ButtonGroupSeparator,
   ButtonGroupText,
 } from "@/components/ui/button-group";
-import { BrandHeaderBar, BrandLogo } from "@/overlay/BrandLockup";
+import { BrandHeaderBar, BrandLogoFat } from "@/overlay/BrandLockup";
 import { SubjectTabDeleteConfirmDialog } from "@/overlay/SubjectTabDeleteConfirmDialog";
 
 type DashboardHeaderProps = {
@@ -127,11 +127,11 @@ export function DashboardHeader({
             onClick={() => onTrialBannerOpenChange?.(true)}
             aria-label="Open trial info"
           >
-            <BrandLogo />
+            <BrandLogoFat />
           </button>
         ) : (
           <div className="flex h-full shrink-0 items-center bg-accent px-2 [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]">
-            <BrandLogo />
+            <BrandLogoFat />
           </div>
         )}
 

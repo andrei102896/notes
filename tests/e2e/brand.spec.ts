@@ -50,6 +50,54 @@ test.describe("brand mark centering", () => {
     expect(Math.abs(gaps.top - gaps.bottom)).toBeLessThan(0.4);
   });
 
+  // Standalone header logo box (red on trial / blue when paid): the fat NN must sit dead-center in the
+  // bordered box. Geometric like the test above — the box is symmetric (uniform 3px border), so ink center
+  // == box center and left/right + top/bottom gaps are equal when centered.
+  test("fat NN glyph is centered in the header logo box", async ({ overlay }) => {
+    const svg = overlay
+      .locator('header [aria-label="Open trial info"] svg')
+      .first();
+
+    const { offset, gaps } = await svg.evaluate((el) => {
+      const s = el as unknown as SVGSVGElement;
+      const box = (
+        s.closest('[aria-label="Open trial info"]') as HTMLElement
+      ).getBoundingClientRect();
+      const svgR = s.getBoundingClientRect();
+      const vb = s.viewBox.baseVal;
+
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const p of Array.from(s.querySelectorAll("path"))) {
+        const b = (p as SVGGraphicsElement).getBBox();
+        minX = Math.min(minX, b.x);
+        minY = Math.min(minY, b.y);
+        maxX = Math.max(maxX, b.x + b.width);
+        maxY = Math.max(maxY, b.y + b.height);
+      }
+      const cx = (u: number) => svgR.x + ((u - vb.x) / vb.width) * svgR.width;
+      const cy = (u: number) => svgR.y + ((u - vb.y) / vb.height) * svgR.height;
+      const ink = { left: cx(minX), right: cx(maxX), top: cy(minY), bottom: cy(maxY) };
+
+      return {
+        offset: {
+          dx: (ink.left + ink.right) / 2 - (box.left + box.right) / 2,
+          dy: (ink.top + ink.bottom) / 2 - (box.top + box.bottom) / 2,
+        },
+        gaps: {
+          left: ink.left - box.left,
+          right: box.right - ink.right,
+          top: ink.top - box.top,
+          bottom: box.bottom - ink.bottom,
+        },
+      };
+    });
+
+    expect(Math.abs(offset.dx)).toBeLessThan(0.5);
+    expect(Math.abs(offset.dy)).toBeLessThan(0.5);
+    expect(Math.abs(gaps.left - gaps.right)).toBeLessThan(0.5);
+    expect(Math.abs(gaps.top - gaps.bottom)).toBeLessThan(0.5);
+  });
+
   // Letter-spaced caps leave a trailing track after the last glyph; each line adds pl = its tracking so caps
   // sit with equal gaps. Guards those pl values (horizontal only; vertical cap centering isn't asserted).
   test("brand text lines have equal horizontal gaps in their boxes", async ({ overlay }) => {

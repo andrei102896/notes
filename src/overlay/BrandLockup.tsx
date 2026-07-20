@@ -32,6 +32,34 @@ export function BrandLogo({
   );
 }
 
+/** Fat NN mark (Figma "NN FAT LOGO", 46×17 ink). The two N's are nudged ±0.5u apart (viewBox widened to 47) for a ~1px inter-letter gap that the shared 1px path-stroke would otherwise close; width stays pinned to the thin mark's 2.625rem so the badge footprint is unchanged. */
+export function BrandLogoFat({
+  className,
+}: {
+  className?: string;
+}): React.ReactElement {
+  return (
+    <svg
+      viewBox="-0.5 0 47 17"
+      className={cn("h-auto w-[2.625rem] shrink-0", className)}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        transform="translate(0.5 0)"
+        d="M37.1427 8.96275L40.4417 5.55301H40.5716V17H46V0H39.5758C36.4222 3.1875 34.7684 4.90385 31.7038 8.03725L28.4048 11.447H28.2749V0H22.8465V17H29.2707L37.1427 8.96275Z"
+        fill="white"
+      />
+      <path
+        transform="translate(-0.5 0)"
+        d="M8.19581 8.96275L4.89675 5.55301H4.76685V17H0V0H5.76272C8.91628 3.1875 10.5701 4.90385 13.6347 8.03725L16.9337 11.447H17.0636V0H21.8305V17H16.0678L8.19581 8.96275Z"
+        fill="white"
+      />
+    </svg>
+  );
+}
+
 /** Brand cluster shared by the header top row and modal header bar; renders only the cluster, each caller wraps it in its own bar. */
 export function BrandLockup(): React.ReactElement {
   return (

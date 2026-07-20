@@ -39,8 +39,9 @@ exists to retry after Playwright upgrades).
   but the clock is frozen (`FIXED_NOW` in fixtures.ts) so it is deterministic.
   Trial/paywall UI is therefore NOT covered by this suite.
 - The host page is `https://nn-test.local/`, fulfilled by route interception —
-  no server, no network. It must stay **https**: id minting uses
-  `crypto.randomUUID`, which only exists in secure contexts.
+  no server, no network. Most specs use https as the representative case; the
+  `http-context` spec runs a plain-`http://` page to cover the `generateId`
+  `getRandomValues` fallback — id minting no longer requires a secure context.
 
 ## Visual baselines
 
