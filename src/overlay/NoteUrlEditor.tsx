@@ -3,16 +3,12 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import { browsingContextWindowForTabUrl } from "@/lib/browsingContextWindow";
 import {
-  clearPendingAnchorState,
-  markOverlayReopenOnNextNavigation,
-  setPendingAnchorForNavigation,
-  setPendingAnchorForNewTab,
-} from "@/lib/pendingNavigation";
+  toOpenableUrl,
+  useNoteLinkAnchor,
+} from "@/hooks/useNoteLinkAnchor";
 import type { FormatState } from "@/lib/richTextFormat";
 import { cn } from "@/lib/utils";
-import { getContentPanelClient } from "@/messaging/contentPanelBridge";
 import type { NNAnchorPosition } from "@/types/nnData";
 
 function formatCreatedDateForBox(timestamp: number): string {
@@ -21,30 +17,6 @@ function formatCreatedDateForBox(timestamp: number): string {
   const day = String(date.getDate()).padStart(2, "0");
   const year = String(date.getFullYear());
   return `${month}/${day}/${year}`;
-}
-
-function toOpenableUrl(value: string): string | null {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return null;
-  }
-  try {
-    const direct = new URL(trimmed);
-    if (direct.protocol === "http:" || direct.protocol === "https:") {
-      return direct.toString();
-    }
-    return null;
-  } catch {
-    try {
-      const withHttps = new URL(`https://${trimmed}`);
-      if (!withHttps.hostname.includes(".")) {
-        return null;
-      }
-      return withHttps.toString();
-    } catch {
-      return null;
-    }
-  }
 }
 
 function isValidUrl(value: string): boolean {
@@ -106,10 +78,8 @@ export function NoteUrlEditor({
   isReadOnly = false,
 }: NoteUrlEditorProps): React.ReactElement {
   const [draft, setDraft] = useState(value);
-  const [isPicking, setIsPicking] = useState(false);
   const [isCopyFlashing, setIsCopyFlashing] = useState(false);
   const copyFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pickSessionRef = useRef<{ requestId: string } | null>(null);
 
   useEffect(() => {
     setDraft(normalizeDraftUrl(value));
@@ -136,37 +106,21 @@ export function NoteUrlEditor({
     setDraft(normalizeDraftUrl(value));
   }, [draft, onSave, value]);
 
-  const openableDraftUrl = toOpenableUrl(draft);
-  const canOpenLink = openableDraftUrl !== null;
-
-  const openInNewTab = useCallback((targetUrl: string) => {
-    chrome.runtime.sendMessage(
-      {
-        type: "OPEN_URL_IN_NEW_TAB",
-        payload: { url: targetUrl },
-      },
-      (response?: { ok?: boolean }) => {
-        if (response?.ok) {
-          return;
-        }
-        window.open(targetUrl, "_blank", "noopener,noreferrer");
-      },
-    );
-  }, []);
-
-  const navigateSameTab = useCallback(
-    (targetUrl: string, options: { scrollToAnchor?: boolean }) => {
-      const tabWin = browsingContextWindowForTabUrl();
-      if (options.scrollToAnchor && anchor) {
-        setPendingAnchorForNavigation(tabWin, targetUrl, anchor);
-      } else {
-        clearPendingAnchorState(tabWin, targetUrl, tabWin.location.href);
-      }
-      markOverlayReopenOnNextNavigation(tabWin, targetUrl);
-      tabWin.location.href = targetUrl;
-    },
-    [anchor],
-  );
+  const {
+    canOpenLink,
+    isPicking,
+    handleLinkClick,
+    handleLinkContextMenu,
+    handleAnchorClick,
+    handleAnchorContextMenu,
+  } = useNoteLinkAnchor({
+    linkUrl: draft,
+    anchorUrl: value,
+    anchor,
+    isReadOnly,
+    onSaveAnchor,
+    onInteract,
+  });
 
   return (
     <div className="bg-background">
@@ -211,31 +165,8 @@ export function NoteUrlEditor({
             variant="secondary"
             aria-label="Navigate to URL"
             disabled={!canOpenLink}
-            onClick={() => {
-              onInteract();
-              const target = toOpenableUrl(draft);
-              if (!target) {
-                return;
-              }
-              const tabWin = browsingContextWindowForTabUrl();
-              const normalizedCurrent = toOpenableUrl(tabWin.location.href);
-              if (normalizedCurrent !== null && normalizedCurrent === target) {
-                // Same page — nothing to navigate, extension stays open.
-                return;
-              }
-              navigateSameTab(target, { scrollToAnchor: false });
-            }}
-            onContextMenu={(event) => {
-              event.preventDefault();
-              onInteract();
-              const target = toOpenableUrl(draft);
-              if (!target) {
-                return;
-              }
-              const tabWin = browsingContextWindowForTabUrl();
-              clearPendingAnchorState(tabWin, target);
-              openInNewTab(target);
-            }}
+            onClick={handleLinkClick}
+            onContextMenu={handleLinkContextMenu}
             className="h-9 w-12 shrink-0 bg-note-action px-0 font-normal text-md text-white hover:bg-note-action/90"
           >
             LINK
@@ -250,83 +181,8 @@ export function NoteUrlEditor({
               // Stop row-level selection handlers treating anchor clicks (notably Cmd/Ctrl+click) as note-selection gestures.
               event.stopPropagation();
             }}
-            onClick={async (event) => {
-              event.stopPropagation();
-              onInteract();
-              if (anchor && (event.ctrlKey || event.metaKey)) {
-                if (isReadOnly) {
-                  return;
-                }
-                onSaveAnchor(null);
-                return;
-              }
-              if (anchor) {
-                const targetUrl = toOpenableUrl(value);
-                if (!targetUrl) {
-                  return;
-                }
-                const tabWin = browsingContextWindowForTabUrl();
-                const normalizedCurrent = toOpenableUrl(tabWin.location.href);
-                const isSamePage =
-                  normalizedCurrent !== null && normalizedCurrent === targetUrl;
-                if (isSamePage) {
-                  try {
-                    await getContentPanelClient().scrollToAnchor(anchor);
-                  } catch {
-                    /* content script unavailable */
-                  }
-                } else {
-                  navigateSameTab(targetUrl, { scrollToAnchor: true });
-                }
-                return;
-              }
-              if (isReadOnly) {
-                return;
-              }
-              if (isPicking) {
-                if (pickSessionRef.current) {
-                  getContentPanelClient().cancelAnchorPick(
-                    pickSessionRef.current.requestId,
-                  );
-                  pickSessionRef.current = null;
-                }
-                setIsPicking(false);
-                return;
-              }
-              setIsPicking(true);
-              const client = getContentPanelClient();
-              const session = client.startAnchorPick();
-              pickSessionRef.current = { requestId: session.requestId };
-              try {
-                const result = await session.result;
-                onSaveAnchor({
-                  pageX: result.pageX,
-                  pageY: result.pageY,
-                  scrollX: result.scrollX,
-                  scrollY: result.scrollY,
-                  elementSelector: result.elementSelector,
-                });
-              } catch {
-                // Pick was cancelled or timed out — no change.
-              } finally {
-                pickSessionRef.current = null;
-                setIsPicking(false);
-              }
-            }}
-            onContextMenu={(event) => {
-              event.stopPropagation();
-              if (!anchor) {
-                return;
-              }
-              event.preventDefault();
-              onInteract();
-              const targetUrl = toOpenableUrl(value);
-              if (!targetUrl) {
-                return;
-              }
-              setPendingAnchorForNewTab(targetUrl, anchor);
-              openInNewTab(targetUrl);
-            }}
+            onClick={handleAnchorClick}
+            onContextMenu={handleAnchorContextMenu}
             className={cn(
               "h-9 px-2 font-normal text-md",
               anchor || isPicking

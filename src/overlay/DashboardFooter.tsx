@@ -1,12 +1,20 @@
 import React from "react";
 
-/** Blue "metal" footer bar (Figma BTTM METAL BAR DB) with the copyright line; symmetric with the header. */
+import {
+  BrandMetalHeaderBar,
+  NN_PLATE_CLASS,
+} from "@/overlay/BrandLockup";
+
+/** Bottom metal bar (Figma BTTM METAL BAR DB) — deliberately identical to the header band: same bar,
+ *  same plate, same 5px rim. */
 export function DashboardFooter(): React.ReactElement {
   return (
-    <footer className="nn-metal-bar flex h-[var(--air-cell)] shrink-0 items-center justify-center">
-      <span className="font-ui text-brand-sub font-bold uppercase tracking-[0.25em] text-accent-foreground">
-        © 2026 Notes for Net
-      </span>
+    <footer className="shrink-0">
+      <BrandMetalHeaderBar
+        className="h-[var(--air-cell)]"
+        plateClassName={NN_PLATE_CLASS}
+        rimClassName="border-[5px]"
+      />
     </footer>
   );
 }

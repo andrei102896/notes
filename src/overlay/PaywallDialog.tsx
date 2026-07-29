@@ -1,7 +1,11 @@
 import React from "react";
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { BrandLockup } from "@/overlay/BrandLockup";
+import { ModalBackdrop, ModalMetalBar } from "@/overlay/ModalBackdrop";
+
+/** Figma TRIAL PERIOD BOX — shared with the BUY box, which the client outlines identically. */
+const HEADER_BOX_CLASS =
+  "flex items-center justify-center border-2 border-accent-deep bg-accent/60 shadow-[inset_0_0_0.45625rem_0.25rem_rgba(0,0,0,0.25)]";
 
 export type PaywallDialogProps = {
   open: boolean;
@@ -18,48 +22,61 @@ export function PaywallDialog({
   trialUnit = "days",
   onBuy,
 }: PaywallDialogProps): React.ReactElement {
+  const trialLabel =
+    trialDaysLeft !== null
+      ? trialUnit === "minutes"
+        ? `TRIAL PERIOD: ${trialDaysLeft}-MINUTE${trialDaysLeft === 1 ? "" : "S"} LEFT`
+        : `TRIAL PERIOD: ${trialDaysLeft}-DAY${trialDaysLeft === 1 ? "" : "S"} LEFT`
+      : "TRIAL ENDED";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
         aria-describedby={undefined}
-        className="top-[4.25rem] right-0 left-0 h-[2.3125rem] w-auto max-w-none translate-x-0 translate-y-0 flex flex-row items-stretch gap-0 overflow-hidden rounded-none border-none bg-air-box shadow-[0px_4px_6.5px_rgba(0,0,0,0.25)] p-0 sm:max-w-none"
+        className="top-0 left-0 block h-full w-full max-w-none translate-x-0 translate-y-0 gap-0 rounded-none border-0 bg-transparent p-0 shadow-none sm:max-w-none"
       >
         <DialogTitle className="sr-only">Notes for Net trial status</DialogTitle>
 
-        <div className="flex shrink-0 items-center gap-2 pl-2">
-          <BrandLockup />
-        </div>
-
-        <div className="flex flex-1 items-center justify-end px-4">
-          <span className="text-[1rem] uppercase leading-none text-modal-foreground">
-            {trialDaysLeft !== null
-              ? trialUnit === "minutes"
-                ? `TRIAL PERIOD: ${trialDaysLeft}-MINUTE${trialDaysLeft === 1 ? "" : "S"} LEFT`
-                : `TRIAL PERIOD: ${trialDaysLeft}-DAY${trialDaysLeft === 1 ? "" : "S"} LEFT`
-              : "TRIAL ENDED"}
-          </span>
-        </div>
-
-        <button
-          className="flex h-full shrink-0 cursor-pointer items-center justify-center bg-accent px-3.5"
-          onClick={() => {
-            onBuy();
-            onOpenChange(false);
-          }}
-          aria-label="Buy now"
-          type="button"
-        >
-          <span className="text-[1.625rem] uppercase leading-none text-white">
-            BUY
-          </span>
-        </button>
-
-        <div className="flex h-full shrink-0 items-center justify-center pr-3 pl-2">
-          <span className="text-[1.5rem] uppercase leading-none text-modal-foreground">
-            $5
-          </span>
-        </div>
+        <ModalBackdrop
+          header={
+            <ModalMetalBar
+              left={
+                <div
+                  data-paywall-trial-box=""
+                  className={`${HEADER_BOX_CLASS} h-[1.875rem] w-[11.52rem]`}
+                >
+                  <span className="text-[1rem] uppercase leading-none text-white">
+                    {trialLabel}
+                  </span>
+                </div>
+              }
+              right={
+                <button
+                  type="button"
+                  aria-label="Buy now"
+                  onClick={() => {
+                    onBuy();
+                    onOpenChange(false);
+                  }}
+                  className={`${HEADER_BOX_CLASS} h-[2rem] w-[5.4rem] cursor-pointer gap-1.5`}
+                >
+                  <span className="text-[1.5rem] uppercase leading-none text-white">
+                    BUY
+                  </span>
+                  <span className="flex items-start">
+                    <span className="text-[0.875rem] leading-none text-white">
+                      $
+                    </span>
+                    <span className="text-[1.5rem] leading-none text-white">
+                      5
+                    </span>
+                  </span>
+                </button>
+              }
+            />
+          }
+        />
       </DialogContent>
     </Dialog>
   );

@@ -1,10 +1,6 @@
 import React from "react";
 
-import {
-  ModalCancelButton,
-  ModalOkButton,
-  NnModalFrame,
-} from "@/overlay/NnModalFrame";
+import { DeleteConfirmModal } from "@/overlay/DeleteConfirmModal";
 
 export type SubjectTabDeleteConfirmDialogProps = {
   open: boolean;
@@ -18,28 +14,15 @@ export function SubjectTabDeleteConfirmDialog({
   onOpenChange,
   onConfirm,
 }: SubjectTabDeleteConfirmDialogProps): React.ReactElement {
-  async function confirm(): Promise<void> {
-    await onConfirm();
-    onOpenChange(false);
-  }
-
   return (
-    <NnModalFrame
+    <DeleteConfirmModal
       open={open}
       onOpenChange={onOpenChange}
       title="This action cannot be undone. Proceed?"
-    >
-      <p className="text-center text-subject-label uppercase leading-tight text-modal-foreground">
-        This cannot be undone: proceed?
-      </p>
-      <div className="flex justify-center gap-3">
-        <ModalCancelButton onClick={() => onOpenChange(false)}>
-          Cancel
-        </ModalCancelButton>
-        <ModalOkButton destructive onClick={() => void confirm()}>
-          OK
-        </ModalOkButton>
-      </div>
-    </NnModalFrame>
+      onConfirm={async () => {
+        await onConfirm();
+        onOpenChange(false);
+      }}
+    />
   );
 }

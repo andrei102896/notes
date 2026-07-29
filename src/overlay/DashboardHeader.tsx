@@ -6,8 +6,15 @@ import {
   ButtonGroupSeparator,
   ButtonGroupText,
 } from "@/components/ui/button-group";
-import { BrandHeaderBar, BrandLogoFat } from "@/overlay/BrandLockup";
+import { openInNewTab } from "@/lib/openInNewTab";
+import {
+  BrandLogoFat,
+  BrandMetalHeaderBar,
+  NN_PLATE_CLASS,
+} from "@/overlay/BrandLockup";
 import { SubjectTabDeleteConfirmDialog } from "@/overlay/SubjectTabDeleteConfirmDialog";
+
+const NN_UPDATES_URL = "https://www.notesfornet.com/updates";
 
 type DashboardHeaderProps = {
   /** When set, “Delete Tab” removes this subject folder. */
@@ -51,10 +58,15 @@ export function DashboardHeader({
     }
   }, [activeSubjectTabId]);
 
+  // The accent line under the white border-b is a box-shadow: one element carries only one border-bottom.
   return (
-    <header className="sticky top-0 z-20 flex h-auto flex-col bg-air-box">
-      {/* nn-metal-bar: Figma TOP METAL BAR (blue metallic) on the brand band only; the id-scoped rule overrides the shared band's bg/shadow for the dashboard header, leaving modals/trial bar gray. py-0: the --air-cell height already sets the band. */}
-      <BrandHeaderBar className="nn-metal-bar relative z-[1] h-[var(--air-cell)] border-b border-black py-0" />
+    <header className="sticky top-0 z-20 flex h-auto flex-col border-b-2 border-white bg-air-box shadow-[0_4px_0_0_var(--color-accent)]">
+      {/* Narrower than the modals' plate: the client anchors its width to the ADD NOTE button below. */}
+      <BrandMetalHeaderBar
+        className="relative z-[1] h-[var(--air-cell)]"
+        plateClassName={NN_PLATE_CLASS}
+        rimClassName="border-[5px]"
+      />
       {/* One white frame around the whole strip: bg-background is the 3px surround (padding, incl. the white separator line under the metal band) and dividers (gap); no button has its own border. relative: positions the nav-bar hilite. */}
       <div className="relative flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
         <Button
@@ -130,17 +142,30 @@ export function DashboardHeader({
             <BrandLogoFat />
           </button>
         ) : (
-          <div className="flex h-full shrink-0 items-center bg-accent px-2 [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]">
+          <button
+            type="button"
+            className="flex h-full shrink-0 cursor-pointer items-center bg-accent px-2 [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]"
+            onClick={() => openInNewTab(NN_UPDATES_URL)}
+            aria-label="Open NN updates page"
+          >
             <BrandLogoFat />
-          </div>
+          </button>
         )}
 
-        {/* WHITE HILITE ON NAV BAR (Figma): the soft translucent "fog", pinned to the TOP of the nav row. clip-path clips the upward blur at the seam so it is never seen on row 1's bottom. */}
+        {/* WHITE HILITE ON NAV BAR (Figma), pinned to the TOP of the nav row. clip-path cuts the upward
+            blur at the seam so it never shows on the metal band's bottom. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-4 bg-[rgba(217,217,217,0.63)] blur-[5px] [clip-path:inset(0_0_-20px_0)]"
         />
       </div>
+
+      {/* SHADOW __BLUE LINE (Figma). The bottom offset clears the 2px white border plus the 4px accent
+          line so the band starts right beneath them. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-[0.40625rem] -bottom-[0.8125rem] h-2 bg-[rgba(55,55,55,0.77)] blur-[0.3rem]"
+      />
 
       <SubjectTabDeleteConfirmDialog
         open={deleteConfirmOpen}

@@ -4,9 +4,47 @@
 **client-provided snapshots** (Figma export + behavior notes). They are NOT updated when the app
 changes — before basing any decision on them, check this table and, when in doubt, the code.
 
-**Precedence:** code (current truth) → **`desired-look.*` (the current design, see below)** →
+**Precedence:** code (current truth) → **per-section Figma CSS pasted in chat during the
+2026-07-28 modal/dashboard redesign (see `REDESIGN_2026-07-28_STATUS.md`)** → `desired-look.*` →
 older Figma export (`css.txt` / `NN_DASHBOARD.png`) → `docs/*.txt` notes. Where sources disagree,
 the newer one wins.
+
+## [OUTDATED for the redesigned areas] — 2026-07-28
+
+An in-progress section-by-section reskin supersedes the sources below **for modals, the brand band,
+the nav-bar bottom edge, subject-tab sizing, the `+` button, the panel border and the scrollbar**.
+Those newer specs arrived as chat-pasted Figma CSS + screenshots and are summarised in
+**`docs/REDESIGN_2026-07-28_STATUS.md`** — read it before trusting `desired-look.*` or `css.txt` on
+any of those areas. Notably now stale in the older snapshots:
+
+- `desired-look.*` header/brand band (gray band + "NOTES FOR NET" wordmark + "CHROME EXTENSION"
+  pill) → replaced by a blue metal band carrying only the NN logo plate. The components that built it
+  (`BrandHeaderBar`, `BrandLockup`, `BrandLogo`) were **deleted 2026-07-28**, so the 2026-07-07 notes
+  below naming them describe code that no longer exists — read them as history.
+- Subject-tab labels are no longer forced to upper case (client request 2026-07-28); any older note
+  saying names display in caps is stale.
+- The **footer** is no longer the copyright line — it is a second copy of the header's metal band with
+  the NN plate (client 2026-07-28). Any snapshot showing `© 2026 Notes for Net` at the panel bottom is
+  stale.
+- The panel's **top** border is gone (the header band is the top edge), so the strip's `+` and the A–Z
+  column's first cell are flush with the panel top. Snapshots showing a blue line above them are stale.
+- Plate/rim/scrollbar values changed repeatedly during the sprint — do not trust ANY older snapshot for
+  them. `docs/REDESIGN_2026-07-28_STATUS.md` → "Current values" is the single answer. Final plate ratio is
+  **3.1:1** (2026-07-29), anchored to the ADD NOTE button, not the 3.5 earlier comps implied, and the NN ink
+  covers **52.5% of the plate width** — the artwork's own fraction. The purchase plate matches the
+  dashboard's in size AND rendered proportions despite being a different export.
+- The `+` button's white border is **3px** (was 4) and its glyph is **71% of the blue box's width** (was
+  61%), both measured off a client Figma crop 2026-07-29.
+- The panel now casts a **lateral shadow** down its left edge onto the host page (client "SHADOW UNDER AI
+  BOXES"); it lives on the host-page shell, not in the iframe. No older snapshot shows it.
+- The paid-state header logo opens `https://www.notesfornet.com/updates` (client 2026-07-29).
+- `docs/2_NN_SUBJECT TAB ATTRIBUTES AND BEHAVIOR.txt`: "character limit of nine [8]" → **25 chars
+  incl. spaces**; "boxes will be one size equivalent to [3] alphabetical index boxes" → **dynamic,
+  quantised to whole A–Z cells, no minimum span** (the 3-cell floor was dropped 2026-07-28 — length is
+  the character count + one blank char each end); subject-tab point size 24 still correct.
+- `docs/4_NN_AI  ATTRIBUTES AND BEHAVIOR.txt`: "AI letters point size of 26" → **24**.
+- `docs/1_NN_DASHBOARD ATTRIBUTES.txt` + `3_NN_NOTES  ATTRIBUTES.txt`: modal look/feel only —
+  behaviour notes still hold.
 
 ## CURRENT design source — `desired-look.*` (the "metal" redesign, 2026-07-07)
 
@@ -19,7 +57,8 @@ light-mode/pre-metal and only still authoritative for parts `desired-look.*` doe
 raw Figma pixel values — Figma's box-shadows render muddy in-browser, so several are reproduced with CSS
 gradients instead):
 
-- **Metal header bar** — `.nn-metal-bar` (styles.css: accent `#29abe2` + top light-blue hilite +
+- **Metal header bar** — [`.nn-metal-bar` is DEAD as of 2026-07-28: the bar moved to Tailwind utilities in
+  `BrandMetalHeaderBar`; the rule has no consumer left.] `.nn-metal-bar` (styles.css: accent `#29abe2` + top light-blue hilite +
   inset bottom depth), applied to **row 1 only** (the `BrandHeaderBar` in `DashboardHeader.tsx`); the
   id-scoped rule overrides the shared band so modals/trial bar stay gray. Row 2 (nav) stays a
   **white-framed button strip** (`bg-background` surround). MIN|MAX|DELETE cluster recolored
@@ -42,7 +81,8 @@ gradients instead):
 - **Blue current-page note drop shadow** (`Note.tsx`): on `matchesCurrentPage`, both collapsed and
   expanded (Figma `NOTE_01_EXPANDED` / `NOTE_02_COLLAPSED`).
 - **Metal footer bar** — new `DashboardFooter.tsx` (wired in `App.tsx` as the 3rd child of the
-  content column): `.nn-metal-bar` + `© 2026 NOTES FOR NET` (Inter bold, wide tracking). Always
+  content column): [BOTH STALE 2026-07-28 — the footer is now a copy of the header band, no copyright
+  line, and `.nn-metal-bar` is dead.] `.nn-metal-bar` + `© 2026 NOTES FOR NET` (Inter bold, wide tracking). Always
   visible (incl. empty states).
 - **"+" add-tab button** (`AddSubjectTabButton.tsx`): border bumped to 2px (Figma `Rectangle 28`).
 - Note action buttons' ANCHOR/COPY **blue active states already existed** (`NoteUrlEditor.tsx`) — no
@@ -66,9 +106,10 @@ gradients instead):
   base `bg-subject-tab` color stays opaque — the shorthand was resetting it to transparent, flashing a
   see-through gap for a frame when the tab activated).
 
-**Tests:** the 6 e2e visual baselines were **regenerated + reviewed on sign-off (2026-07-08)** and are
-current (39 tests / 11 specs green). Refresh again with `npm run test:e2e:update` (calibration machine
-only) after any further intended design change.
+**Tests:** [OUTDATED counts — see `REDESIGN_2026-07-28_STATUS.md`.] The baselines were regenerated and
+reviewed again on **2026-07-28** sign-off; the suite is now **59 tests / 19 specs**, all green. Refresh
+with `npm run test:e2e:update` (calibration machine only) after any further intended design change, and
+review each new PNG before accepting it — that command *is* the design sign-off.
 
 ## Known divergences from the current app
 

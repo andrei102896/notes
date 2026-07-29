@@ -11,7 +11,7 @@ import {
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
 import { getTabSession, patchTabSession } from "@/lib/tabSession";
 import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
-import { ModalBrandBar, ModalWatermark } from "@/overlay/NnModalFrame";
+import { NnModalBox } from "@/overlay/NnModalBox";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
 import { NotesList } from "@/overlay/NotesList";
 import { storageService } from "@/services/storageService";
@@ -26,7 +26,6 @@ type DashboardContentProps = {
   browserTabUrlKey: string | null;
   activeSubjectTabId: string | null;
   activeNoteId: string | null;
-  /** Which empty-state panel to show: first launch (no tabs), tabs-but-none-selected, or none. */
   emptyState: "first-run" | "select-or-create" | null;
   /** Opens the strip's Add Subject Tab dialog; wired to the first-run "+". */
   onRequestAddSubjectTab: () => void;
@@ -202,27 +201,23 @@ export const DashboardContent = forwardRef<
         aria-label="Dashboard content"
       >
         <div className="flex min-h-0 flex-1 items-center justify-center p-4">
-          <div className="flex w-full flex-col">
-            <ModalBrandBar />
-            {/* Figma (source of truth): tall modal body 252px (MODAL BG); 24px Fjalla; accent words #29ABE2; faint NN watermark behind. */}
-            <div className="relative isolate flex min-h-[15.75rem] flex-col justify-center gap-6 overflow-hidden border-x-[7px] border-b-[7px] border-accent bg-modal px-3 py-8 text-center text-subject-label uppercase leading-tight text-modal-foreground">
-              <ModalWatermark />
+          <NnModalBox>
+            <div className="flex flex-1 flex-col items-center justify-center px-3 text-center text-subject-label leading-[1.875rem] uppercase text-modal-foreground">
               {emptyState === "first-run" ? (
-                // First launch (no subject tabs): the "+" opens the same Add dialog as the strip's (client update 2026-07-02).
-                <div className="flex items-center justify-center gap-3">
-                  {/* translate-y nudges the all-caps line down to optically center with the taller "+" (caps ride high in the line box). */}
-                  <p className="translate-y-[2px]">
+                // Figma "CREATE A SUBJECT TAB...": the "+" here opens the strip's Add dialog.
+                <div className="flex items-center justify-center gap-4">
+                  <p>
                     <span className="text-accent">Create</span> a{" "}
                     <span className="text-accent">subject tab</span> by clicking
                   </p>
-                  {/* Square here (w = h = air-cell) so the "+" reads centered next to the text; the strip keeps w-10. */}
                   <AddSubjectTabButton
                     onClick={onRequestAddSubjectTab}
                     disabled={isReadOnly}
-                    className="w-[var(--air-cell)]"
+                    className="h-[2.4375rem] w-[2.5625rem]"
                   />
                 </div>
               ) : (
+                // Figma "SELECT A SUB TAB..": message block 296×59 (two 30px lines).
                 <>
                   <p>
                     <span className="text-accent">Select</span> or{" "}
@@ -233,7 +228,7 @@ export const DashboardContent = forwardRef<
                 </>
               )}
             </div>
-          </div>
+          </NnModalBox>
         </div>
       </section>
     );
@@ -247,7 +242,7 @@ export const DashboardContent = forwardRef<
       <div
         ref={notesScrollRef}
         onScroll={handleNotesScroll}
-        className="min-h-0 flex-1 overflow-auto py-4 px-6"
+        className="nn-scrollbar min-h-0 flex-1 overflow-auto py-4 px-6"
       >
         {notes.length > 0 ? (
           <NotesList

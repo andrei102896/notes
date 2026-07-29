@@ -13,7 +13,7 @@ import {
   formatStateFromSelection,
 } from "@/lib/richTextFormat";
 import { sanitizeNoteHtml } from "@/lib/sanitizeNoteHtml";
-import { ModalWatermark } from "@/overlay/NnModalFrame";
+import { ModalWatermark } from "@/overlay/NnModalShell";
 
 export type RichTextBodyEditorHandle = {
   applyFormat: (command: "bold" | "italic" | "underline") => void;

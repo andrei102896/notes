@@ -65,7 +65,6 @@ export function App(): React.ReactElement {
     id: t.id,
     name: t.name,
   }));
-  // First launch (no tabs) gets the "create a tab" prompt; tabs-but-none-selected gets "select or create".
   const emptyState: "first-run" | "select-or-create" | null =
     subjectTabsForDisplay.length === 0
       ? "first-run"
@@ -213,7 +212,9 @@ export function App(): React.ReactElement {
   return (
     <main
       id="nn-scroll-bookmarks-overlay-host"
-      className="relative flex h-full w-full min-w-0 flex-row justify-end border-[3px] border-[#282828]"
+      /* No border-t: the header band IS the panel's top edge. A top border pushes the band past the
+         iframe edge, which clips the logo plate's top rim. */
+      className="relative flex h-full w-full min-w-0 flex-row justify-end border-x-[3px] border-b-[3px] border-accent"
     >
       <PaywallDialog
         open={trialBannerOpen && (trialDaysLeft !== null || isReadOnly)}

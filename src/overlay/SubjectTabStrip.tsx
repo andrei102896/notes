@@ -7,6 +7,10 @@ import {
 } from "react";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  SUBJECT_TAB_DEFAULT_SPAN,
+  useSubjectTabCellSpans,
+} from "@/hooks/useSubjectTabCellSpans";
 import { useSubjectTabStripScroll } from "@/hooks/useSubjectTabStripScroll";
 import { indexOfFirstTabForLetter, type AirLetter } from "@/lib/airSubjectTabs";
 import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
@@ -79,6 +83,10 @@ export const SubjectTabStrip = forwardRef<
   );
 
   const tabsScrollAreaRef = useRef<HTMLDivElement>(null);
+  const cellSpans = useSubjectTabCellSpans(
+    sortedTabs.map((t) => t.name),
+    tabsScrollAreaRef,
+  );
   const { onScroll: handleStripScroll } = useSubjectTabStripScroll({
     scrollRef: tabsScrollAreaRef,
     activeSubjectTabId,
@@ -163,11 +171,18 @@ export const SubjectTabStrip = forwardRef<
         className="flex h-full w-10 shrink-0 flex-col"
         aria-label="Subject tabs"
       >
-        <AddSubjectTabButton
-          onClick={() => onAddDialogOpenChange(true)}
-          disabled={isReadOnly}
-          addDialogOpen={addDialogOpen}
-        />
+        {/* The "+" fills one whole A–Z cell, not a square: the cell is taller than the column is wide,
+            so a square would leave see-through slivers above and below. */}
+        <div className="flex h-[var(--air-cell)] w-full shrink-0 items-center justify-center">
+          <AddSubjectTabButton
+            onClick={() => onAddDialogOpenChange(true)}
+            disabled={isReadOnly}
+            addDialogOpen={addDialogOpen}
+            /* 1px white line on the right (outer shadow = no layout impact): the A–Z cell's own white
+               border-r hugs the button's left border, so without this the white reads 5px left vs 4px right. */
+            className="h-full w-full shadow-[1px_0_0_0_#ffffff]"
+          />
+        </div>
 
         <Tabs
           value={activeSubjectTabId ?? ""}
@@ -220,10 +235,16 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  /* Every tab keeps its border-l (post-rotation = the 1px white line at the tab's visual TOP), incl. the first — that's the separator between the + button and the first subject. No y-nudge: tabs align to the A–Z cells' border-t lines. pl-2.5 indents the label start (~10px @ ref, post-rotation = gap at the cell top); pr-1 + tracking-tight keep max-length names from clipping where the renderer runs wide (Windows DirectWrite). pt centers the 1.875rem label line across the w-10 (2.5rem) strip thickness — base items-start pins it to the visual-right edge, so pt=(2.5-1.875)/2 balances the two sides. */
-                  className="w-[calc(var(--air-cell)*3)]! h-[calc(var(--air-cell)*3)]! shrink-0 justify-start leading-tight tracking-tight pl-2.5 pr-1 pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left"
+                  /* width === height: rotation is a transform, so the column stacks by the UNROTATED
+                     height while the visible length is the width. pt centres the label on the strip. */
+                  style={{
+                    width: `calc(var(--air-cell) * ${cellSpans[tab.name] ?? SUBJECT_TAB_DEFAULT_SPAN})`,
+                    height: `calc(var(--air-cell) * ${cellSpans[tab.name] ?? SUBJECT_TAB_DEFAULT_SPAN})`,
+                  }}
+                  className="shrink-0 justify-start leading-tight px-[1ch] pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left"
                 >
-                  {tab.name.toUpperCase()}
+                  {/* Case as typed: the client requires upper and lower case names (A–Z index matching and sorting are case-insensitive). */}
+                  {tab.name}
                 </TabsTrigger>
               ))}
             </TabsList>

@@ -5,16 +5,15 @@ import { IS_WINDOWS } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 
 type AddSubjectTabButtonProps = {
-  /** Omit to render an inert "+" (first-run illustrative cue); pass to open the Add dialog (strip). */
-  onClick?: () => void;
+  onClick: () => void;
   disabled?: boolean;
   /** Drives aria-expanded for the strip's dialog trigger. */
   addDialogOpen?: boolean;
-  /** Context sizing override. The strip omits it (stays w-10 to fit the 40px column); the first-run modal passes w-[var(--air-cell)] to square the button. */
+  /** Context sizing override (the first-run modal passes the Figma 41×39 box). */
   className?: string;
 };
 
-/** The blue "+" that creates a subject tab — at the top of the strip, and (handler-less) in the first-run panel. */
+/** Used twice: at the top of the subject-tab strip and in the first-run panel, each sizing it itself. */
 export function AddSubjectTabButton({
   onClick,
   disabled = false,
@@ -25,9 +24,9 @@ export function AddSubjectTabButton({
     <Button
       variant="icon"
       size="icon"
-      /* One A–Z cell tall (var(--air-cell)); width = w-10 (size icon) in the strip, squared in the modal via className. */
       className={cn(
-        "relative z-30 h-[var(--air-cell)] shrink-0 border-2 border-border bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100",
+        // border: Figma "Rectangle 28" — 4px white, not the panel's dark stroke.
+        "relative z-30 shrink-0 border-[3px] border-white bg-accent text-accent-foreground hover:brightness-90 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-accent disabled:text-accent-foreground disabled:opacity-100",
         className,
       )}
       type="button"
@@ -38,7 +37,8 @@ export function AddSubjectTabButton({
       aria-haspopup="dialog"
       aria-expanded={addDialogOpen}
     >
-      {/* Vector "+" (font glyph off-center on Windows); square viewBox + symmetric arms → uniform padding. Windows shifts viewBox min-y to -1 to cancel a ~1px top-lean from its SVG pixel-snapping (Mac renders centered). */}
+      {/* Vector, not a font glyph — the glyph renders off-centre on Windows. The -1 viewBox min-y cancels
+          a ~1px top-lean from Windows' SVG pixel-snapping; Mac already centres. */}
       <svg
         data-add-tab-glyph
         viewBox={IS_WINDOWS ? "0 -1 24 24" : "0 0 24 24"}

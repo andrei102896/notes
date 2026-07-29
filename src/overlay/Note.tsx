@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import type { FormatState } from "@/lib/richTextFormat";
 import { cn } from "@/lib/utils";
+import { CollapsedNoteNav } from "@/overlay/CollapsedNoteNav";
 import { NoteUrlEditor } from "@/overlay/NoteUrlEditor";
 import {
   RichTextBodyEditor,
@@ -192,6 +193,15 @@ export function Note({
             }}
             className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-normal text-white outline-none cursor-pointer"
           />
+          {!expanded && note.heading.trim() !== "" ? (
+            <CollapsedNoteNav
+              note={note}
+              isReadOnly={isReadOnly}
+              onActivate={onActivate}
+              onHighlightNote={onHighlightNote}
+              onUpdateNote={onUpdateNote}
+            />
+          ) : null}
           <div className="flex shrink-0 items-stretch">
             <CollapsibleTrigger asChild>
               <Button

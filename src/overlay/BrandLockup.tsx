@@ -1,38 +1,19 @@
 import React from "react";
 
-import { IS_WINDOWS } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 
-/** Brand-cluster NN mark (white NN) — NOT the off-limits payment logo. */
-export function BrandLogo({
-  className,
-  // Origin shifted so the glyph ink centroid (31.40, 13.66) sits at the viewBox center — the paths themselves are drawn off-center vertically.
-  viewBox = "-0.0993 -1.3364 63 30",
-}: {
-  className?: string;
-  viewBox?: string;
-}): React.ReactElement {
-  return (
-    <svg
-      viewBox={viewBox}
-      className={cn("h-5 w-auto shrink-0", className)}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M35.5083 4.92908V12.1556C35.5083 15.0218 35.4221 17.2442 35.0737 19.6742L35.0151 20.0863L35.4087 20.2191L35.4956 20.2484L35.8403 20.3646L36.0571 20.0717C37.2652 18.4381 38.7074 16.7609 40.5034 14.9261L41.2954 14.1293L50.5933 4.92908H54.0396V22.3978H51.4556V15.0062C51.4556 11.9485 51.542 9.74468 51.7583 7.43396L51.7993 6.99451L50.9204 6.79919L50.7271 7.05994C49.2637 9.03214 47.3176 11.121 45.269 13.1703H45.2681L36.061 22.3949H32.9243V4.92908H35.5083Z"
-        fill="white"
-      />
-      <path
-        d="M12.2393 5.04956L21.6025 14.1912V14.1902C23.7909 16.3281 25.4869 18.2403 26.8779 20.0945L27.085 20.3708L27.417 20.2751L27.5068 20.2488L27.9248 20.1277L27.8633 19.697C27.5149 17.2801 27.4277 15.0739 27.4277 12.2273V5.04956H30.0371V22.3982H26.8701L17.5967 13.2302H17.5957C15.5302 11.1943 13.5743 9.1175 12.1006 7.15796L11.9111 6.90698L11.6035 6.96851L11.4717 6.9939L11.0293 7.08179L11.0713 7.53198C11.2876 9.82672 11.377 12.0146 11.377 15.0554V22.3953H8.76172V5.04956H12.2393Z"
-        fill="white"
-      />
-    </svg>
-  );
-}
+/** Plate box ratio for the dashboard band, the footer and the modal backdrops. Must stay in step with
+ *  NN_PLATE_CLASS below — Tailwind's scanner cannot read a template literal, so the class is a literal. */
+export const NN_PLATE_ASPECT = 3.1;
 
-/** Fat NN mark (Figma "NN FAT LOGO", 46×17 ink). The two N's are nudged ±0.5u apart (viewBox widened to 47) for a ~1px inter-letter gap that the shared 1px path-stroke would otherwise close; width stays pinned to the thin mark's 2.625rem so the badge footprint is unchanged. */
+/** Vertical squeeze on the plate glyphs: +1px padding above and below the NN, and it undoes part of the
+ *  stretch from preserveAspectRatio="none". The glyphs are deliberately NOT counter-scaled horizontally —
+ *  the client renders this same artwork in a 3.1:1 box, so the NN keeps its share of the plate (52.5% of
+ *  the width) and takes the same non-uniform scale their comps show. Widening it reads as bulky. */
+export const PLATE_GLYPH_SQUEEZE_Y = 0.895;
+
+/** Fat NN mark (Figma "NN FAT LOGO"). The N's are nudged ±0.5u apart (viewBox widened to 47) or the
+ *  shared 1px stroke closes the gap; width stays pinned to 2.625rem so the badge footprint never grows. */
 export function BrandLogoFat({
   className,
 }: {
@@ -60,52 +41,194 @@ export function BrandLogoFat({
   );
 }
 
-/** Brand cluster shared by the header top row and modal header bar; renders only the cluster, each caller wraps it in its own bar. */
-export function BrandLockup(): React.ReactElement {
-  return (
-    <>
-      <div className="flex items-stretch border-2 border-mn-stroke bg-accent">
-        <span className="flex items-center bg-logo-box [&_path]:stroke-white [&_path]:[stroke-linejoin:round] [&_path]:[stroke-width:1px]">
-          {/* The visible dark box = this span + the row's 2px left border (there's no border on its right, where the blue bar begins). Nudge the mark left by half that border so it centers in the box the eye sees, not just the span. */}
-          <BrandLogo className="-translate-x-px" />
-        </span>
-        <div className="flex items-center justify-center px-2">
-          {/* pl offsets the 0.1em trailing track (tracking-widest) so caps center horizontally, like the Chrome Extension line below. pt is a downward optical nudge (leading-none leaves caps high in the line box); 0.11em centers them on Mac. Windows-only 1px bottom pad offsets DirectWrite's heavier vertical metrics. */}
-          <span
-            className="pl-[0.1em] pt-[0.11em] font-ui text-brand-title font-bold uppercase leading-none tracking-widest text-accent-foreground"
-            style={{ paddingTop: IS_WINDOWS ? "2px" : undefined }}
-          >
-            Notes for Net
-          </span>
-        </div>
-      </div>
-      <div
-        className="flex items-center justify-center bg-chrome-ext px-1 py-1"
-        style={{ paddingTop: "4px" }}
-      >
-        {/* pl offsets the 0.25em trailing track so the wide-spaced caps stay optically centered in the box. */}
-        <span className="pl-[0.25em] font-ui text-brand-sub font-semibold uppercase leading-none tracking-[0.25em] text-accent-foreground">
-          Chrome Extension
-        </span>
-      </div>
-    </>
-  );
-}
-
-/** Shared header band (Figma HEADER BOX): gray bar + brand cluster; className overrides height (e.g. the header's --air-cell). */
-export function BrandHeaderBar({
+/** NN plate (Figma LOGO BOX / LOGO ALL, 120×29) for the header band and every modal bar. Inlined
+ *  because bundled asset URLs break in the host-origin iframe. */
+export function NnLogoPlate({
   className,
 }: {
   className?: string;
 } = {}): React.ReactElement {
   return (
+    <svg
+      viewBox="0 0 120 29"
+      preserveAspectRatio="none"
+      fill="none"
+      aria-hidden
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("w-auto shrink-0", className)}
+    >
+      <g filter="url(#filter0_d_718_11)">
+        <g filter="url(#filter1_i_718_11)">
+          <rect width="120" height="29" fill="white" />
+        </g>
+        {/* Rim lives in MetalBarPlate as a CSS-border overlay — an svg stroke rescaled with the artwork and landed sub-pixel. */}
+        <g transform={`translate(0 14.5) scale(1 ${PLATE_GLYPH_SQUEEZE_Y}) translate(0 -14.66)`}>
+          <path
+            d="M82.7412 6.65039L82.6113 6.74219C78.6338 9.5556 76.5451 11.072 72.6836 13.835L72.6816 13.8369L69.1514 16.3896V6.65039H61.3066V22.6504H70.0664L70.1973 22.5566L80.123 15.4658L80.125 15.4639L83.6553 12.9102V22.6504H91.5V6.65039H82.7412Z"
+            fill="#0D7DAD"
+            stroke="black"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d="M36.4248 6.65039L36.5547 6.74219C40.5323 9.55562 42.6208 11.0719 46.4824 13.835L46.4844 13.8369L50.0146 16.3896V6.65039H57.0254V22.6504H49.0986L48.9688 22.5566L39.043 15.4658L39.041 15.4639L35.5107 12.9102V22.6504H28.5V6.65039H36.4248Z"
+            fill="#0D7DAD"
+            stroke="black"
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
+      </g>
+      <defs>
+        <filter
+          id="filter0_d_718_11"
+          x="0"
+          y="0"
+          width="120"
+          height="29"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.83 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_718_11"
+          />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect1_dropShadow_718_11"
+            result="shape"
+          />
+        </filter>
+        <filter
+          id="filter1_i_718_11"
+          x="0"
+          y="0"
+          width="120"
+          height="29"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            result="shape"
+          />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feMorphology
+            radius="3"
+            operator="erode"
+            in="SourceAlpha"
+            result="effect1_innerShadow_718_11"
+          />
+          <feOffset />
+          <feGaussianBlur stdDeviation="5" />
+          <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0.160784 0 0 0 0 0.670588 0 0 0 0 0.886275 0 0 0 1 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="shape"
+            result="effect1_innerShadow_718_11"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
+/** Plate slot: full bar height, 3.5:1 per the client render — the raw asset is 4.14:1, hence
+ *  preserveAspectRatio="none". max-w stops a tall window's plate from crowding the flanking boxes. */
+const METAL_BAR_PLATE_CLASS = "relative h-full aspect-[3.5] max-w-[40%]";
+
+/** Dashboard band, footer and modal-backdrop plate: flush to the bar, narrower than the modals' 3.5:1 —
+ *  the client anchors its width to the ADD NOTE button below. Literal, and NN_PLATE_ASPECT must match. */
+export const NN_PLATE_CLASS = "aspect-[3.1]";
+
+/** The rim is a CSS-border overlay, not an svg stroke, so changing its thickness never rescales the
+ *  NN artwork. */
+export function MetalBarPlate({
+  className,
+  rimClassName,
+  children,
+}: {
+  className?: string;
+  rimClassName?: string;
+  children: React.ReactNode;
+}): React.ReactElement {
+  return (
+    <div data-nn-plate="" className={cn(METAL_BAR_PLATE_CLASS, className)}>
+      {children}
+      {/* ONE border carrying the whole ramp: the hilite has to FADE through the rim, and a clipped second
+          border stepped between two flat colours. border-color is the no-border-image fallback. */}
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-0 border-[3px] border-accent-deep [border-image:linear-gradient(to_bottom,#9EE2FF_0%,#7DD3F7_15%,#3EA8D8_38%,#0081B8_58%,#14709A_80%,#0B5B80_100%)_1]",
+          rimClassName,
+        )}
+      />
+    </div>
+  );
+}
+
+/** Flanking bands (Figma UPDATE____HEADER BOX LEFT/RIGHT): accent at 0.86 so the bar's stronger inset
+ *  shadow reads through — darker and blue-nuanced, not flat. */
+const HEADER_BOX_CLASS =
+  "h-full flex-1 bg-accent/[0.86] shadow-[inset_0_-1.125rem_0.7rem_0.1875rem_rgba(0,0,0,0.28)]";
+
+/** Blue metal bar (Figma TOP METAL BAR DB), shared by the dashboard brand band, the footer and the
+ *  small-modal header — each passes its own height and rim thickness. */
+export function BrandMetalHeaderBar({
+  className,
+  plateClassName,
+  rimClassName,
+}: {
+  className?: string;
+  plateClassName?: string;
+  rimClassName?: string;
+} = {}): React.ReactElement {
+  return (
     <div
+      data-nn-metal-bar=""
       className={cn(
-        "flex shrink-0 items-center justify-center gap-2 bg-air-box px-2 py-1.5 shadow-[0px_4px_6.5px_rgba(0,0,0,0.25)]",
+        /* w-full: a caller's items-center (the name modal) would otherwise shrink the bar to the plate's width. */
+        "relative flex w-full shrink-0 items-center bg-accent shadow-[inset_0_-1.125rem_0.7rem_0.1875rem_rgba(0,0,0,0.45)]",
         className,
       )}
     >
-      <BrandLockup />
+      {/* WHITE HILITE ON TOP BAR (Figma 40% of the bar). Kept UNDER the plate: over it at full strength
+          it erases the rim's top edge and tints the glyphs — the rim carries its own copy of the ramp. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[40%] bg-accent-hilite blur-[0.184375rem]"
+      />
+      <div className={HEADER_BOX_CLASS} />
+      <MetalBarPlate className={plateClassName} rimClassName={rimClassName}>
+        <NnLogoPlate className="h-full w-full" />
+      </MetalBarPlate>
+      <div className={HEADER_BOX_CLASS} />
     </div>
   );
 }

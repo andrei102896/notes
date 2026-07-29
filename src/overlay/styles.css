@@ -12,17 +12,14 @@ body {
   --font-sans: "Fjalla One", sans-serif;
   --font-ui: "Inter", system-ui, sans-serif;
   /* Design point sizes at the 686px/16px reference; in rem so they ride the panel knob. */
-  --text-air-letter: 1.625rem; /* 26px — A–Z index letters (Fjalla One Regular, doc 4_NN_AI) */
+  --text-air-letter: 1.5rem; /* 24px — A–Z index letters; client reduced from 26px to match the subject tabs */
   --text-subject-label: 1.5rem; /* 24px — subject tabs (css.txt WORDS_*); name ≠ --color-subject-tab (text-* utility collision) */
   --text-note-body: 1.125rem; /* 18px — note body */
   --text-note-title: 1.4375rem; /* 23px — note title (Fjalla One Regular, Figma BOX_TITLE text) */
   --text-note-meta: 0.6875rem; /* 11px — note URL / date row (Inter Bold) */
-  --text-brand-title: 0.8125rem; /* 13px — "NOTES FOR NET" (Inter Bold) */
-  --text-brand-sub: 0.625rem; /* 10px — "CHROME EXTENSION" (Inter Semi Bold) */
   --text-navlabel: 1.4375rem; /* 23px — ADD NOTE / DELETE TAB (Figma) */
   --text-navmin: 1.3125rem; /* 21px — MIN MAX DELETE (Figma) */
   --text-navribbon: 1.125rem; /* 18px — THIS TAB NOTES (Figma) */
-  --text-add-glyph: 3.25rem; /* 52px — "+" add-tab glyph (2× the A–Z index letter) */
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 47.4% 11.2%);
   --color-dashboard-frosted: hsl(0 0% 78%);
@@ -42,15 +39,13 @@ body {
   --color-note-field: #fefefe; /* URL label / URL field / date box bg (Figma BOX_URL / BOX_URL_ADDRESS / BOX_DATE) */
   --color-note-action: #000000; /* LINK / COPY action buttons (Figma BOX_LINK / BOX_COPY) */
   --color-ribbon: #565656; /* THIS TAB NOTES ribbon (Figma) */
-  --color-chrome-ext: #3c3c3c; /* CHROME EXTENSION pill (Figma CHR EXT BOX) */
-  --color-mn-stroke: #282828; /* outer panel + NN BIG BOX stroke (Figma) */
-  --color-logo-box: #2c2c2c; /* NN logo box (Figma LOGO BOX) */
   --color-mintext: #252525; /* MIN MAX DELETE text (Figma) */
   --color-accent: #29abe2;
   --color-accent-foreground: hsl(0 0% 100%);
+  --color-accent-deep: #0081b8; /* deep-blue strokes on purchase/dashboard modal chrome (Figma #0081B8) */
+  --color-accent-hilite: #9ee2ff; /* metal-bar top hilite (Figma WHITE HILITE ON TOP BAR) */
   --color-modal: #3c3c3c; /* modal panel bg (Figma MODAL BG) */
   --color-modal-foreground: #e0e0e0; /* modal light text + OK button text */
-  --color-modal-cancel: #4d4d4d; /* CANCEL button text */
   --color-modal-delete: #e22929; /* destructive OK box (Figma OK BOX); ≠ --color-destructive */
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(210 40% 98%);
@@ -106,11 +101,15 @@ body {
   );
 }
 
+/* One A–Z box: 26 fill the panel height. On the iframe ROOT, not #host — dialogs portal to the iframe
+   body, where a #host-scoped --air-cell is undefined and heights silently degenerate to auto. */
+:root {
+  --air-cell: calc(100vh / 26);
+}
+
 #nn-scroll-bookmarks-overlay-host {
   color-scheme: light;
   background-color: transparent;
-  /* One A–Z box: 26 fill the panel height; "+" = 1 cell, a subject tab = 3. */
-  --air-cell: calc(100vh / 26);
 }
 
 #nn-scroll-bookmarks-overlay-host,
@@ -120,7 +119,8 @@ body {
   font-family: "Fjalla One", sans-serif;
 }
 
-/* The font-ui utility (brand badge, note URL/date row — Inter per Figma) must survive the host-wide Fjalla default above: the ID selector beats the plain class, so re-assert it ID-scoped. Dialogs portal to the iframe body (outside #host) where .font-ui already works — this keeps both scopes on one rendering. */
+/* Re-assert .font-ui ID-scoped so it outranks the host-wide Fjalla default above. Portaled dialogs land
+   outside #host, where the plain class already wins — both scopes then render the same. */
 #nn-scroll-bookmarks-overlay-host .font-ui,
 #nn-scroll-bookmarks-overlay-host .font-ui * {
   font-family: var(--font-ui);
@@ -142,16 +142,19 @@ body {
   font-size: var(--text-note-title);
 }
 
-/* Add Subject Tab naming box: Fjalla One Regular 24 to match the CANCEL/OK buttons. element+attribute selector (NOT #host-scoped) so it still applies when the dialog portals to the iframe body, and its specificity beats the Input's md:text-sm. */
+/* Subject-tab naming box (Figma EX TEXT). Element+attribute selector, NOT #host-scoped: the dialog
+   portals to the iframe body, and this specificity still beats the Input's md:text-sm. */
 input[data-subject-name-input] {
   font-family: "Fjalla One", sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
-/* "+" sized here, ID-scoped so it beats the button's forced svg size-6; height tracks --air-cell, width auto keeps aspect. */
+/* ID-scoped to beat the button's forced svg size-6. 71% = the glyph:blue-box width ratio measured off the
+   client's Figma crop (181 of 255). Sized off WIDTH, not height: the glyph is square and its cell is not,
+   so the tight axis sets the size and the vertical gap necessarily comes out larger. */
 #nn-scroll-bookmarks-overlay-host [data-add-tab-glyph] {
-  height: calc(var(--air-cell) * 0.58);
-  width: auto;
+  width: 71%;
+  height: auto;
 }
 
 #nn-scroll-bookmarks-overlay-host [data-note-body] :is(b, strong) {
@@ -184,4 +187,28 @@ body.nn-picking-anchor * {
 /* Hide scrollbar for Chrome, Safari and Opera */
 .hidden-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* NN scrollbar (Figma NN_SCROLL BAR). Track transparent so the panel background shows through; rem-based
+   so the thumb scales with the panel. */
+.nn-scrollbar::-webkit-scrollbar {
+  /* Thumb (0.375rem) + an 8px right gutter; scrollbar pseudo-elements take no margin, so the gutter is
+     a transparent right border on the thumb with background-clip: padding-box. */
+  width: calc(0.375rem + 0.5rem);
+  height: 0.375rem;
+}
+.nn-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nn-scrollbar::-webkit-scrollbar-thumb {
+  box-sizing: border-box;
+  background: var(--color-accent);
+  background-clip: padding-box;
+  border-right: 0.5rem solid transparent;
+  /* Inset shadow, not a border: the border slot carries the gutter, and an inset shadow hugs the
+     padding box — the visible thumb. */
+  box-shadow: inset 0 0 0 0.3px #000000;
+  /* Pill radius, not 6px: a corner's padding box gets (radius − border-width), so 6px against the 8px
+     transparent gutter leaves the right-hand corners square. */
+  border-radius: 9999px;
 }

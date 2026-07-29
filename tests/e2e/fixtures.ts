@@ -45,6 +45,9 @@ export const test = base.extend<ExtensionFixtures>({
         `--load-extension=${DIST_DIR}`,
         "--no-first-run",
         "--hide-crash-restore-bubble",
+        // Headed is mandatory (the extension's service worker never starts headless), so park the window
+        // off-screen instead: it still composites and screenshots normally, but stops stealing the desktop.
+        "--window-position=-2400,-2400",
       ],
     });
     await use(context);

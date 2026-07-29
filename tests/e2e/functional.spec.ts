@@ -27,7 +27,7 @@ test.describe("first run", () => {
   test("the first-run + opens the add dialog and creates the first tab", async ({
     overlay,
   }) => {
-    // The + inside the first-run message (not the strip's) — same dialog (client update 2026-07-02).
+    // The + inside the first-run modal (not the strip's) — same dialog.
     await overlay
       .locator('[aria-label="Dashboard content"] [aria-label="Add subject tab"]')
       .click();
@@ -282,23 +282,28 @@ test.describe("persistence and consistency", () => {
     await expectTitles(overlay, ["STAYS"]);
   });
 
-  test("brand badge renders with one font in header and modals", async ({
+  test("Inter survives the host Fjalla rule and portaled modals stay Fjalla", async ({
     overlay,
   }) => {
-    // Regression: host-wide Fjalla rule used to defeat .font-ui in the header while portaled dialogs used Inter.
-    const headerFont = await overlay
-      .locator("header span", { hasText: "Notes for Net" })
+    // Regression guard: the host-wide Fjalla rule defeats .font-ui inside #host unless re-asserted.
+    // A note's URL/date row is the only font-ui surface left after the band and footer were reskinned.
+    await createSubjectTab(overlay, "DESKS");
+    await addNote(overlay, "FONT CHECK");
+    const metaFont = await overlay
+      .locator("[data-slot='card'] .font-ui")
+      .first()
       .evaluate((el) => getComputedStyle(el).fontFamily);
+    expect(metaFont).toContain("Inter");
+
     await overlay
       .locator('[aria-label="Subject tabs"] button[aria-haspopup="dialog"]')
       .click();
     const dialog = overlay.locator('[data-slot="dialog-content"]');
     await dialog.waitFor({ state: "visible" });
     const modalFont = await dialog
-      .locator("span", { hasText: "Notes for Net" })
+      .locator("label")
       .evaluate((el) => getComputedStyle(el).fontFamily);
-    expect(headerFont).toContain("Inter");
-    expect(modalFont).toBe(headerFont);
+    expect(modalFont).toContain("Fjalla");
   });
 
   test("page URL context is the fake host", async ({ page }) => {

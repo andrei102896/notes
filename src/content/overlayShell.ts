@@ -152,7 +152,9 @@ function configureOverlayShell(shell: HTMLDivElement): void {
     "color-scheme:light",
     `z-index:${2147483647}`,
     "overflow:visible",
-    "box-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25)",
+    /* Lateral shadow on the SHELL, not inside the iframe: an iframe cannot paint outside its own box,
+       and a box-shadow never hit-tests, so the host page keeps its clicks. */
+    "box-shadow:-8px 0 44px 8px rgba(26,26,26,0.42), 0 25px 50px -12px rgb(0 0 0 / 0.25)",
     "transform:translateX(100%)",
     "transition:transform 300ms ease-out",
     "visibility:hidden",
