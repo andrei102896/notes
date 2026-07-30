@@ -1,9 +1,5 @@
 import { expect, test } from "./fixtures";
-import {
-  createSubjectTab,
-  dblclickSubjectTab,
-  subjectTab,
-} from "./helpers";
+import { createSubjectTab, dblclickSubjectTab, subjectTab } from "./helpers";
 
 /** Canvas-measured, not scrollWidth: the trigger's invisible `after:` indicator sits outside the right
  *  edge and inflates scrollWidth by ~3px. Tabs are rotate-90, so on-strip length is offsetWidth. */
@@ -69,7 +65,10 @@ test("subject tab length follows the character count with no 3-cell floor", asyn
     measured.push({ name, ...m, cells: Math.round(cells) });
   }
 
-  expect(measured[0].cells, "a 1-character tab is under the old 3-cell floor").toBeLessThan(3);
+  expect(
+    measured[0].cells,
+    "a 1-character tab is under the old 3-cell floor",
+  ).toBeLessThan(3);
   for (let i = 1; i < measured.length; i += 1) {
     expect(
       measured[i].boxWidth,
@@ -117,9 +116,9 @@ test("subject tab labels keep the case they were typed in", async ({
   );
 });
 
-/** The "+" fills one A–Z cell with an even border and a centred glyph. Equal gaps on BOTH axes is
- *  impossible in a non-square cell, so each axis is balanced against itself and the difference logged. */
-test("the + button fills its cell symmetrically with a centred glyph", async ({
+/** The "+" fills its A–Z cell so its own border is the only white. The cell is not square, so the glyph is
+ *  capped on the tight axis instead: off width alone a 620px-tall window crushed it to 1.75px vs 3.25px. */
+test("the + button fills its cell with an even border and an uncrushed glyph", async ({
   overlay,
   page,
 }, testInfo) => {
@@ -145,7 +144,7 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
       };
       return {
         border,
-        // Margin between the button and the cell slot it sits in — must be 0 all round.
+        // Must be 0 all round, or the leftover shows as a sliver and breaks the even white frame.
         margins: [
           box.top - wrap.top,
           wrap.right - box.right,
@@ -155,7 +154,9 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
         cellHeight: cell.height,
         boxHeight: box.height,
         glyphWidth: glyph.width,
+        glyphHeight: glyph.height,
         contentWidth: box.width - border.left - border.right,
+        contentHeight: box.height - border.top - border.bottom,
         glyphSquare: Math.abs(glyph.width - glyph.height),
         gapLeft: glyph.left - (box.left + border.left),
         gapRight: box.right - border.right - glyph.right,
@@ -165,7 +166,6 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
     });
 
   expect(Math.abs(geom.boxHeight - geom.cellHeight)).toBeLessThan(0.5);
-  // Zero margin on every side, or a see-through sliver shows around the button.
   for (const margin of geom.margins) {
     expect(Math.abs(margin)).toBeLessThan(0.5);
   }
@@ -174,19 +174,39 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
     expect(Math.abs(b - borders[0])).toBeLessThan(0.1);
   }
   expect(geom.glyphSquare).toBeLessThan(0.5);
-  expect(Math.abs(geom.gapLeft - geom.gapRight)).toBeLessThan(0.5);
+  // Left gap runs 1px wider by design: the glyph carries a +0.5px optical nudge (styles.css).
+  expect(
+    geom.gapLeft - geom.gapRight,
+    "+ glyph nudged 0.5px right",
+  ).toBeCloseTo(1, 1);
   expect(Math.abs(geom.gapTop - geom.gapBottom)).toBeLessThan(0.5);
-  // Glyph vs the blue box it sits in, as a RATIO so it holds at any panel width: the client's Figma crop
-  // measures 181 of 255 across = 0.71. Their box is square and ours is taller than wide, so only the
-  // width ratio can match; the vertical gap necessarily comes out larger.
+  // Ratios, not px, so they hold at any panel size. 0.71 = Figma crop (181 of 255); a cap on both axes
+  // rather than an exact fit, since the cell is not square. Asserting height guards the crush regression.
   const widthRatio = geom.glyphWidth / geom.contentWidth;
+  const heightRatio = geom.glyphHeight / geom.contentHeight;
   console.log(
-    `+ glyph is ${(widthRatio * 100).toFixed(1)}% of the blue box (Figma 71%), ` +
-      `gaps ${geom.gapLeft.toFixed(2)} side / ${geom.gapTop.toFixed(2)} top`,
+    `+ glyph is ${(widthRatio * 100).toFixed(1)}% wide / ${(heightRatio * 100).toFixed(1)}% tall ` +
+      `of the blue box (Figma 71% cap), gaps ${geom.gapLeft.toFixed(2)} side / ${geom.gapTop.toFixed(2)} top`,
   );
-  expect(widthRatio, "glyph width ratio matches the Figma crop").toBeCloseTo(0.71, 2);
+  expect(
+    widthRatio,
+    "glyph never wider than the Figma crop",
+  ).toBeLessThanOrEqual(0.72);
+  expect(
+    heightRatio,
+    "glyph never taller than the Figma crop",
+  ).toBeLessThanOrEqual(0.72);
+  expect(
+    Math.max(widthRatio, heightRatio),
+    "glyph fills its tight axis",
+  ).toBeCloseTo(0.71, 2);
   // Never touching the border on any axis.
-  for (const gap of [geom.gapLeft, geom.gapRight, geom.gapTop, geom.gapBottom]) {
+  for (const gap of [
+    geom.gapLeft,
+    geom.gapRight,
+    geom.gapTop,
+    geom.gapBottom,
+  ]) {
     expect(gap).toBeGreaterThan(0.5);
   }
   // Painted pixels ACROSS THE NEIGHBOURHOOD, not just the button: the A–Z cell's white border-r hugs the
@@ -231,7 +251,7 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
         }
         return n;
       };
-      const scale = c.width / (leftEdge.clipWidth);
+      const scale = c.width / leftEdge.clipWidth;
       const lx = Math.round(leftEdge.offset * scale);
       const rx = Math.round(rightEdge.offset * scale);
       return {
@@ -243,11 +263,16 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
     {
       dataUrl: `data:image/png;base64,${row.toString("base64")}`,
       leftEdge: { offset: PAD, clipWidth: box.width + PAD * 2 },
-      rightEdge: { offset: PAD + box.width - 1, clipWidth: box.width + PAD * 2 },
+      rightEdge: {
+        offset: PAD + box.width - 1,
+        clipWidth: box.width + PAD * 2,
+      },
     },
   );
 
-  console.log(`+ white either side (device px): left ${white.left}, right ${white.right}`);
+  console.log(
+    `+ white either side (device px): left ${white.left}, right ${white.right}`,
+  );
   expect(white.left, "white to the left of the + interior").toBeGreaterThan(0);
   expect(
     Math.abs(white.left - white.right),
@@ -261,7 +286,9 @@ test("the + button fills its cell symmetrically with a centred glyph", async ({
   );
 
   // The "+" next to the A box: review artifact for the grid alignment.
-  const strip = await overlay.locator('[aria-label="Subject tabs"]').boundingBox();
+  const strip = await overlay
+    .locator('[aria-label="Subject tabs"]')
+    .boundingBox();
   if (strip) {
     await page.screenshot({
       path: testInfo.outputPath("plus-vs-air-cell.png"),

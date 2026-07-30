@@ -8,8 +8,13 @@ code conventions see [`AGENTS.md`](AGENTS.md).
 
 ## 1. Prerequisites
 
-- **Node.js** 18+ and **npm**.
+- **Node.js** 18+ and **npm**. Enforced by the toolchain, not just advisory: Vite 5 needs
+  `^18 || >=20`, ESLint 9 needs `^18.18 || ^20.9 || >=21.1`. On Windows, a stale system Node
+  (e.g. 14) fails at `npm install`; install Node 20 with
+  [nvm-windows](https://github.com/coreybutler/nvm-windows) (`nvm install 20 && nvm use 20`,
+  which lands in `C:\nvm4w\nodejs`) rather than replacing the system install.
 - A **Chrome / Chromium** browser for loading and testing.
+- For the e2e suite, Playwright's browser binaries: `npx playwright install chromium`.
 - An **[extensionpay.com](https://extensionpay.com)** account + a connected **Stripe**
   account (only if payments are in scope — see §5).
 
@@ -133,6 +138,13 @@ styling (against stubbed pages). Still NOT covered —
 trial/paywall, full drag-reorder + multi-select (only the stuck-dim cleanup is), rich-text B/I/U,
 note COPY/PASTE, and LINK/ANCHOR on **real** sites — verify those in a loaded build (see §4).
 Scope + quirks: [`tests/e2e/README.md`](tests/e2e/README.md).
+
+> ⚠️ **The visual baselines and several geometry specs are calibrated to one machine (the Mac).** On
+> Windows at 100% scaling they fail on font antialiasing and rem rounding alone — `visual.spec.ts`
+> (~1–6% pixel diff), `nav-strip-frame`, `metal-bar`, `rename subject tab modal`. These are
+> environmental, not regressions; verify by stashing your changes and rebuilding clean before chasing
+> one. Only run `test:e2e:update` on the Mac. A few specs (`keep the case`, `delete confirm modal`,
+> `label padding`) are also flaky under parallel load and pass in isolation.
 
 `npm run lint` also emits **non-blocking** `max-lines` warnings for any file over the 300-LOC house
 cap (see [`AGENTS.md`](AGENTS.md) §9). These are informational — they do not fail the gate; a few

@@ -171,9 +171,9 @@ export const SubjectTabStrip = forwardRef<
         className="flex h-full w-10 shrink-0 flex-col"
         aria-label="Subject tabs"
       >
-        {/* The "+" fills one whole A–Z cell, not a square: the cell is taller than the column is wide,
-            so a square would leave see-through slivers above and below. */}
-        <div className="flex h-[var(--air-cell)] w-full shrink-0 items-center justify-center">
+        {/* Fills the cell so its own border is the only white; shrinking it to a square leaves slivers that
+            break that, whatever they are painted. Glyph is capped instead — see styles.css. */}
+        <div className="flex h-[var(--air-cell-snapped,var(--air-cell))] w-full shrink-0 items-center justify-center">
           <AddSubjectTabButton
             onClick={() => onAddDialogOpenChange(true)}
             disabled={isReadOnly}

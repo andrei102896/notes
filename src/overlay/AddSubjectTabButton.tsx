@@ -1,7 +1,6 @@
 import React from "react";
 
 import { Button } from "@/components/ui/button";
-import { IS_WINDOWS } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 
 type AddSubjectTabButtonProps = {
@@ -9,7 +8,7 @@ type AddSubjectTabButtonProps = {
   disabled?: boolean;
   /** Drives aria-expanded for the strip's dialog trigger. */
   addDialogOpen?: boolean;
-  /** Context sizing override (the first-run modal passes the Figma 41×39 box). */
+  /** Context sizing override (the first-run modal passes its own square box). */
   className?: string;
 };
 
@@ -37,11 +36,10 @@ export function AddSubjectTabButton({
       aria-haspopup="dialog"
       aria-expanded={addDialogOpen}
     >
-      {/* Vector, not a font glyph — the glyph renders off-centre on Windows. The -1 viewBox min-y cancels
-          a ~1px top-lean from Windows' SVG pixel-snapping; Mac already centres. */}
+      {/* Vector, not a font glyph — a font glyph rendered off-centre on Windows. */}
       <svg
         data-add-tab-glyph
-        viewBox={IS_WINDOWS ? "0 -1 24 24" : "0 0 24 24"}
+        viewBox="0 0 24 24"
         fill="currentColor"
         aria-hidden
       >

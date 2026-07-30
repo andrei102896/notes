@@ -185,6 +185,45 @@ If the client does want white rules flanking the field, they are a small additio
    crop — 181px of glyph in a 255px blue box — and the spec asserts the *ratio*, not a px gap, so it holds
    at any panel width. Their crop's blue box is square (255×249) while ours is 23.1×28.6, which is why only
    the width ratio can match and the vertical gap runs larger.
+   **Re-opened and re-closed 2026-07-30 (Windows):** the square was tried again and rejected again, this
+   time because the leftover cell space has to be painted *something* and every option breaks the white
+   frame — transparent shows the host page (the 2026-07-28 objection), white reads as extra padding on one
+   axis, grey reads as a grey frame. **Fills the cell — final.** The crushed-glyph symptom that prompted
+   the re-open was a separate bug (width-only sizing, trap 2b) and is fixed independently. The first-run
+   `+`, which has no cell to fill, IS square now.
+
+## Windows pass (2026-07-30) — READ BEFORE PULLING ON THE MAC
+
+The whole sprint above was built and calibrated on the Mac (Retina, dpr 2). This pass was the first time
+the app was run on Windows at **100% scaling (dpr 1)** in a **short/landscape** window, and it surfaced
+three real `+` button defects that were structurally invisible to the Mac and to the e2e suite.
+
+### ⚠️ Action required on the Mac
+
+**Regenerate the visual baselines** (`npm run test:e2e:update`, calibration machine only) and eyeball each
+PNG. `first-run.png` and `full-panel.png` genuinely changed — the first-run `+` was resized. They were NOT
+regenerated on Windows because the suite is Mac-calibrated (see `tests/e2e/README.md`).
+
+### What was fixed
+
+| Defect | Cause | Fix |
+|---|---|---|
+| `+` glyph clipped and off-centre | A Windows-only `viewBox="0 -1 24 24"` "recentring" hack. It never recentred anything — flexbox already centres the `<svg>` box — it slid the crop window down over a static path, blanking the top and **clipping the bottom tip of the vertical bar** (SVG clips to viewBox). | Deleted; both platforms use `0 0 24 24`. `src/lib/platform.ts` (`IS_WINDOWS`) was its only caller and is gone. |
+| `+` glyph crushed top and bottom | `[data-add-tab-glyph]` was `width: 71%` with **no height constraint**. The cell is `--air-cell` (`100vh/26`) tall against a fixed-width column, so on a short/landscape window it is WIDER than tall and 71%-of-width made the square glyph taller than its box. Measured 1.75px of blue top/bottom vs 3.25px at the sides at a 620px window. | Added `max-height: 71%`, so 71% applies to whichever axis is tighter. The svg's viewBox ratio keeps it square. |
+| First-run `+` lopsided | Sized `41×39` (Figma "Rectangle 28") — wider than tall around a square glyph, giving 5.5px of blue at the sides vs 4.5px above. Also threw off optical centring against the sentence. | Square (`size-[2.5625rem]`). Supersedes the Figma value; the spec assertion changed with it. |
+
+Also added: `--air-cell-snapped` (`lib/panelScaling.ts` → `content/overlayMetrics.ts`) rounds the `+` cell to
+whole **device** px so its white border rasterises evenly, and a `translateX(0.5px)` optical nudge on the
+strip glyph only. Both are marginal — see "Traps" 9–11 before touching them.
+
+### Windows-only test noise (do not chase these on the Mac)
+
+These fail on Windows and were verified pre-existing by stashing all changes and rebuilding clean:
+`nav-strip-frame` (3px vs 2.6px), `rename subject tab modal` (text selection returns `""`), `metal-bar`
+(5px vs 4.8px, 2px vs 1.6px) and all six `visual.spec.ts` baselines (~1–6% antialiasing diff). `keep the
+case`, `delete confirm modal` and `label padding` are **flaky under parallel load** — each passes in
+isolation. Windows dev setup: system Node was 14, too old for Vite 5 / ESLint 9; Node 20 was installed via
+nvm-windows to `C:\nvm4w\nodejs`.
 
 ## Deferred work
 
@@ -300,6 +339,10 @@ fault; it was the process. Do this instead.
    their **unrotated height**; the visible on-strip length is the **width**. The two must be equal or
    the visual extent drifts from the reserved space — hence square boxes sized in whole `--air-cell`
    multiples.
+2b. **Corollary (2026-07-30):** because the cell's height rides the viewport and its width does not, the
+   cell **flips aspect ratio** with the window — taller than wide on a tall window, wider than tall on a
+   short/landscape one. Anything sized off one axis alone (`width: 71%`) breaks on the other. Constrain
+   both axes, and test at a short window.
 3. **`scrollWidth` lies on tabs.** `TabsTrigger` has an invisible `after:` indicator at `-right-1`,
    which inflates `scrollWidth` by ~3px on every tab. A `scrollWidth > clientWidth` clipping check
    reports false positives; measure the label with canvas against the content box instead.
@@ -329,6 +372,35 @@ fault; it was the process. Do this instead.
    captured the band still translated, so the host page showed past the iframe edge as a grey stripe
    over the bar's right 13% — a pure artifact, while `elementFromPoint` reported accent blue there.
    Wait for the panel before screenshotting, and confirm suspicious artifacts against the DOM.
+
+### Added by the Windows pass (2026-07-30)
+
+11. **Layout geometry is not what the user sees — measure painted pixels.** `getBoundingClientRect` and
+   `getComputedStyle` reported the first-run `+` as perfectly even (`gap L/R/T/B = 3.638/3.650/3.638/3.650`)
+   while the rendered result was ~3.5px vertical vs ~4.1px horizontal. Fractional box sizes, border
+   rasterisation and antialiasing all move the visible edge. Screenshot at `deviceScaleFactor: 4`, decode
+   raw pixels, and walk runs of white/accent. The client's eye was right every time it disagreed with CSS.
+12. **Never clip a screenshot exactly to `boundingBox()`.** Playwright's clip is in CSS px and gets rounded,
+   so a fractional-width element loses its right/bottom edge — which produced "the border is 1px on the
+   right, 2.25px on the left" out of a box whose borders are provably uniform. Clip with padding and find
+   the element inside the image. This cost several rounds of chasing a measurement artifact as if it were
+   a bug.
+13. **Sweep dpr AND window size before committing a pixel fix.** Snapping the `+` cell to whole CSS px
+   improved dpr 1 (Δ 0.34 → 0.20 device px) and **regressed dpr 2** (Δ 0.04 → 0.40) — it had to be whole
+   *device* px (34.5 at dpr 2, not 35). Build a throwaway script that loops candidates × dpr × viewport and
+   prints a table; do not reason about sub-pixel rasterisation from first principles.
+14. **`aspect-square` cannot shrink a definite dimension.** `h-full aspect-square max-w-full` does nothing:
+   `h-full` makes the height definite, so aspect-ratio has nothing to solve for and the max-width clamp
+   never feeds back. Use an explicit `min()` on both axes.
+15. **`npm run dev` (CRXJS) leaves `dist/` as thin loaders** that stream code from the localhost dev server,
+   so what the browser shows depends on the page being re-injected — and survives the dev server being
+   killed. Two separate "your change did nothing" reports traced to a stale build showing a version that
+   had already been discarded. For a clean verification loop: stop the dev server, `npm run build`, Reload
+   in `chrome://extensions`, reload the page, and grep the bundle to prove the value shipped (CSS is
+   minified — `translateX(0.5px)` becomes `translate(.5px)`).
+16. **`AddSubjectTabButton` renders twice** — the subject-tab strip and the first-run modal, each sized by
+   its own caller. Identify which one a screenshot shows before measuring; a complaint that is accurate for
+   one is impossible for the other, which reads as the report contradicting itself.
 11. The ghost NN PNG (`src/assets/ghost-nn.png`, base64 in `ghostNnPng.ts`) has **max alpha 41/255** —
    it was not flattened with its Figma blend. It reads only because it sits over the square glow. A
    re-export with the blend baked in is a `cp` + regenerate away.
@@ -368,10 +440,12 @@ likely to come back:
 - The scrollbar gutter is `0.5rem` (8px at the reference), so it *scales* with the panel rather than
   being a hard 8px. The client asked for "double the margin"; if they want a rigid 8px at every panel
   size, swap the rem for px in `.nn-scrollbar`.
-- `+` glyph gaps are 3.36px at the sides vs 6.09px top/bottom — unavoidable in a non-square cell without
-  an uneven white border, which the client rejected. The A–Z cell is taller than wide (`--air-cell` =
-  `100vh/26` against a 2.5rem column) whereas the Figma crop's cell is wider than tall; that difference is
-  systemic and accepted, so no glyph size can match Figma on both axes at once.
+- `+` glyph gaps are uneven on the cell's long axis — unavoidable in a non-square cell without an uneven
+  white border, which the client rejected. The A–Z cell is taller than wide on a tall window and wider than
+  tall on a short one (`--air-cell` = `100vh/26` against a 2.5rem column); that difference is systemic and
+  accepted, so no glyph size can match Figma on both axes at once. **Updated 2026-07-30:** 71% is now a
+  `max-height` *cap* on both axes rather than a width-only fit, so the tight axis binds and the glyph is
+  never crushed — the failure mode on a short window. The client accepted the residual long-axis gap.
 - **The visual baselines have now missed three deliberate changes** (note dates, the modal-backdrop logo
   artwork, and this `+` resize) because `maxDiffPixelRatio: 0.001` is larger than a small element's pixel
   delta. Treat them as a coarse net only; anything that matters gets an explicit geometry/artwork assertion,

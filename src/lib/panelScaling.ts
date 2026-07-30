@@ -22,3 +22,14 @@ export function clampPanelWidth(viewportWidth: number): number {
 export function rootFontPxForPanelWidth(panelWidth: number): number {
   return (panelWidth / REFERENCE_PANEL_WIDTH_PX) * BASE_ROOT_FONT_PX;
 }
+
+const AIR_CELL_COUNT = 26;
+
+/** One A–Z cell on the device grid; the raw `100vh / 26` is fractional and rasterizes its bottom border
+ *  thicker than its top. Snap to DEVICE px — whole CSS px is 35 where dpr 2 needs 34.5, and regresses it. */
+export function airCellPxForPanelHeight(
+  panelHeight: number,
+  dpr: number,
+): number {
+  return snapToDevicePx(panelHeight / AIR_CELL_COUNT, dpr);
+}

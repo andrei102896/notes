@@ -210,10 +210,12 @@ export const DashboardContent = forwardRef<
                     <span className="text-accent">Create</span> a{" "}
                     <span className="text-accent">subject tab</span> by clicking
                   </p>
+                  {/* Square, superseding Figma "Rectangle 28" (41×39): only a square box sits the square
+                      glyph equidistant, and 41×39 also threw off centring against the sentence. */}
                   <AddSubjectTabButton
                     onClick={onRequestAddSubjectTab}
                     disabled={isReadOnly}
-                    className="h-[2.4375rem] w-[2.5625rem]"
+                    className="size-[2.5625rem]"
                   />
                 </div>
               ) : (

@@ -1,5 +1,6 @@
 import { OVERLAY_SHELL_ID } from "@/content/constants";
 import {
+  airCellPxForPanelHeight,
   clampPanelWidth,
   rootFontPxForPanelWidth,
   snapToDevicePx,
@@ -20,8 +21,10 @@ export function syncOverlayViewportMetrics(shell: HTMLElement): void {
   const panelWidth = snapToDevicePx(Math.min(clampedWidth, viewportWidth), dpr);
   const rootFontPx = rootFontPxForPanelWidth(panelWidth);
 
+  const panelHeight = snapToDevicePx(height, dpr);
+
   shell.style.top = `${snapToDevicePx(top, dpr)}px`;
-  shell.style.height = `${snapToDevicePx(height, dpr)}px`;
+  shell.style.height = `${panelHeight}px`;
   shell.style.width = `${panelWidth}px`;
 
   // Measured host scrollbar width: panel hugs the right edge, so the UI insets by this (+2px margin) to clear it; 0 for overlay scrollbars.
@@ -38,6 +41,10 @@ export function syncOverlayViewportMetrics(shell: HTMLElement): void {
     iframeDoc.documentElement.style.setProperty(
       "--nn-scrollbar-gutter",
       scrollbarGutter,
+    );
+    iframeDoc.documentElement.style.setProperty(
+      "--air-cell-snapped",
+      `${airCellPxForPanelHeight(panelHeight, dpr)}px`,
     );
   }
 }

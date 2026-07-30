@@ -86,8 +86,14 @@ body {
 }
 
 /* Subject tabs: dark metallic sheen (Figma #3F3F3F). Rotated 90°, so element "to right" reads as a vertical light-top→dark-bottom sheen. Active tab keeps its solid blue (!bg-accent). background-image (NOT the `background` shorthand) so the base bg-subject-tab color stays underneath — else activating drops the gradient to a transparent color for a frame and the tab flickers. */
-#nn-scroll-bookmarks-overlay-host [data-slot="tabs-trigger"]:not([data-state="active"]) {
-  background-image: linear-gradient(to right, #262626 0%, #383838 55%, #4d4d4d 100%);
+#nn-scroll-bookmarks-overlay-host
+  [data-slot="tabs-trigger"]:not([data-state="active"]) {
+  background-image: linear-gradient(
+    to right,
+    #262626 0%,
+    #383838 55%,
+    #4d4d4d 100%
+  );
 }
 
 /* "This Tab Notes" label: gray ribbon with a pointed right edge toward the Min control. */
@@ -149,12 +155,19 @@ input[data-subject-name-input] {
   font-size: 1.25rem;
 }
 
-/* ID-scoped to beat the button's forced svg size-6. 71% = the glyph:blue-box width ratio measured off the
-   client's Figma crop (181 of 255). Sized off WIDTH, not height: the glyph is square and its cell is not,
-   so the tight axis sets the size and the vertical gap necessarily comes out larger. */
+/* ID-scoped to beat the button's forced svg size-6. 71% = Figma crop (181 of 255); max-height applies it to
+   whichever axis is tighter, or a wider-than-tall cell crushes the glyph top and bottom. */
 #nn-scroll-bookmarks-overlay-host [data-add-tab-glyph] {
   width: 71%;
   height: auto;
+  max-height: 71%;
+}
+
+/* Strip "+" only: flex centring rounds its fractional remainder rightwards, so the glyph reads ~0.5px left. */
+#nn-scroll-bookmarks-overlay-host
+  [aria-label="Subject tabs"]
+  [data-add-tab-glyph] {
+  transform: translateX(0.5px);
 }
 
 #nn-scroll-bookmarks-overlay-host [data-note-body] :is(b, strong) {

@@ -148,7 +148,7 @@ test("empty-state modal box matches the confirm modal shell", async ({
   await page.screenshot({ path: testInfo.outputPath("empty-state.png") });
 });
 
-/** First-run modal (Figma "CREATE A SUBJECT TAB..."): same 467×189 shell, message + the 41×39 "+". */
+/** First-run modal (Figma "CREATE A SUBJECT TAB..."): same 467×189 shell, message + the square "+". */
 test("first-run modal shows the + inside the shared modal shell", async ({
   overlay,
   page,
@@ -172,8 +172,8 @@ test("first-run modal shows the + inside the shared modal shell", async ({
     throw new Error("first-run box or + not measurable");
   }
   expect(boxSize.width / boxSize.height).toBeCloseTo(467 / 189, 1);
-  // Figma "Rectangle 28" is 41×39 — wider than tall, unlike the strip's square cell.
-  expect(plusSize.width / plusSize.height).toBeCloseTo(41 / 39, 1);
+  // Square, superseding Figma "Rectangle 28" (41×39), which left 5.5px of blue at the sides vs 4.5px above.
+  expect(plusSize.width / plusSize.height).toBeCloseTo(1, 2);
 
   await overlay
     .locator('[aria-label="Dashboard content"]')
