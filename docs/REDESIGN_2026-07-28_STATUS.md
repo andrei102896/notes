@@ -1,7 +1,7 @@
 # Modal + dashboard redesign — status (2026-07-28)
 
-Section-by-section reskin driven by fresh client Figma exports. **Nothing is committed yet** — the
-whole changeset below is uncommitted working-tree state (user owns all git).
+Section-by-section reskin driven by fresh client Figma exports. Sections 1–28 are **committed**
+(2026-07-30, "New redesign"); anything after that is uncommitted working-tree state (user owns all git).
 
 **How this sprint works:** the user sends one section at a time as a *screenshot + Figma CSS*, the
 section is implemented, reviewed against a Playwright screenshot artifact, then the next section
@@ -49,6 +49,7 @@ positions, blend modes, span-level text colours and layer order — expect to me
 | 26 | Review-fix pass: version sync, NUL-byte source file, dead classes/params removed, plate numbers derived from one place | `package.json`, `hooks/useSubjectTabCellSpans.ts`, `overlay/BrandLockup.tsx` + specs |
 | 27 | NN ink back to the artwork's 52.5% width share — the horizontal counter-scale made it bulky | `overlay/BrandLockup.tsx`, `overlay/ModalBackdrop.tsx` |
 | 28 | Headed e2e window parked off-screen so runs stop covering the desktop | `tests/e2e/fixtures.ts` |
+| 29 | Nav strip `padding-bottom` 3px → **1px** so the white frame reads even on all four sides (the header's 2px `border-b` stacks under it) | `overlay/DashboardHeader.tsx`, `tests/e2e/nav-strip-frame.spec.ts` |
 
 ### Shared modal architecture (the reusable spine)
 
@@ -187,7 +188,7 @@ If the client does want white rules flanking the field, they are a small additio
 
 ## Deferred work
 
-- **Full suite: 59 passed, 0 failed (2026-07-28).** The five stale `visual.spec.ts` baselines were
+- **Full suite: 60 passed, 0 failed (2026-07-30).** The five stale `visual.spec.ts` baselines were
   regenerated and signed off after reviewing each new PNG — they had predated the whole sprint (the old
   `header.png` still showed the deleted "NOTES FOR NET / CHROME EXTENSION" wordmark).
 - **Known defect, deliberately not fixed: `page.clock.setFixedTime` never reaches the overlay.** The
@@ -342,6 +343,7 @@ fault; it was the process. Do this instead.
 | `tests/e2e/metal-bar.spec.ts` | Plate spans the full bar height (zero top/bottom gap, metal left/right, centred), flush to the panel's OUTER top, 3.1:1 box, 1–1.55× the ADD NOTE button, **NN ink covers 52.5% of the plate width / 49.4% of its height and is centred on both axes**, rim equal on 4 sides + gradient that never steps, no black seam between header rows, 4px accent bottom line, footer bar identical to the header |
 | `tests/e2e/scrollbar.spec.ts` | Notes list gets `.nn-scrollbar`, an 8px right gutter (pixel-verified, since `background-clip` is what makes the transparent border visible), and pill ends measured by row-width taper with the thumb parked mid-track |
 | `tests/e2e/panel-shadow.spec.ts` | The panel's left-edge shadow, scanned in host-page pixels: darkest at the edge, monotonic fade to ~85px, present at the top and bottom of the edge as well as mid-panel |
+| `tests/e2e/nav-strip-frame.spec.ts` | The nav strip's white frame: `padding-bottom` 1px + the header's 2px `border-b` = the 3px the other sides get from padding, then the painted proof — a 1px column through ADD NOTE must show the same run of white above and below it (the padding and the border merge into one band, so only pixels can tell 3px from 5px) |
 
 `tests/e2e/functional.spec.ts` and `brand.spec.ts` also changed: two brand tests were **deleted** (they
 hunted the removed wordmark) and the surviving font test was repointed twice — first off the deleted
@@ -352,12 +354,12 @@ default e2e state starts a fresh local trial and shows the red logo instead).
 
 Run a section's own spec after each change (`npx playwright test <spec>`); artifacts land in
 `test-results/<test>/*.png` and are the review currency with the user. **`npm run test:e2e` takes ~3
-minutes and is worth running before any handoff** — the suite is 59 tests / 19 specs and fully green.
+minutes and is worth running before any handoff** — the suite is 60 tests / 20 specs and fully green.
 
 ## Where polish left off (last updated 2026-07-29)
 
 Everything the client raised has been implemented and pixel-verified, and a full review pass has been
-applied on top (§ sections 22–26). Suite: **59 tests / 19 specs, all green.** Threads that are closed but
+applied on top (§ sections 22–26). Suite: **60 tests / 20 specs, all green.** Threads that are closed but
 likely to come back:
 
 - The plate's *inner* blue glow spreads ~8px horizontally vs ~5px vertically, because

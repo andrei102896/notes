@@ -68,7 +68,8 @@ export function DashboardHeader({
         rimClassName="border-[5px]"
       />
       {/* One white frame around the whole strip: bg-background is the 3px surround (padding, incl. the white separator line under the metal band) and dividers (gap); no button has its own border. relative: positions the nav-bar hilite. */}
-      <div className="relative flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px]">
+      {/* pb is 1px because the header's own 2px white border-b stacks under it — 1+2 reads as the same 3px frame. */}
+      <div className="relative flex h-[var(--air-cell)] items-stretch gap-[3px] bg-background p-[3px] pb-px">
         <Button
           variant="default"
           size="sm"
