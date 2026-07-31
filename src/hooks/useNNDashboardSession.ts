@@ -11,6 +11,7 @@ import { noteListLayoutKey, resolveNoteListLayout } from "@/lib/nnNoteLayout";
 import { DEFAULT_NN_SYNC, DEFAULT_PAGE_SESSION } from "@/lib/nnStorageDefaults";
 import { migrateNNSyncPayload } from "@/lib/nnStorageNormalize";
 import { getTabSession, patchTabSession } from "@/lib/tabSession";
+import { TAB_RESTORED_EVENT } from "@/messaging/contentPanelProtocol";
 import {
   ensureNNSyncInitialized,
   getNNSync,
@@ -70,33 +71,51 @@ export function useNNDashboardSession(): {
     DEFAULT_PAGE_SESSION(),
   );
 
-  // Mount-only: runs once per page load (hard nav remounts React, SPA URL changes don't) and restores the tab session's selected subject (docs/1).
-  useEffect(() => {
-    let cancelled = false;
-
-    void (async () => {
-      const [initialSync, tabSession] = await Promise.all([
+  /** Loads storage + the tab session's selected subject; `isCancelled` drops a resolve after unmount. */
+  const restoreFromStorage = useCallback(
+    async (isCancelled: () => boolean): Promise<void> => {
+      const [storedSync, tabSession] = await Promise.all([
         ensureNNSyncInitialized(),
         getTabSession(),
       ]);
-      if (cancelled) {
+      if (isCancelled()) {
         return;
       }
-      setSync(initialSync);
+      setSync(storedSync);
       const restored = tabSession?.activeSubjectTabId ?? null;
       const canRestore =
         restored !== null &&
-        initialSync.subjectTabs.some((tab) => tab.id === restored);
+        storedSync.subjectTabs.some((tab) => tab.id === restored);
 
       setPageSession({
         activeSubjectTabId: canRestore ? restored : null,
       });
-    })();
+    },
+    [],
+  );
 
+  // Mount-only: runs once per page load (hard nav remounts React, SPA URL changes don't) and restores the tab session's selected subject (docs/1).
+  useEffect(() => {
+    let cancelled = false;
+    void restoreFromStorage(() => cancelled);
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [restoreFromStorage]);
+
+  // Back/forward from the bfcache resumes this panel with the data it was frozen with: storage events that
+  // fired meanwhile were never delivered, so re-read rather than wait for the next change.
+  useEffect(() => {
+    let cancelled = false;
+    const handler = (): void => {
+      void restoreFromStorage(() => cancelled);
+    };
+    window.addEventListener(TAB_RESTORED_EVENT, handler);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(TAB_RESTORED_EVENT, handler);
+    };
+  }, [restoreFromStorage]);
 
   useEffect(() => {
     return subscribeNNSync((next) => {

@@ -17,6 +17,7 @@
     "build:e2e": "cross-env VITE_EXTPAY_EXTENSION_ID= vite build --outDir dist-e2e",
     "test:e2e": "npm run build:e2e && playwright test",
     "test:e2e:update": "npm run build:e2e && playwright test --update-snapshots",
+    "test:e2e:live": "npm run build:e2e && cross-env NN_LIVE=1 playwright test tests/e2e/session-persistence.live.spec.ts",
     "prepare": "husky"
   },
   "dependencies": {

@@ -1,6 +1,9 @@
 /** Versioned content-host ↔ overlay-panel messages; bump {@link CONTENT_PANEL_PROTOCOL_VERSION} on payload/semantics changes. */
 export const CONTENT_PANEL_PROTOCOL_VERSION = 1 as const;
 
+/** Host-window event: this page came back from the bfcache, so the panel must re-read storage it missed while frozen. */
+export const TAB_RESTORED_EVENT = "nn-tab-restored";
+
 export type ProtocolVersion = typeof CONTENT_PANEL_PROTOCOL_VERSION;
 
 /** Shared envelope for every message on this channel. */

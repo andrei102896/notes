@@ -43,7 +43,7 @@ were **regenerated on sign-off (2026-07-08)** and are current — refresh again 
 - Payment/trial code is **OFF-LIMITS** (§7) — never edit, not even to "clean up".
 - Read a file before editing it (several traps, §8).
 - After any TS edit run `npm run typecheck` + `npm run lint` (husky pre-commit enforces both; keep
-  them clean). An **e2e suite exists** (`npm run test:e2e`, §4, 61 tests / 20 specs) — run it for
+  them clean). An **e2e suite exists** (`npm run test:e2e`, §4, 68 tests / 21 specs) — run it for
   overlay-behavior changes. It now covers subject-tab create/persist/scroll, A–Z letter highlight,
   LINK, anchor navigation, note-body image paste, brand-mark + header-text centering, and
   note-action styling (against stubbed pages). Still NOT covered —
@@ -58,8 +58,8 @@ vite.config.ts       Vite + react + tailwind + crx; "@" → src.   package.json 
 .env.example         VITE_EXTPAY_EXTENSION_ID + VITE_TRIAL_MODE (both documented)
 
 src/background.ts    SW: ExtPay init/onPaid broadcast (§7); action click → TOGGLE_OVERLAY; owns per-tab session (chrome.storage.session, keyed tabId)
-src/content.ts       Content-script ENTRY on <all_urls> (slim ~70 LOC): console suppressions, registerContentPanelHost, startup sequence (orphan-shell cleanup → open-hint paint → restore → anchor scroll). Logic split into src/content/
-src/content/         Content-script modules (each owns its module-level state): overlayShell.ts (mount + show/hide/toggle/showOverlayWhenReady + uninstall teardown), overlayMetrics.ts (THE proportional sizing; uses lib/panelScaling), anchorScroll.ts (cross-nav scroll restore — retries until late/dynamic pages settle; session anchor key is URL-guarded so it can't fire on an unrelated page — + the open-gate promise), loadingVeil.ts (cross-origin cold-restore veil), runtimeMessages.ts (TOGGLE_OVERLAY / PAYMENT_COMPLETED listeners, side-effect import), consoleSuppressions.ts, openHint.ts, constants.ts
+src/content.ts       Content-script ENTRY on <all_urls> (slim ~100 LOC): console suppressions, registerContentPanelHost, startup sequence (orphan-shell cleanup → open-hint PRE-MOUNT off-screen, never a visible paint → authoritative session restore → bfcache re-sync → anchor scroll). Logic split into src/content/
+src/content/         Content-script modules (each owns its module-level state): overlayShell.ts (mount + show/hide/toggle/showOverlayWhenReady + uninstall teardown), overlayMetrics.ts (THE proportional sizing; uses lib/panelScaling), anchorScroll.ts (cross-nav scroll restore — retries until late/dynamic pages settle; session anchor key is URL-guarded so it can't fire on an unrelated page — + the open-gate promise), runtimeMessages.ts (TOGGLE_OVERLAY / PAYMENT_COMPLETED listeners, side-effect import), consoleSuppressions.ts, openHint.ts, constants.ts
 src/messaging/       contentPanelProtocol.ts + contentPanelBridge.ts — in-realm panel↔content API (NOT postMessage, §8)
 src/services/
   nnStorage.ts       Persistence read layer: ensureNNSyncInitialized / getNNSync (assembles the payload from shards) / subscribeNNSync. The rest of the family is imported DIRECTLY where used (no barrel re-export): pure helpers nnStorage{Defaults,Normalize,Builders} in src/lib/; side-effecting nnStorage{Shards,Migrations,SubjectTabs,Notes} in services/. Sharded chrome.storage.local (nnSyncMeta/nnNoteIndex/nnNote:<id>/nnLayout:<key>), migrations, CRUD
@@ -97,7 +97,7 @@ src/overlay/         React UI inside the panel iframe
 src/components/ui/   shadcn primitives, re-themed to h-10 / text-2xl scale (§6)
 dist/                Built output (loadable). Built from the configured `.env` (real ExtPay id + prod 7-day trial) → paywall active (§7)
 dist-e2e/            E2E build (`npm run build:e2e` — ExtPay compiled OUT); what the test suite loads. Gitignored
-tests/e2e/           Playwright suite (61 tests / 20 specs: functional, visual, navigation, anchor, anchor-persist, http-context, link, reorder, air, image-paste, brand, note-actions, metal-bar, modal-backdrop, panel-shadow, paywall, scrollbar, subject-tab-sizing, nav-strip-frame; baselines in __screenshots__/ ARE committed — calibrated to one machine, expect small font-render drift elsewhere). Two known limits of the visual baselines: `page.clock` never reaches the overlay iframe, so any snapshot with a note bakes in the day it was generated; and `maxDiffPixelRatio: 0.001` absorbs small-area changes — a logo-artwork swap in the top bar passed unnoticed, so geometry/artwork invariants get their own explicit assertions instead. Fixtures boot headed Chromium per test with the extension loaded — see tests/e2e/README.md
+tests/e2e/           Playwright suite (68 tests / 21 specs: functional, visual, navigation, anchor, anchor-persist, http-context, link, reorder, air, image-paste, brand, note-actions, metal-bar, modal-backdrop, panel-shadow, paywall, scrollbar, subject-tab-sizing, nav-strip-frame, session-persistence; baselines in __screenshots__/ ARE committed — calibrated to one machine, expect small font-render drift elsewhere). Two known limits of the visual baselines: `page.clock` never reaches the overlay iframe, so any snapshot with a note bakes in the day it was generated; and `maxDiffPixelRatio: 0.001` absorbs small-area changes — a logo-artwork swap in the top bar passed unnoticed, so geometry/artwork invariants get their own explicit assertions instead. Fixtures boot headed Chromium per test with the extension loaded — see tests/e2e/README.md
 playwright.config.ts Playwright config (1 worker, screenshot settings, snapshot path template)
 ```
 
@@ -125,7 +125,13 @@ NOT run off-machine — always `pack` (a production build) for another machine, 
 Gates: `npm run typecheck`, `npm run lint` (husky pre-commit runs both). E2E: `npm run test:e2e`
 (Playwright, **headed-only** — re-verified 2026-07-29 on PW 1.61.1: headless never starts the extension's
 service worker, so every spec times out. The window is parked at `--window-position=-2400,-2400` so runs
-no longer cover the desktop; rendering and screenshots are unaffected. Refresh visual baselines
+no longer cover the desktop; rendering and screenshots are unaffected. The fixture also un-sets
+Playwright's default `--disable-back-forward-cache`, because NN's restore path differs between a bfcache
+Back — which never re-runs the content script — and a rebuilt page; note a bfcache restore fires no
+`load` event, so `goBack`/`waitForURL` must use `waitUntil: "commit"`. **`npm run test:e2e:live`** runs
+`*.live.spec.ts` against the real ford.com/tesla.com — needs network, excluded from the default suite by
+`testIgnore` — because stub pages are always bfcache-eligible while real sites usually are NOT, which is
+the opposite restore path. Refresh visual baselines
 deliberately with `npm run test:e2e:update`, reviewing each PNG). Details + covered/uncovered scope:
 `tests/e2e/README.md`. Packaging for another machine: `npm run pack` → `nn-extension-<version>.zip`
 (production build, paywall ACTIVE — a fresh install starts the trial, so the header badge is RED and the
@@ -147,6 +153,17 @@ leaving a visible but empty, click-blocking shell. Eager mount keeps NN reliable
 at the cost of the ~400 kB content chunk on every page. All persistence is `chrome.storage.local`
 via `nnStorage.ts`. Panel height tracks `visualViewport`; width is viewport-proportional with a
 root-font knob (§6).
+
+**Min/max across navigation (client-driven, 2026-07-31).** The tab session is the ONLY authority for
+whether NN is on screen. The per-origin `sessionStorage` open-hint (`content/openHint.ts`) merely
+**pre-mounts** the panel parked off-screen (`premountOverlay`) so the authoritative async read has a
+painted panel to slide in; it must never paint the panel itself — it goes stale as soon as NN is toggled
+on another origin, and painting from it flashed a minimized panel back on. A **bfcache** Back never
+re-runs the content script, so a `pageshow`/`event.persisted` listener re-applies the session (~1 frame,
+the browser repaints the frozen DOM first) and fires `TAB_RESTORED_EVENT` so the panel re-reads storage.
+The cross-origin reveal is a 300ms **slide** once the panel has painted (two rAFs, capped by
+`PANEL_REVEAL_CAP_MS`); the old frosted veil is gone. Keeping the panel alive across a navigation is
+impossible — Chrome destroys the document, the content script and the iframe.
 
 ## 6. Responsive sizing — core shipped, gaps remain
 
@@ -208,6 +225,16 @@ trial (`nn_trial_started_at` in `chrome.storage.local`) deliberately resets on u
 
 ## 8. Known traps (still live)
 
+- **Never decide overlay visibility from the open-hint** (`content/openHint.ts`). `sessionStorage` is
+  per-origin: minimize on site B and site A's hint still reads "open", so painting from it flashes a
+  panel the user dismissed. It may only `premountOverlay()`. And do NOT gate that on
+  `performance.getEntriesByType("navigation")[0].type === "back_forward"` — that entry is still **empty**
+  when the content script runs, so the guard silently no-ops (it appeared to work on one site by timing
+  luck; measured on tesla.com, 2026-07-31). §5 has the whole restore model.
+- **A build is not your source.** After reverting/restoring a file, re-run `npm run build:e2e` before
+  re-running any spec — two "the fix doesn't work" investigations this sprint were stale bundles. And
+  never grep the bundle for an identifier to check a fix shipped: it is minified and renamed. Grep an
+  emitted CSS rule / string literal, or compare timestamps.
 - **IN-PROGRESS REDESIGN (2026-07-28).** A section-by-section modal + dashboard reskin is uncommitted
   in the working tree. **Read [docs/REDESIGN_2026-07-28_STATUS.md](docs/REDESIGN_2026-07-28_STATUS.md)
   before touching modals, the brand band, the subject-tab strip, the `+` button or `styles.css`** — it

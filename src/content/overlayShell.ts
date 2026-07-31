@@ -1,8 +1,11 @@
 import type { Root } from "react-dom/client";
 
 import { whenAnchorScrollDone } from "@/content/anchorScroll";
-import { EXTENSION_CONTEXT_POLL_MS, OVERLAY_SHELL_ID } from "@/content/constants";
-import { removeLoadingVeil, showLoadingVeil } from "@/content/loadingVeil";
+import {
+  EXTENSION_CONTEXT_POLL_MS,
+  OVERLAY_SHELL_ID,
+  PANEL_REVEAL_CAP_MS,
+} from "@/content/constants";
 import { writeOpenHint } from "@/content/openHint";
 import {
   attachOverlayViewportListeners,
@@ -37,7 +40,6 @@ function teardownOrphanedOverlay(): void {
     window.clearTimeout(hideOverlayTimer);
     hideOverlayTimer = null;
   }
-  removeLoadingVeil();
   try {
     overlayRoot?.unmount();
   } catch {
@@ -197,16 +199,50 @@ export function showOverlay({
   }
 }
 
+/**
+ * Mounts the panel parked off-screen (visible, so it really paints; still pointer-transparent) without
+ * deciding whether it should be shown. The open-hint that triggers this is per-origin, so it cannot know
+ * about a minimize that happened on another origin — only the tab session can, and that read is async.
+ * Pre-mounting means the authoritative read has a fully painted panel to slide in a few ms later.
+ */
+export function premountOverlay(): void {
+  ensureOverlayMounted().style.visibility = "visible";
+}
+
+/** Resolves once the panel has painted a frame, or at the cap — never leaves the reveal waiting on a slow page. */
+function whenPanelPainted(): Promise<void> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const settle = (): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve();
+    };
+    window.setTimeout(settle, PANEL_REVEAL_CAP_MS);
+    // Two frames: the first runs before React's commit paints, the second after it.
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(settle);
+    });
+  });
+}
+
 /** Wait for any in-progress anchor scroll to finish, then show overlay. */
 export function showOverlayWhenReady(): void {
   void whenAnchorScrollDone().then(() => {
     try {
-      // Cross-origin nav has no sync open-hint, so frost the async restore into one smooth reveal.
-      const isColdRestore = !overlayShellSlideOpen;
-      showOverlay({ animate: false });
-      if (isColdRestore) {
-        showLoadingVeil();
+      // Already on screen — nothing to animate.
+      if (overlayShellSlideOpen) {
+        showOverlay({ animate: false });
+        return;
       }
+      // Cold restore: let React paint while the shell is parked off-screen, then slide it in like a
+      // normal open instead of snapping it on and hiding the load-in behind a fade.
+      premountOverlay();
+      void whenPanelPainted().then(() => {
+        showOverlay({ animate: true });
+      });
     } catch {
       // One page's mount failure must not surface as an unhandled rejection.
     }
@@ -218,7 +254,6 @@ export function hideOverlay({
   animate = true,
   persist = true,
 }: { animate?: boolean; persist?: boolean } = {}): void {
-  removeLoadingVeil();
   const shell = document.getElementById(OVERLAY_SHELL_ID);
   if (!shell) {
     overlayShellSlideOpen = false;

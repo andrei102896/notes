@@ -8,7 +8,10 @@ Functional + visual-regression coverage for the NN overlay, driven through the r
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
-Specs (12): `functional`, `visual`, `navigation` (single-tab persistence + subject-tab
+Specs (21 — the redesign and the 2026-07-31 behaviour work added `paywall`, `modal-backdrop`,
+`subject-tab-sizing`, `metal-bar`, `scrollbar`, `panel-shadow`, `nav-strip-frame`,
+`session-persistence`, plus the opt-in `session-persistence.live`): `functional`, `visual`,
+`navigation` (single-tab persistence + subject-tab
 strip scroll restore after cross-site nav), `anchor` (cross-page fire + late-layout retry),
 `anchor-persist` (overlay stays visible after an anchor pick — the host shell, not just the
 iframe button), `http-context` (create tab + note on a plain-http non-secure page — the
@@ -22,13 +25,20 @@ divider closes the group after PASTE).
 ## Run
 
 ```bash
-npm run test:e2e          # build dist-e2e, run all 40 tests
+npm run test:e2e          # build dist-e2e, run the whole hermetic suite (68 tests)
 npm run test:e2e:update   # same, but refresh the visual baselines
+npm run test:e2e:live     # *.live.spec.ts against REAL sites (ford.com + bugatti.com; needs network)
 npx playwright test functional   # functional specs only (after a build:e2e)
 ```
 
+`*.live.spec.ts` is excluded from the default run (`testIgnore`, lifted by `NN_LIVE=1`): it depends on the
+internet and on sites that change. Run it for navigation/restore work, because stub pages are always
+bfcache-eligible while the real sites are not — opposite code paths.
+
 Each test boots a fresh Chromium profile with the extension loaded, so windows
-open/close per test — that is expected. `--load-extension` needs a real browser;
+open/close per test — that is expected. The profile keeps the browser's
+back/forward cache ON (Playwright disables it by default); a bfcache restore
+fires no `load` event, so navigation waits must use `waitUntil: "commit"`. `--load-extension` needs a real browser;
 this Chromium build does not bring the extension up headless (`PW_HEADLESS=1`
 exists to retry after Playwright upgrades).
 
@@ -63,10 +73,17 @@ and eyeball the PNGs before committing them.
   mousedown Radix Tabs selects on. Use `clickSubjectTab` / `dblclickSubjectTab`.
 - The notes list re-renders async after a tab switch; assert titles with the
   polling `expectTitles`, never a one-shot read.
+- **After a bfcache Back, Playwright's frame handle is stale** — any `frameLocator` on the
+  overlay iframe hangs even though the panel is there. Read it through
+  `page.evaluate` on `iframe.contentDocument` (same-origin); see `panelState` in
+  `session-persistence.spec.ts`.
+- A flash lasting a frame or two is over before a `page.evaluate` can start. Count it
+  from inside with an `addInitScript` rAF counter (`PAGE_PROBE` in the same spec).
 
 ## Not covered yet (candidates for next specs)
 
 Full drag & drop reordering + multi-select drag (only the stuck-dim cleanup is
 covered), rich-text B/I/U, COPY/PASTE actions, trial/paywall flows, and LINK/ANCHOR
 against **real** sites (the specs use route-stubbed pages — verify Audi/Bugatti by
-hand). Notes-list scroll-position restore is also unverified.
+hand; the min/max + slide-in restore IS covered on real sites by `session-persistence.live`).
+Notes-list scroll-position restore is also unverified.

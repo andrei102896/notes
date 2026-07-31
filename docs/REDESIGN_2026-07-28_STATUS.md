@@ -1,7 +1,9 @@
 # Modal + dashboard redesign — status (2026-07-28)
 
 Section-by-section reskin driven by fresh client Figma exports. Sections 1–28 are **committed**
-(2026-07-30, "New redesign"); anything after that is uncommitted working-tree state (user owns all git).
+(2026-07-30, "New redesign"); §29, §30 and the 2026-07-31 client-feedback work are **uncommitted**
+working-tree state — 15 paths, user owns all git. `nn-extension-1.0.3.zip` is packed from exactly that
+tree (verified by identical bundle hash), so it needs no re-pack before testing.
 
 **How this sprint works:** the user sends one section at a time as a *screenshot + Figma CSS*, the
 section is implemented, reviewed against a Playwright screenshot artifact, then the next section
@@ -258,7 +260,7 @@ nvm-windows to `C:\nvm4w\nodejs`.
 
 ## Deferred work
 
-- **Full suite: 61 passed, 0 failed (2026-07-31).** The five stale `visual.spec.ts` baselines were
+- **Full suite: 68 passed, 0 failed (2026-07-31).** The five stale `visual.spec.ts` baselines were
   regenerated and signed off after reviewing each new PNG — they had predated the whole sprint (the old
   `header.png` still showed the deleted "NOTES FOR NET / CHROME EXTENSION" wordmark).
 - **Known defect, deliberately not fixed: `page.clock.setFixedTime` never reaches the overlay.** The
@@ -472,6 +474,8 @@ fault; it was the process. Do this instead.
 | `tests/e2e/metal-bar.spec.ts` | Plate spans the full bar height (zero top/bottom gap, metal left/right, centred), flush to the panel's OUTER top, 3.1:1 box, 1–1.55× the ADD NOTE button, **NN ink covers 52.5% of the plate width / 49.4% of its height and is centred on both axes**, rim equal on 4 sides + gradient that never steps, no black seam between header rows, 4px accent bottom line, footer bar identical to the header |
 | `tests/e2e/scrollbar.spec.ts` | Notes list gets `.nn-scrollbar`, an 8px right gutter (pixel-verified, since `background-clip` is what makes the transparent border visible), and pill ends measured by row-width taper with the thumb parked mid-track |
 | `tests/e2e/panel-shadow.spec.ts` | The panel's left-edge shadow, scanned in host-page pixels: darkest at the edge, monotonic fade to ~85px, present at the top and bottom of the edge as well as mid-panel |
+| `tests/e2e/session-persistence.spec.ts` | 7 tests for the 2026-07-31 behaviour work: the client's exact Back sequence (bfcache path, stale panel measured in painted frames), the same on a bfcache-ineligible page (`unload` handler; zero frames painted, which is what the pre-mount buys), the inverse (maximized survives Back), a forward navigation to a third site, the slide (frame-by-frame travel, no veil element), the reveal cap on a page whose subresource hangs, and notes being current after Back |
+| `tests/e2e/session-persistence.live.spec.ts` | The same Back/slide scenarios against **real** sites (`npm run test:e2e:live`, network required, excluded by default). Sites are two constants at the top of the file; ford.com + bugatti.com as committed |
 | `tests/e2e/nav-strip-frame.spec.ts` | The nav strip's white frame: `padding-bottom` 1px + the header's 2px `border-b` = the 3px the other sides get from padding, then the painted proof — a 1px column through ADD NOTE must show the same run of white above and below it (the padding and the border merge into one band, so only pixels can tell 3px from 5px) |
 
 `tests/e2e/functional.spec.ts` and `brand.spec.ts` also changed: two brand tests were **deleted** (they
@@ -483,12 +487,40 @@ default e2e state starts a fresh local trial and shows the red logo instead).
 
 Run a section's own spec after each change (`npx playwright test <spec>`); artifacts land in
 `test-results/<test>/*.png` and are the review currency with the user. **`npm run test:e2e` takes ~3
-minutes and is worth running before any handoff** — the suite is 61 tests / 20 specs and fully green.
+minutes and is worth running before any handoff** — the suite is 68 tests / 21 specs and fully green.
+
+## Client feedback 2026-07-31 — behaviour, not design (SHIPPED, uncommitted)
+
+Two items from Brian, both about navigation rather than looks. Full model in `AGENTS.md` §5; the
+"why it cannot be more than this" answer lives there too.
+
+1. **Min/max was not persistent.** Minimize NN on page B, hit Back → page A came back with NN maximized.
+   Two independent causes: a **bfcache** Back never re-runs the content script (the frozen DOM, panel
+   included, is repainted as-is), and the **open-hint is per-origin**, so page A's hint still said "open".
+   Fixed by a `pageshow`/`persisted` re-sync plus demoting the hint to a *pre-mount only* signal
+   (`premountOverlay`). A `navigation.type === "back_forward"` guard was tried first and is **wrong** —
+   that timing entry is empty when the content script runs (see the traps section).
+2. **The fade-back was inelegant.** The frosted veil (`loadingVeil.ts`, 1s hold + 300ms fade) is deleted;
+   the cross-origin restore now slides in over 300ms once the panel has painted, capped by
+   `PANEL_REVEAL_CAP_MS` (700ms) so a slow site cannot strand it.
+
+Also added: `TAB_RESTORED_EVENT` → `useNNDashboardSession` re-reads storage on restore. **Measured to be
+belt-and-braces**: Chrome queues the extension's `storage.onChanged` while the page is frozen and flushes
+it on unfreeze, so notes are current after Back either way. Kept deliberately (explicit guarantee), but the
+test covering it passes with or without — do not read it as a regression test for that code.
+
+Two suspected races were investigated with timestamp traces and proved **unreachable**, and the guard
+written for them was deleted: nothing is on screen while a reveal is pending (so a hide cannot be undone),
+and the anchor gate resolves in ~800ms, before any toolbar message can arrive (≥1s).
+
+Verified on real sites, not just stubs (`npm run test:e2e:live`): ford.com, tesla.com, bugatti.com and
+framed-shot.com are all **bfcache-ineligible**, so the real-world path is the rebuilt-page one; NN returns
+in ~300–670ms end to end, nearly all of it the page's own load.
 
 ## Where polish left off (last updated 2026-07-29)
 
 Everything the client raised has been implemented and pixel-verified, and a full review pass has been
-applied on top (§ sections 22–26). Suite: **61 tests / 20 specs, all green.** Threads that are closed but
+applied on top (§ sections 22–26). Suite: **68 tests / 21 specs, all green.** Threads that are closed but
 likely to come back:
 
 - The plate's *inner* blue glow spreads ~8px horizontally vs ~5px vertically, because

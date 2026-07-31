@@ -1,9 +1,7 @@
 export const OVERLAY_SHELL_ID = "nn-scroll-bookmarks-overlay-shell";
 
-export const LOADING_VEIL_ID = "nn-overlay-loading-veil";
-/** Cold-restore blur window: ~1s hold + fade. No page loads faster, so it always covers the load-in. */
-export const LOADING_VEIL_HOLD_MS = 1000;
-export const LOADING_VEIL_FADE_MS = 300;
+/** Cold restore waits for the panel's first painted frame before sliding in; this bounds that wait so a slow or throttled page can never strand it off-screen. */
+export const PANEL_REVEAL_CAP_MS = 700;
 
 /** Sync paint-hint mirror of the open flag (per-origin sessionStorage); the background session stays authoritative. */
 export const OPEN_HINT_SESSION_KEY = "__nn_open";

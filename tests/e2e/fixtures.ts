@@ -36,6 +36,9 @@ export const test = base.extend<ExtensionFixtures>({
   context: async ({}, use) => {
     const userDataDir = mkdtempSync(join(tmpdir(), "nn-e2e-"));
     const context = await chromium.launchPersistentContext(userDataDir, {
+      // Playwright disables the back/forward cache by default; real Chrome has it on, and NN's restore
+      // behaviour differs between the two paths (a bfcache Back never re-runs the content script).
+      ignoreDefaultArgs: ["--disable-back-forward-cache"],
       // Headed: this Chromium build doesn't bring the extension up headless (verified — every spec fails). PW_HEADLESS=1 to retry after Playwright upgrades.
       headless: process.env.PW_HEADLESS === "1",
       viewport: { width: 1400, height: 900 },
