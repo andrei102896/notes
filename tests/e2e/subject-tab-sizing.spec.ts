@@ -174,11 +174,7 @@ test("the + button fills its cell with an even border and an uncrushed glyph", a
     expect(Math.abs(b - borders[0])).toBeLessThan(0.1);
   }
   expect(geom.glyphSquare).toBeLessThan(0.5);
-  // Left gap runs 1px wider by design: the glyph carries a +0.5px optical nudge (styles.css).
-  expect(
-    geom.gapLeft - geom.gapRight,
-    "+ glyph nudged 0.5px right",
-  ).toBeCloseTo(1, 1);
+  expect(Math.abs(geom.gapLeft - geom.gapRight)).toBeLessThan(0.5);
   expect(Math.abs(geom.gapTop - geom.gapBottom)).toBeLessThan(0.5);
   // Ratios, not px, so they hold at any panel size. 0.71 = Figma crop (181 of 255); a cap on both axes
   // rather than an exact fit, since the cell is not square. Asserting height guards the crush regression.

@@ -163,13 +163,6 @@ input[data-subject-name-input] {
   max-height: 71%;
 }
 
-/* Strip "+" only: flex centring rounds its fractional remainder rightwards, so the glyph reads ~0.5px left. */
-#nn-scroll-bookmarks-overlay-host
-  [aria-label="Subject tabs"]
-  [data-add-tab-glyph] {
-  transform: translateX(0.5px);
-}
-
 #nn-scroll-bookmarks-overlay-host [data-note-body] :is(b, strong) {
   font-weight: 700;
 }

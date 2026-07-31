@@ -115,7 +115,8 @@ review each new PNG before accepting it — that command *is* the design sign-of
 
 | Source | Says | App today | Where |
 |---|---|---|---|
-| `css.txt` ~3179 | "+" button glyph = Fjalla 55.77 font glyph | Inline SVG vector plus (symmetric 24×24 viewBox, height `0.58×--air-cell`; Windows gets a −1 viewBox y-nudge) | `src/overlay/AddSubjectTabButton.tsx`, `src/overlay/styles.css` |
+| `css.txt` ~3179 | "+" button glyph = Fjalla 55.77 font glyph | Inline SVG vector plus, symmetric `0 0 24 24` viewBox on every platform, sized `71%` of whichever axis of its box is tighter | `src/overlay/AddSubjectTabButton.tsx`, `src/overlay/styles.css` |
+| Figma "Rectangle 28" 41×39 | first-run "+" is wider than tall | Square (`size-[2.5625rem]`) — 41×39 around a square glyph left 5.5px of blue at the sides vs 4.5px above | `src/overlay/DashboardContent.tsx` |
 | `docs/1_NN_DASHBOARD` | First-run message is a single sentence | Figma two-line + accent "OR" layout shipped (Figma wins) | `src/overlay/DashboardContent.tsx` |
 | `docs/3_NN_NOTES` | Notes have a "price" field | No code exists for it (never built) | — |
 | `docs/2` (implied smooth tab cueing) | — | Tab-strip scroll-snap deliberately DROPPED (client-approved: Chrome scroll-snap freezes the mouse wheel); plain native scrolling | `src/overlay/SubjectTabStrip.tsx` |

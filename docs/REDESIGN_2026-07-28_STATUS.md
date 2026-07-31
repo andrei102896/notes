@@ -198,7 +198,7 @@ The whole sprint above was built and calibrated on the Mac (Retina, dpr 2). This
 the app was run on Windows at **100% scaling (dpr 1)** in a **short/landscape** window, and it surfaced
 three real `+` button defects that were structurally invisible to the Mac and to the e2e suite.
 
-### ⚠️ Action required on the Mac
+### ⚠️ Action required on the Mac — DONE 2026-07-31, see "Mac verification pass" below
 
 **Regenerate the visual baselines** (`npm run test:e2e:update`, calibration machine only) and eyeball each
 PNG. `first-run.png` and `full-panel.png` genuinely changed — the first-run `+` was resized. They were NOT
@@ -213,8 +213,38 @@ regenerated on Windows because the suite is Mac-calibrated (see `tests/e2e/READM
 | First-run `+` lopsided | Sized `41×39` (Figma "Rectangle 28") — wider than tall around a square glyph, giving 5.5px of blue at the sides vs 4.5px above. Also threw off optical centring against the sentence. | Square (`size-[2.5625rem]`). Supersedes the Figma value; the spec assertion changed with it. |
 
 Also added: `--air-cell-snapped` (`lib/panelScaling.ts` → `content/overlayMetrics.ts`) rounds the `+` cell to
-whole **device** px so its white border rasterises evenly, and a `translateX(0.5px)` optical nudge on the
-strip glyph only. Both are marginal — see "Traps" 9–11 before touching them.
+whole **device** px so its white border rasterises evenly. A `translateX(0.5px)` optical nudge on the strip
+glyph was added here too and **reverted on the Mac** — see below.
+
+### Mac verification pass (2026-07-31)
+
+Pulled on the calibration machine, baselines regenerated, every fix re-measured in painted pixels at dpr 2
+across 760×700 / 760×620 / 1000×700 / 1280×800 / 1400×900.
+
+| Windows fix | Holds at dpr 2? |
+|---|---|
+| `viewBox` back to `0 0 24 24` | Yes, no change — the painted `<path>` ink fills the `<svg>` box exactly on both axes (33×33 device px in a 16.44 css-px square at 1400×900). The Mac never had the clip. |
+| `max-height: 71%` | Yes. At 760×620 the height axis is the binding one (glyph 72% of the content height vs 57% of its width) and the blue above/below is 5 device px — the crush the cap exists for cannot happen. On a tall window the width still binds, unchanged. |
+| First-run `+` square | Yes. 28.69 css square, glyph 34×34 device px, blue gap **7 device px on all four sides** (`B20 W6 B7 W34 B7 W6 B18` on both axes at 1400×900), centre exactly level with the sentence (0.00px). |
+| `--air-cell-snapped` | **Kept.** Neutral-to-positive at dpr 2: identical painted interior everywhere, and it removes a 1-device-px glyph-gap asymmetry at 760×620 (5/5 snapped vs 5/6 raw). Cheap, no regression. |
+| `translateX(0.5px)` | **Reverted.** Measured at dpr 2 it *creates* the bias it was meant to remove. |
+
+The nudge, blue gap left/right of the glyph in device px:
+
+| Viewport | with nudge | without |
+|---|---|---|
+| 760×700 | 8 / 6 | **7 / 7** |
+| 760×620 | 10 / 9 | 9 / 10 |
+| 1000×700 | 8 / 6 | **7 / 7** |
+| 1280×800 | 7 / 6 | 6 / 7 |
+| 1400×900 | 8 / 6 | **7 / 7** |
+
+Without it the glyph is exactly centred at three of five viewports and off by one device px at the other
+two; with it, it is never centred and is two device px right at three of them. A single constant cannot be
+right at both dpr: the remainder flex centring has to round is set by the box width, which rides the panel
+width continuously — so a value tuned by eye at one dpr and one window size is wrong everywhere else. The
+residual ±1 device px is that remainder and no constant removes it.
+`subject-tab-sizing.spec.ts` went back to asserting `|gapLeft - gapRight| < 0.5`.
 
 ### Windows-only test noise (do not chase these on the Mac)
 
@@ -270,9 +300,9 @@ Everything the reskin orphaned, verified unreferenced before removal:
 
 The file that held them was **renamed `NnModalFrame.tsx` → `NnModalShell.tsx`** (it keeps only
 `NnModalShell` + `ModalWatermark`), and its 4 importers repointed. `NnLogoPlate` and
-`ModalMetalHeaderBar` are now module-private (single in-file caller each). `IS_WINDOWS` is no longer
-imported by `BrandLockup` — the Windows padding nudge died with the lockup; `AddSubjectTabButton` still
-uses it for the `+` viewBox.
+`ModalMetalHeaderBar` are now module-private (single in-file caller each). `IS_WINDOWS` and
+`src/lib/platform.ts` are gone entirely (2026-07-30): the lockup's Windows padding nudge died with the
+lockup, and the `+` viewBox hack it also gated was a bug, not a tweak.
 
 ## How to run the next redesign (this one cost far too many rounds)
 
@@ -397,13 +427,28 @@ fault; it was the process. Do this instead.
    killed. Two separate "your change did nothing" reports traced to a stale build showing a version that
    had already been discarded. For a clean verification loop: stop the dev server, `npm run build`, Reload
    in `chrome://extensions`, reload the page, and grep the bundle to prove the value shipped (CSS is
-   minified — `translateX(0.5px)` becomes `translate(.5px)`).
+   minified — `max-height: 71%` becomes `max-height:71%`, and lengths lose their leading zero).
 16. **`AddSubjectTabButton` renders twice** — the subject-tab strip and the first-run modal, each sized by
    its own caller. Identify which one a screenshot shows before measuring; a complaint that is accurate for
    one is impossible for the other, which reads as the report contradicting itself.
-11. The ghost NN PNG (`src/assets/ghost-nn.png`, base64 in `ghostNnPng.ts`) has **max alpha 41/255** —
+17. The ghost NN PNG (`src/assets/ghost-nn.png`, base64 in `ghostNnPng.ts`) has **max alpha 41/255** —
    it was not flattened with its Figma blend. It reads only because it sits over the square glow. A
    re-export with the blend baked in is a `cp` + regenerate away.
+
+### Added by the Mac verification pass (2026-07-31)
+
+18. **A constant sub-pixel "optical nudge" is a machine-specific hack — measure it at both dpr before
+   keeping it.** `translateX(0.5px)` recentred the strip `+` on Windows at dpr 1 and pushed it two device px
+   right on the Mac at dpr 2. The offset it corrects is the remainder flex centring rounds, and that
+   remainder is set by the box width, which rides the panel width continuously — no single constant is right
+   across dpr and window size. Prefer living with the ±1 device px.
+19. **`--air-cell-snapped` is an inline property on the iframe root**, set by `syncOverlayViewportMetrics`.
+   A stylesheet rule cannot override it for an experiment; `documentElement.style.removeProperty` can, and
+   the next resize puts it back.
+20. **`page.screenshot({ clip })` silently clamps a negative origin and drops rows unevenly.** The strip `+`
+   sits at `y = 0`, so `y: box.y - PAD` goes negative and the returned image is neither the requested height
+   nor a predictable crop — which reads as "the element is all white". Clamp the origin to 0 and add the
+   difference back to the size (this is trap 12's sibling, at the other edge).
 
 ## New tests
 
@@ -450,7 +495,9 @@ likely to come back:
   artwork, and this `+` resize) because `maxDiffPixelRatio: 0.001` is larger than a small element's pixel
   delta. Treat them as a coarse net only; anything that matters gets an explicit geometry/artwork assertion,
   and regenerate them after every intended visual change or the committed reference silently stops
-  depicting the app.
+  depicting the app. **`test:e2e:update` is not enough to correct that** — `-u` defaults to `changed`, so a
+  baseline whose delta is under the threshold is left untouched however many times it is rerun. The
+  first-run `+` resize needed `npx playwright test visual.spec.ts --update-snapshots=all` to land.
 - **Dead CSS: `.nn-metal-bar`** (`styles.css`, ~7 lines). The reskin moved the bar to Tailwind utilities in
   `BrandMetalHeaderBar` / `ModalMetalBar`; nothing carries the class any more (only the unrelated
   `data-nn-metal-bar` attribute, which tests use). Left in place because deleting CSS was outside the
