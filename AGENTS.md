@@ -43,7 +43,7 @@ were **regenerated on sign-off (2026-07-08)** and are current — refresh again 
 - Payment/trial code is **OFF-LIMITS** (§7) — never edit, not even to "clean up".
 - Read a file before editing it (several traps, §8).
 - After any TS edit run `npm run typecheck` + `npm run lint` (husky pre-commit enforces both; keep
-  them clean). An **e2e suite exists** (`npm run test:e2e`, §4, 60 tests / 20 specs) — run it for
+  them clean). An **e2e suite exists** (`npm run test:e2e`, §4, 61 tests / 20 specs) — run it for
   overlay-behavior changes. It now covers subject-tab create/persist/scroll, A–Z letter highlight,
   LINK, anchor navigation, note-body image paste, brand-mark + header-text centering, and
   note-action styling (against stubbed pages). Still NOT covered —
@@ -97,7 +97,7 @@ src/overlay/         React UI inside the panel iframe
 src/components/ui/   shadcn primitives, re-themed to h-10 / text-2xl scale (§6)
 dist/                Built output (loadable). Built from the configured `.env` (real ExtPay id + prod 7-day trial) → paywall active (§7)
 dist-e2e/            E2E build (`npm run build:e2e` — ExtPay compiled OUT); what the test suite loads. Gitignored
-tests/e2e/           Playwright suite (60 tests / 20 specs: functional, visual, navigation, anchor, anchor-persist, http-context, link, reorder, air, image-paste, brand, note-actions, metal-bar, modal-backdrop, panel-shadow, paywall, scrollbar, subject-tab-sizing, nav-strip-frame; baselines in __screenshots__/ ARE committed — calibrated to one machine, expect small font-render drift elsewhere). Two known limits of the visual baselines: `page.clock` never reaches the overlay iframe, so any snapshot with a note bakes in the day it was generated; and `maxDiffPixelRatio: 0.001` absorbs small-area changes — a logo-artwork swap in the top bar passed unnoticed, so geometry/artwork invariants get their own explicit assertions instead. Fixtures boot headed Chromium per test with the extension loaded — see tests/e2e/README.md
+tests/e2e/           Playwright suite (61 tests / 20 specs: functional, visual, navigation, anchor, anchor-persist, http-context, link, reorder, air, image-paste, brand, note-actions, metal-bar, modal-backdrop, panel-shadow, paywall, scrollbar, subject-tab-sizing, nav-strip-frame; baselines in __screenshots__/ ARE committed — calibrated to one machine, expect small font-render drift elsewhere). Two known limits of the visual baselines: `page.clock` never reaches the overlay iframe, so any snapshot with a note bakes in the day it was generated; and `maxDiffPixelRatio: 0.001` absorbs small-area changes — a logo-artwork swap in the top bar passed unnoticed, so geometry/artwork invariants get their own explicit assertions instead. Fixtures boot headed Chromium per test with the extension loaded — see tests/e2e/README.md
 playwright.config.ts Playwright config (1 worker, screenshot settings, snapshot path template)
 ```
 

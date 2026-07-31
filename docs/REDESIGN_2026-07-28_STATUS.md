@@ -50,6 +50,7 @@ positions, blend modes, span-level text colours and layer order — expect to me
 | 27 | NN ink back to the artwork's 52.5% width share — the horizontal counter-scale made it bulky | `overlay/BrandLockup.tsx`, `overlay/ModalBackdrop.tsx` |
 | 28 | Headed e2e window parked off-screen so runs stop covering the desktop | `tests/e2e/fixtures.ts` |
 | 29 | Nav strip `padding-bottom` 3px → **1px** so the white frame reads even on all four sides (the header's 2px `border-b` stacks under it) | `overlay/DashboardHeader.tsx`, `tests/e2e/nav-strip-frame.spec.ts` |
+| 30 | Final subject tab closed by an outer 1px shadow (a border paints *inside* the box, 1.5px above the A–Z line), and the strip shifted by `--air-cell-drift` so every tab edge sits exactly on an A–Z line | `overlay/SubjectTabStrip.tsx`, `overlay/styles.css`, `tests/e2e/subject-tab-sizing.spec.ts` |
 
 ### Shared modal architecture (the reusable spine)
 
@@ -257,7 +258,7 @@ nvm-windows to `C:\nvm4w\nodejs`.
 
 ## Deferred work
 
-- **Full suite: 60 passed, 0 failed (2026-07-30).** The five stale `visual.spec.ts` baselines were
+- **Full suite: 61 passed, 0 failed (2026-07-31).** The five stale `visual.spec.ts` baselines were
   regenerated and signed off after reviewing each new PNG — they had predated the whole sprint (the old
   `header.png` still showed the deleted "NOTES FOR NET / CHROME EXTENSION" wordmark).
 - **Known defect, deliberately not fixed: `page.clock.setFixedTime` never reaches the overlay.** The
@@ -376,59 +377,70 @@ fault; it was the process. Do this instead.
 3. **`scrollWidth` lies on tabs.** `TabsTrigger` has an invisible `after:` indicator at `-right-1`,
    which inflates `scrollWidth` by ~3px on every tab. A `scrollWidth > clientWidth` clipping check
    reports false positives; measure the label with canvas against the content box instead.
-4. **Element screenshots, not page screenshots,** for artifacts — a full-page shot can catch the
+4. **A tab's bounding box is not where the tab is painted.** The trigger is square and rotated about
+   its top-left, so `boundingBox()` returns that same square: only its *vertical* extent is the tab's,
+   while half its width hangs outside the strip, which clips it. Scanning pixels at
+   `box.x + box.width / 2` samples the notes list and can pass for the wrong reason — take x from the
+   strip, y from the tab.
+5. **A border cannot close a tab.** Borders paint *inside* the box, and every A–Z grid line paints
+   *below* its boundary (it is the next cell's `border-t`), so a closing `border-r` lands 1.5px above
+   the line it must match — the client reads that as "the tab is a few pixels short". Use an outer
+   `box-shadow`, which paints past the edge like the neighbouring cell's border would. Related: the
+   `+` cell is device-snapped while the A–Z column is not, which put the whole strip ~0.12px off the
+   grid; `--air-cell-drift` (styles.css) adds that back below the `+`.
+6. **Element screenshots, not page screenshots,** for artifacts — a full-page shot can catch the
    overlay mid slide-in (or after slide-out) and come out shifted or blank.
-5. **Assert what you claim.** A "does hiding it change one pixel" check passed on a ghost logo that
+7. **Assert what you claim.** A "does hiding it change one pixel" check passed on a ghost logo that
    was humanly invisible. The test now measures the *fraction* of pixels that visibly change (>5%).
-6. **The e2e fixture freezes the page clock** at `FIXED_NOW` (2026-07-02). Seed the trial from the
+8. **The e2e fixture freezes the page clock** at `FIXED_NOW` (2026-07-02). Seed the trial from the
    service worker's real clock, or an "active" trial reads as long expired.
-7. **Custom properties defined on `#host` do NOT reach portaled dialogs.** `--air-cell` lived on
+9. **Custom properties defined on `#host` do NOT reach portaled dialogs.** `--air-cell` lived on
    `#nn-scroll-bookmarks-overlay-host`; every modal portals into the iframe `body`, outside it. Setting
    the purchase bar to `h-[var(--air-cell)]` there produced a **57px** bar instead of 34.6, because the
    `height` resolved to `auto` and the layout degenerated silently — no error, no warning. `--air-cell`
    now lives on `:root` (`styles.css`). Anything a modal may need must be declared at the root.
-8. **Measure text in the document that owns the element.** `useSubjectTabCellSpans` built its canvas
+10. **Measure text in the document that owns the element.** `useSubjectTabCellSpans` built its canvas
    with the content-script realm's `document`, which has no Fjalla One — every label was measured with
    fallback metrics (~35% too wide), so a 9-character tab claimed 4–5 A–Z cells instead of 3. Use
    `container.ownerDocument.createElement("canvas")`. `document.fonts.check()` on the iframe's font set
    said "loaded" while the canvas silently used the fallback, so the guard hid the bug rather than
    catching it. (Also: `check()` returns true for any family list containing a generic like `sans-serif`
    — check the first family alone.)
-9. **A caller's `items-center` shrinks a bar to its content.** `SubjectTabNameModal` passes
+11. **A caller's `items-center` shrinks a bar to its content.** `SubjectTabNameModal` passes
    `items-center` to `NnModalBox`; the metal bar (a flex-column child) collapsed to the plate's 87px
    instead of the box's 336px, which is what the client saw as "no metal left and right of the logo in
    the modals". The bar carries `w-full` so no caller can do that again.
-10. **Element screenshots still need the slide-in to finish.** A header-band artifact taken immediately
+12. **Element screenshots still need the slide-in to finish.** A header-band artifact taken immediately
    captured the band still translated, so the host page showed past the iframe edge as a grey stripe
    over the bar's right 13% — a pure artifact, while `elementFromPoint` reported accent blue there.
    Wait for the panel before screenshotting, and confirm suspicious artifacts against the DOM.
 
 ### Added by the Windows pass (2026-07-30)
 
-11. **Layout geometry is not what the user sees — measure painted pixels.** `getBoundingClientRect` and
+13. **Layout geometry is not what the user sees — measure painted pixels.** `getBoundingClientRect` and
    `getComputedStyle` reported the first-run `+` as perfectly even (`gap L/R/T/B = 3.638/3.650/3.638/3.650`)
    while the rendered result was ~3.5px vertical vs ~4.1px horizontal. Fractional box sizes, border
    rasterisation and antialiasing all move the visible edge. Screenshot at `deviceScaleFactor: 4`, decode
    raw pixels, and walk runs of white/accent. The client's eye was right every time it disagreed with CSS.
-12. **Never clip a screenshot exactly to `boundingBox()`.** Playwright's clip is in CSS px and gets rounded,
+14. **Never clip a screenshot exactly to `boundingBox()`.** Playwright's clip is in CSS px and gets rounded,
    so a fractional-width element loses its right/bottom edge — which produced "the border is 1px on the
    right, 2.25px on the left" out of a box whose borders are provably uniform. Clip with padding and find
    the element inside the image. This cost several rounds of chasing a measurement artifact as if it were
    a bug.
-13. **Sweep dpr AND window size before committing a pixel fix.** Snapping the `+` cell to whole CSS px
+15. **Sweep dpr AND window size before committing a pixel fix.** Snapping the `+` cell to whole CSS px
    improved dpr 1 (Δ 0.34 → 0.20 device px) and **regressed dpr 2** (Δ 0.04 → 0.40) — it had to be whole
    *device* px (34.5 at dpr 2, not 35). Build a throwaway script that loops candidates × dpr × viewport and
    prints a table; do not reason about sub-pixel rasterisation from first principles.
-14. **`aspect-square` cannot shrink a definite dimension.** `h-full aspect-square max-w-full` does nothing:
+16. **`aspect-square` cannot shrink a definite dimension.** `h-full aspect-square max-w-full` does nothing:
    `h-full` makes the height definite, so aspect-ratio has nothing to solve for and the max-width clamp
    never feeds back. Use an explicit `min()` on both axes.
-15. **`npm run dev` (CRXJS) leaves `dist/` as thin loaders** that stream code from the localhost dev server,
+17. **`npm run dev` (CRXJS) leaves `dist/` as thin loaders** that stream code from the localhost dev server,
    so what the browser shows depends on the page being re-injected — and survives the dev server being
    killed. Two separate "your change did nothing" reports traced to a stale build showing a version that
    had already been discarded. For a clean verification loop: stop the dev server, `npm run build`, Reload
    in `chrome://extensions`, reload the page, and grep the bundle to prove the value shipped (CSS is
    minified — `max-height: 71%` becomes `max-height:71%`, and lengths lose their leading zero).
-16. **`AddSubjectTabButton` renders twice** — the subject-tab strip and the first-run modal, each sized by
+18. **`AddSubjectTabButton` renders twice** — the subject-tab strip and the first-run modal, each sized by
    its own caller. Identify which one a screenshot shows before measuring; a complaint that is accurate for
    one is impossible for the other, which reads as the report contradicting itself.
 17. The ghost NN PNG (`src/assets/ghost-nn.png`, base64 in `ghostNnPng.ts`) has **max alpha 41/255** —
@@ -437,15 +449,15 @@ fault; it was the process. Do this instead.
 
 ### Added by the Mac verification pass (2026-07-31)
 
-18. **A constant sub-pixel "optical nudge" is a machine-specific hack — measure it at both dpr before
+19. **A constant sub-pixel "optical nudge" is a machine-specific hack — measure it at both dpr before
    keeping it.** `translateX(0.5px)` recentred the strip `+` on Windows at dpr 1 and pushed it two device px
    right on the Mac at dpr 2. The offset it corrects is the remainder flex centring rounds, and that
    remainder is set by the box width, which rides the panel width continuously — no single constant is right
    across dpr and window size. Prefer living with the ±1 device px.
-19. **`--air-cell-snapped` is an inline property on the iframe root**, set by `syncOverlayViewportMetrics`.
+20. **`--air-cell-snapped` is an inline property on the iframe root**, set by `syncOverlayViewportMetrics`.
    A stylesheet rule cannot override it for an experiment; `documentElement.style.removeProperty` can, and
    the next resize puts it back.
-20. **`page.screenshot({ clip })` silently clamps a negative origin and drops rows unevenly.** The strip `+`
+21. **`page.screenshot({ clip })` silently clamps a negative origin and drops rows unevenly.** The strip `+`
    sits at `y = 0`, so `y: box.y - PAD` goes negative and the returned image is neither the requested height
    nor a predictable crop — which reads as "the element is all white". Clamp the origin to 0 and add the
    difference back to the size (this is trap 12's sibling, at the other edge).
@@ -456,7 +468,7 @@ fault; it was the process. Do this instead.
 |------|--------|
 | `tests/e2e/paywall.spec.ts` | Purchase modal fills the panel, its plate AND its rendered NN ink both equal the dashboard's (all measured in the same DOM, so the rule cannot silently drift), plate flush to the outer top, trial + BUY boxes carry the Figma outline/bg/inset and the 184.34×30 box, trial box centred, ghost NN visibly present (canvas pixel-diff ratio, logged), Escape + BUY dismiss |
 | `tests/e2e/modal-backdrop.spec.ts` | Dashboard backdrop behind rename; **its bar carries the same plate artwork as the modal box's bar** (viewBox + stroke compared — the visual baselines cannot see this, the plate is small enough to stay under `maxDiffPixelRatio`); delete confirm holds 467×189; empty-state shell; first-run `+`; name modal fixed field + 25-char cap; rename modal label/prefill/selection + Figma sizes as root-font shares |
-| `tests/e2e/subject-tab-sizing.spec.ts` | Length follows the character count with no floor (box ≥ label+padding, < that + one cell; strictly grows with the label), spans whole cells, 1-character padding, 25-char name not clipped, case preserved, `+` fills its cell with zero margin + even border + centred glyph |
+| `tests/e2e/subject-tab-sizing.spec.ts` | Length follows the character count with no floor (box ≥ label+padding, < that + one cell; strictly grows with the label), spans whole cells, 1-character padding, 25-char name not clipped, case preserved, **every tab edge (4 tabs, 4 different spans) is a 1px white line on the same device row as the A–Z line beside it** — scanned in both columns at the same y, which is the only way to catch a line that is present but 1.5px high, `+` fills its cell with zero margin + even border + centred glyph |
 | `tests/e2e/metal-bar.spec.ts` | Plate spans the full bar height (zero top/bottom gap, metal left/right, centred), flush to the panel's OUTER top, 3.1:1 box, 1–1.55× the ADD NOTE button, **NN ink covers 52.5% of the plate width / 49.4% of its height and is centred on both axes**, rim equal on 4 sides + gradient that never steps, no black seam between header rows, 4px accent bottom line, footer bar identical to the header |
 | `tests/e2e/scrollbar.spec.ts` | Notes list gets `.nn-scrollbar`, an 8px right gutter (pixel-verified, since `background-clip` is what makes the transparent border visible), and pill ends measured by row-width taper with the thumb parked mid-track |
 | `tests/e2e/panel-shadow.spec.ts` | The panel's left-edge shadow, scanned in host-page pixels: darkest at the edge, monotonic fade to ~85px, present at the top and bottom of the edge as well as mid-panel |
@@ -471,12 +483,12 @@ default e2e state starts a fresh local trial and shows the red logo instead).
 
 Run a section's own spec after each change (`npx playwright test <spec>`); artifacts land in
 `test-results/<test>/*.png` and are the review currency with the user. **`npm run test:e2e` takes ~3
-minutes and is worth running before any handoff** — the suite is 60 tests / 20 specs and fully green.
+minutes and is worth running before any handoff** — the suite is 61 tests / 20 specs and fully green.
 
 ## Where polish left off (last updated 2026-07-29)
 
 Everything the client raised has been implemented and pixel-verified, and a full review pass has been
-applied on top (§ sections 22–26). Suite: **60 tests / 20 specs, all green.** Threads that are closed but
+applied on top (§ sections 22–26). Suite: **61 tests / 20 specs, all green.** Threads that are closed but
 likely to come back:
 
 - The plate's *inner* blue glow spreads ~8px horizontally vs ~5px vertically, because

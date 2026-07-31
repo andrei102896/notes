@@ -187,7 +187,9 @@ export const SubjectTabStrip = forwardRef<
         <Tabs
           value={activeSubjectTabId ?? ""}
           orientation="vertical"
-          className="flex min-h-0 min-w-10 flex-1 flex-col overflow-hidden"
+          /* The "+" cell above is device-snapped, the A–Z column is not: adding the difference back puts
+             every tab edge on an A–Z line instead of ~0.12px above it. */
+          className="mt-[var(--air-cell-drift)] flex min-h-0 min-w-10 flex-1 flex-col overflow-hidden"
           onValueChange={(next) => {
             if (next) {
               onSelectTab(next);
@@ -241,7 +243,10 @@ export const SubjectTabStrip = forwardRef<
                     width: `calc(var(--air-cell) * ${cellSpans[tab.name] ?? SUBJECT_TAB_DEFAULT_SPAN})`,
                     height: `calc(var(--air-cell) * ${cellSpans[tab.name] ?? SUBJECT_TAB_DEFAULT_SPAN})`,
                   }}
-                  className="shrink-0 justify-start leading-tight px-[1ch] pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left"
+                  /* Junction lines are painted by the tab below, so the last tab would end open. An
+                     OUTER shadow (+x = the visual bottom under the rotation), not a border: a border
+                     paints inside the box and lands 1.5px above the A–Z grid line it must match. */
+                  className="shrink-0 justify-start leading-tight px-[1ch] pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left last:shadow-[1px_0_0_0_#ffffff]"
                 >
                   {/* Case as typed: the client requires upper and lower case names (A–Z index matching and sorting are case-insensitive). */}
                   {tab.name}

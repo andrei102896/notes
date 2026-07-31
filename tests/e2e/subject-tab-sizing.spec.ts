@@ -320,6 +320,102 @@ test("label padding is one character at each end", async ({
   expect(Math.abs(padding / 2 - oneCharWidth)).toBeLessThan(1.5);
 });
 
+/** Junction lines are painted by the tab BELOW, so the last tab has nothing to close it — and every tab
+ *  edge, junctions included, has to land on the A–Z line beside it. A border cannot close the last tab:
+ *  it paints inside the box, 1.5px above the grid line, which reads as "the tab is a few pixels short". */
+test("every subject tab edge is a white line on the A–Z grid", async ({
+  overlay,
+  page,
+}, testInfo) => {
+  // Different spans, so the edges land on different cell lines and any per-tab drift accumulates.
+  for (const name of ["Zi", "Closing", "asdadadasdasda", "Mid"]) {
+    await createSubjectTab(overlay, name);
+  }
+  await page.waitForTimeout(400);
+
+  const strip = await overlay
+    .locator('[aria-label="Subject tabs"]')
+    .boundingBox();
+  const cell = await overlay.locator("[data-air-cell]").first().boundingBox();
+  if (!strip || !cell) {
+    throw new Error("subject tabs not measurable");
+  }
+
+  const REACH = 6;
+  // Same rows, both columns: the tab edge and the A–Z line it must sit on.
+  const firstWhiteRow = async (x: number, top: number) => {
+    const shot = await page.screenshot({
+      clip: { x, y: top, width: 1, height: REACH * 2 },
+    });
+    return page.evaluate(async (dataUrl) => {
+      const img = await new Promise<HTMLImageElement>((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = dataUrl;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const px = ctx.getImageData(0, 0, 1, canvas.height).data;
+      let first = -1;
+      let run = 0;
+      for (let y = 0; y < canvas.height; y += 1) {
+        const isWhite =
+          px[y * 4] > 246 && px[y * 4 + 1] > 246 && px[y * 4 + 2] > 246;
+        if (isWhite) {
+          run += 1;
+          if (first < 0) first = y;
+        } else if (first >= 0) {
+          break;
+        }
+      }
+      return { first, run, devicePx: canvas.height };
+    }, `data:image/png;base64,${shot.toString("base64")}`);
+  };
+
+  const triggers = overlay.locator('[data-slot="tabs-trigger"]');
+  const count = await triggers.count();
+  expect(count, "all four tabs rendered").toBe(4);
+
+  for (let i = 0; i < count; i += 1) {
+    const tab = triggers.nth(i);
+    // The trigger is square and rotated about its top-left, so its bounding box is the same square
+    // either way: only the vertical extent is the tab's, and half its width hangs outside the clipped
+    // strip. Take x from the strip, y from the tab.
+    const box = await tab.boundingBox();
+    const label = (await tab.textContent())?.trim();
+    if (!box) {
+      throw new Error(`tab ${label} not measurable`);
+    }
+    const top = box.y + box.height - REACH;
+    const tabLine = await firstWhiteRow(strip.x + strip.width / 2, top);
+    const gridLine = await firstWhiteRow(cell.x + cell.width / 2, top);
+    const perCssPx = tabLine.devicePx / (REACH * 2);
+    const isLast = i === count - 1;
+    console.log(
+      `"${label}"${isLast ? " (last)" : ""}: edge line ${(tabLine.run / perCssPx).toFixed(1)}px at device row ${tabLine.first}, A–Z line at ${gridLine.first}`,
+    );
+
+    expect(tabLine.run, `"${label}" has a white edge line`).toBeGreaterThan(0);
+    expect(
+      tabLine.run / perCssPx,
+      `"${label}" edge line is 1px, not a band`,
+    ).toBeLessThan(2.5);
+    // The whole point: it must not sit above the A–Z line, which is what a border does.
+    expect(
+      Math.abs(tabLine.first - gridLine.first),
+      `"${label}" edge shares the A–Z line's device row`,
+    ).toBeLessThanOrEqual(1);
+  }
+
+  await overlay
+    .locator('[aria-label="Subject tabs"]')
+    .screenshot({ path: testInfo.outputPath("tab-edges.png") });
+});
+
 /** A 25-char name (the input cap) must render whole, not clipped by the tab box. */
 test("a full-length subject tab name is not clipped", async ({
   overlay,

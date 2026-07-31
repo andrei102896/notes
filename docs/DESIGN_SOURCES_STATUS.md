@@ -107,7 +107,7 @@ gradients instead):
   see-through gap for a frame when the tab activated).
 
 **Tests:** [OUTDATED counts — see `REDESIGN_2026-07-28_STATUS.md`.] The baselines were regenerated and
-reviewed again on **2026-07-28** sign-off; the suite is now **60 tests / 20 specs**, all green. Refresh
+reviewed again on **2026-07-28** sign-off; the suite is now **61 tests / 20 specs**, all green. Refresh
 with `npm run test:e2e:update` (calibration machine only) after any further intended design change, and
 review each new PNG before accepting it — that command *is* the design sign-off.
 

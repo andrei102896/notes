@@ -111,6 +111,9 @@ body {
    body, where a #host-scoped --air-cell is undefined and heights silently degenerate to auto. */
 :root {
   --air-cell: calc(100vh / 26);
+  /* The "+" cell is device-snapped while the A–Z column is not, so the tab strip starts off the grid by
+     this much. Added back below the "+" to put every tab edge back on an A–Z line. */
+  --air-cell-drift: calc(var(--air-cell) - var(--air-cell-snapped, var(--air-cell)));
 }
 
 #nn-scroll-bookmarks-overlay-host {
