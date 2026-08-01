@@ -104,6 +104,9 @@ test("the + glyph sits symmetrically on both axes at every panel width", async (
     '[aria-label="Subject tabs"] [aria-label="Add subject tab"]',
   );
   const dpr = await page.evaluate(() => window.devicePixelRatio);
+  // On a host whose OS scaling is not 100%, Chrome multiplies it by the fixture's deviceScaleFactor — so this
+  // is 2 on the Mac but 2.5 on a Windows box at 125%, and the run is measuring a frame that never ships.
+  console.log(`devicePixelRatio in the overlay: ${dpr}`);
   const PAD = 10;
   const offCentre: string[] = [];
 

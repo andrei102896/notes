@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Button } from "@/components/ui/button";
+import { useSymmetricAddGlyph } from "@/hooks/useSymmetricAddGlyph";
 import { cn } from "@/lib/utils";
 
 type AddSubjectTabButtonProps = {
@@ -19,6 +20,8 @@ export function AddSubjectTabButton({
   addDialogOpen,
   className,
 }: AddSubjectTabButtonProps): React.ReactElement {
+  const glyphRef = useSymmetricAddGlyph();
+
   return (
     <Button
       variant="icon"
@@ -38,6 +41,7 @@ export function AddSubjectTabButton({
     >
       {/* Vector, not a font glyph — a font glyph rendered off-centre on Windows. */}
       <svg
+        ref={glyphRef}
         data-add-tab-glyph
         viewBox="0 0 24 24"
         fill="currentColor"
