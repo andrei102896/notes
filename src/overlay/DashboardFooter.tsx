@@ -1,9 +1,6 @@
 import React from "react";
 
-import {
-  BrandMetalHeaderBar,
-  NN_PLATE_CLASS,
-} from "@/overlay/BrandLockup";
+import { BrandMetalHeaderBar, NN_PLATE_CLASS } from "@/overlay/BrandLockup";
 
 /** Bottom metal bar (Figma BTTM METAL BAR DB) — deliberately identical to the header band: same bar,
  *  same plate, same 5px rim. */

@@ -17,7 +17,9 @@ async function sampleShell(page: import("@playwright/test").Page, ms: number) {
     }> = [];
     const steps = Math.floor(total / 100);
     for (let i = 0; i < steps; i += 1) {
-      const shell = document.getElementById("nn-scroll-bookmarks-overlay-shell");
+      const shell = document.getElementById(
+        "nn-scroll-bookmarks-overlay-shell",
+      );
       const cs = shell ? getComputedStyle(shell) : null;
       samples.push({
         t: i * 100,
@@ -78,7 +80,9 @@ test("anchor pick whose click lands on a link", async ({ context, page }) => {
 
   const { toggleOverlay } = await import("./fixtures");
   await toggleOverlay(context, page);
-  const overlay = page.frameLocator("#nn-scroll-bookmarks-overlay-shell iframe");
+  const overlay = page.frameLocator(
+    "#nn-scroll-bookmarks-overlay-shell iframe",
+  );
   await overlay
     .locator("#nn-scroll-bookmarks-overlay-host")
     .waitFor({ state: "attached", timeout: 10_000 });
@@ -99,7 +103,12 @@ test("anchor pick whose click lands on a link", async ({ context, page }) => {
 
   // Did the click leak into a navigation?
   const navigated = timeline.some((s) => s.url.includes("/target"));
-  console.log("NAVIGATED:", navigated, "FINAL:", JSON.stringify(timeline.at(-1)));
+  console.log(
+    "NAVIGATED:",
+    navigated,
+    "FINAL:",
+    JSON.stringify(timeline.at(-1)),
+  );
 
   // Whatever happened, the overlay must end up visible (persistent).
   const shell = page.locator("#nn-scroll-bookmarks-overlay-shell");

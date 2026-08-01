@@ -55,7 +55,7 @@ Everything is stored locally via `chrome.storage.local`; nothing is sent to a se
 - **`npm run dev`** — the live workflow (CRXJS hot-reload): load `dist/` unpacked once and
   edits auto-reload the extension and open tabs.
 - **`npm run build`** — static production build into `dist/`.
-- **`npm run pack`** — builds and zips `dist/` to `nn-extension-dist.zip` (gitignored) for
+- **`npm run pack`** — builds and zips `dist/` to `nn-extension-<version>.zip` (gitignored) for
   loading on **another machine** (e.g. Windows). The `npm run dev` `dist/` is tied to the
   localhost dev server and won't run off-machine, so always `pack` for that; after loading,
   refresh the test tab so the content script attaches.

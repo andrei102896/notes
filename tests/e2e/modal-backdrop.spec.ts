@@ -6,7 +6,6 @@ import {
   dblclickSubjectTab,
 } from "./helpers";
 
-
 /** The dashboard modal BG behind every small modal (Figma DASHBOARD MODAL BG): full-panel, logo-only header, no tagline. */
 test("dashboard modal backdrop fills the panel behind the rename modal", async ({
   overlay,
@@ -56,7 +55,9 @@ test("dashboard modal backdrop fills the panel behind the rename modal", async (
         modalBox: read(plates.find((p) => p.closest("[data-nn-modal-box]"))!),
       };
     });
-  console.log(`backdrop plate ${artwork.topBar} vs modal box ${artwork.modalBox}`);
+  console.log(
+    `backdrop plate ${artwork.topBar} vs modal box ${artwork.modalBox}`,
+  );
   expect(artwork.topBar, "backdrop bar carries the dashboard plate").toBe(
     artwork.modalBox,
   );
@@ -69,7 +70,9 @@ test("dashboard modal backdrop fills the panel behind the rename modal", async (
   await expect(overlay.getByRole("button", { name: "Buy now" })).toHaveCount(0);
 
   // Inspection artifact for design review.
-  await page.screenshot({ path: testInfo.outputPath("dashboard-backdrop.png") });
+  await page.screenshot({
+    path: testInfo.outputPath("dashboard-backdrop.png"),
+  });
 
   // The rename modal still works on top of the backdrop.
   const input = overlay.locator("input[data-subject-name-input]");
@@ -137,7 +140,9 @@ test("empty-state modal box matches the confirm modal shell", async ({
 
   const box = overlay.locator("[data-nn-modal-box]");
   await expect(box).toBeVisible();
-  await expect(overlay.getByText(/to view, edit or add notes to/i)).toBeVisible();
+  await expect(
+    overlay.getByText(/to view, edit or add notes to/i),
+  ).toBeVisible();
 
   const boxSize = await box.boundingBox();
   if (!boxSize) {
@@ -162,9 +167,11 @@ test("first-run modal shows the + inside the shared modal shell", async ({
   ).toBeVisible();
 
   const plus = overlay.locator(
-    '[aria-label="Dashboard content"] [aria-label="Add subject tab"]',
+    '[data-nn-modal-box] [aria-label="Add subject tab"]',
   );
   await expect(plus).toBeVisible();
+  // Client 2026-07-31: first run is the full-panel NN backdrop, not the grey dashboard behind a box.
+  await expect(overlay.locator("[data-modal-ghost]")).toBeVisible();
 
   const boxSize = await box.boundingBox();
   const plusSize = await plus.boundingBox();
@@ -176,7 +183,7 @@ test("first-run modal shows the + inside the shared modal shell", async ({
   expect(plusSize.width / plusSize.height).toBeCloseTo(1, 2);
 
   await overlay
-    .locator('[aria-label="Dashboard content"]')
+    .locator("#nn-scroll-bookmarks-overlay-host")
     .screenshot({ path: testInfo.outputPath("first-run-modal.png") });
 });
 
@@ -187,13 +194,13 @@ test("subject tab name modal matches the fixed-field spec", async ({
   page,
 }, testInfo) => {
   await overlay
-    .locator('[aria-label="Subject tabs"] button[aria-haspopup="dialog"]')
+    .locator('[data-nn-modal-box] [aria-label="Add subject tab"]')
     .click();
   const dialog = overlay.locator('[data-slot="dialog-content"]');
   await expect(dialog).toBeVisible();
   await page.waitForTimeout(400);
 
-  const box = overlay.locator("[data-nn-modal-box]");
+  const box = dialog.locator("[data-nn-modal-box]");
   const input = overlay.locator("input[data-subject-name-input]");
   await expect(box).toBeVisible();
   await expect(input).toBeVisible();
@@ -256,7 +263,10 @@ test("rename subject tab modal matches the rename spec", async ({
   // Pre-filled name opens selected so typing replaces it.
   const selection = await input.evaluate((el) => {
     const field = el as HTMLInputElement;
-    return field.value.slice(field.selectionStart ?? 0, field.selectionEnd ?? 0);
+    return field.value.slice(
+      field.selectionStart ?? 0,
+      field.selectionEnd ?? 0,
+    );
   });
   expect(selection).toBe("ASTRO");
 
@@ -272,7 +282,9 @@ test("rename subject tab modal matches the rename spec", async ({
       boxRatio: rect.width / rect.height,
       fieldWidthShare: field.width / rect.width,
       fieldHeightRem: field.height / rootPx,
-      labelRem: parseFloat(getComputedStyle(el.querySelector("label")!).fontSize) / rootPx,
+      labelRem:
+        parseFloat(getComputedStyle(el.querySelector("label")!).fontSize) /
+        rootPx,
       okRem: parseFloat(getComputedStyle(ok).fontSize) / rootPx,
     };
   });

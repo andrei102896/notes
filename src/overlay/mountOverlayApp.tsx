@@ -2,6 +2,7 @@ import React from "react";
 
 import { createRoot, type Root } from "react-dom/client";
 
+import familjenGroteskUrl from "@/assets/fonts/FamiljenGrotesk-Regular.ttf";
 import fjallaRegularUrl from "@/assets/fonts/FjallaOne-Regular.ttf";
 import interBoldUrl from "@/assets/fonts/Inter_18pt-Bold.ttf";
 import interSemiBoldUrl from "@/assets/fonts/Inter_18pt-SemiBold.ttf";
@@ -25,6 +26,8 @@ function buildFontFaceCss(): string {
     face("Inter", "normal", "600", interSemiBoldUrl),
     face("Inter", "normal", "700", interBoldUrl),
     face("Inter", "italic", "400 700", interItalicUrl),
+    // Purchase-modal statement only (client's Figma: Familjen Grotesk Regular 17/21). SIL OFL 1.1.
+    face("Familjen Grotesk", "normal", "400", familjenGroteskUrl),
   ].join("");
 }
 

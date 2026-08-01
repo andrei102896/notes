@@ -1,6 +1,6 @@
 # Design sources — sync status
 
-**Last audited: 2026-07-07.** The files in `docs/` + root `css.txt` + `NN_DASHBOARD.png` are
+**Last audited: 2026-08-01.** The files in `docs/` + root `css.txt` + `NN_DASHBOARD.png` are
 **client-provided snapshots** (Figma export + behavior notes). They are NOT updated when the app
 changes — before basing any decision on them, check this table and, when in doubt, the code.
 
@@ -9,10 +9,11 @@ changes — before basing any decision on them, check this table and, when in do
 older Figma export (`css.txt` / `NN_DASHBOARD.png`) → `docs/*.txt` notes. Where sources disagree,
 the newer one wins.
 
-## [OUTDATED for the redesigned areas] — 2026-07-28
+## [OUTDATED for the redesigned areas] — 2026-07-28, extended 2026-08-01
 
 An in-progress section-by-section reskin supersedes the sources below **for modals, the brand band,
-the nav-bar bottom edge, subject-tab sizing, the `+` button, the panel border and the scrollbar**.
+the nav-bar bottom edge, subject-tab sizing, the `+` button, the panel border, the scrollbar, the
+first-run screen, the note body and the purchase modal**.
 Those newer specs arrived as chat-pasted Figma CSS + screenshots and are summarised in
 **`docs/REDESIGN_2026-07-28_STATUS.md`** — read it before trusting `desired-look.*` or `css.txt` on
 any of those areas. Notably now stale in the older snapshots:
@@ -38,10 +39,27 @@ any of those areas. Notably now stale in the older snapshots:
 - The panel now casts a **lateral shadow** down its left edge onto the host page (client "SHADOW UNDER AI
   BOXES"); it lives on the host-page shell, not in the iframe. No older snapshot shows it.
 - The paid-state header logo opens `https://www.notesfornet.com/updates` (client 2026-07-29).
+- **Client feedback round, 2026-07-31 → 2026-08-01** — every older snapshot is stale on these:
+  - **Note body**: still #D9D9D9 with #464646 text — the NN watermark is now accent blue and BLURRED
+    ("note logo BG" / "NN blue blurred").
+  - **First run**: was a box on the grey dashboard; now the full-panel NN backdrop with the box on it, and
+    the nav row, A–Z rail and strip are covered. Clicking its `+` swaps the box, backdrop untouched.
+  - **Purchase modal**: gained the client's STATEMENT box (665×219, `rgba(41,171,226,0.1)`, 0.3px accent
+    hairline, Familjen Grotesk 17/21) and its background squares now spread across the panel instead of
+    smearing down the middle.
+  - **Metal bar**: the flanking HEADER BOXes now read as their own layer (they paint over the hilite, with
+    a deep-blue hairline), and the hilite is 36% of the bar height, not 40%.
+  - **Nav-bar bottom edge**: accent line + a 3px WHITE BAR + the blurred dark band beneath, with the notes
+    list's top padding deepened so the two shadows merge before the first note.
+  - **Subject tabs**: no longer quantised to A–Z cells — the label plus one blank character, nothing more.
+  - **Buttons/labels**: modal CANCEL/OK and the collapsed note's title are centred on their GLYPHS
+    (`text-box` trim), not on the line box.
+  - **Fonts**: Familjen Grotesk 400 is bundled (SIL OFL 1.1) for the statement box only.
 - `docs/2_NN_SUBJECT TAB ATTRIBUTES AND BEHAVIOR.txt`: "character limit of nine [8]" → **25 chars
-  incl. spaces**; "boxes will be one size equivalent to [3] alphabetical index boxes" → **dynamic,
-  quantised to whole A–Z cells, no minimum span** (the 3-cell floor was dropped 2026-07-28 — length is
-  the character count + one blank char each end); subject-tab point size 24 still correct.
+  incl. spaces**; "boxes will be one size equivalent to [3] alphabetical index boxes" → **the label plus
+  one blank character each end, and nothing else** — the 3-cell floor went 2026-07-28 and the round-up to
+  whole A–Z cells went 2026-07-31 (client: "do not try to line it up with alpha index boxes"), so tab
+  edges no longer meet the A–Z rows; subject-tab point size 24 still correct.
 - `docs/4_NN_AI  ATTRIBUTES AND BEHAVIOR.txt`: "AI letters point size of 26" → **24**.
 - `docs/1_NN_DASHBOARD ATTRIBUTES.txt` + `3_NN_NOTES  ATTRIBUTES.txt`: modal look/feel only —
   behaviour notes still hold.
@@ -106,8 +124,8 @@ gradients instead):
   base `bg-subject-tab` color stays opaque — the shorthand was resetting it to transparent, flashing a
   see-through gap for a frame when the tab activated).
 
-**Tests:** [OUTDATED counts — see `REDESIGN_2026-07-28_STATUS.md`.] The baselines were regenerated and
-reviewed again on **2026-07-28** sign-off; the suite is now **68 tests / 21 specs**, all green. Refresh
+**Tests:** the suite is **75 tests / 24 specs**, 75 passed on **2026-08-01**, with all six baselines
+regenerated and reviewed on that run. Refresh
 with `npm run test:e2e:update` (calibration machine only) after any further intended design change, and
 review each new PNG before accepting it — that command *is* the design sign-off.
 
@@ -116,6 +134,9 @@ review each new PNG before accepting it — that command *is* the design sign-of
 | Source | Says | App today | Where |
 |---|---|---|---|
 | `css.txt` ~3179 | "+" button glyph = Fjalla 55.77 font glyph | Inline SVG vector plus, symmetric `0 0 24 24` viewBox on every platform, sized `71%` of whichever axis of its box is tighter | `src/overlay/AddSubjectTabButton.tsx`, `src/overlay/styles.css` |
+| every snapshot | note body's NN watermark is hard-edged and white | Same watermark, accent blue + blurred (client 2026-08-01); background and text colour unchanged | `src/overlay/RichTextBodyEditor.tsx` |
+| every snapshot | first run is a box on the dashboard | Full-panel NN backdrop carrying the box; nav row, A–Z rail and strip covered (client 2026-07-31) | `src/overlay/FirstRunPanel.tsx` |
+| `desired-look.*` | subject tabs align to the A–Z grid | Length = label + one blank character; edges deliberately do NOT meet the A–Z lines (client 2026-07-31) | `src/overlay/SubjectTabStrip.tsx` |
 | Figma "Rectangle 28" 41×39 | first-run "+" is wider than tall | Square (`size-[2.5625rem]`) — 41×39 around a square glyph left 5.5px of blue at the sides vs 4.5px above | `src/overlay/DashboardContent.tsx` |
 | `docs/1_NN_DASHBOARD` | First-run message is a single sentence | Figma two-line + accent "OR" layout shipped (Figma wins) | `src/overlay/DashboardContent.tsx` |
 | `docs/3_NN_NOTES` | Notes have a "price" field | No code exists for it (never built) | — |

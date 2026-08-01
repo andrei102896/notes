@@ -22,6 +22,8 @@ type SubjectTabNameModalProps = {
   /** Pre-filled name; empty to add. Selected on open when non-empty (rename). */
   initialValue: string;
   onConfirm: (name: string) => void | Promise<void>;
+  /** See NnModalShell: false while the first-run panel already paints the backdrop. */
+  showBackdrop?: boolean;
 };
 
 /** Add / rename subject tab (Figma "ADD SUBJECT TAB MODAL 1", 467×211); empty submit blocked. */
@@ -32,6 +34,7 @@ export function SubjectTabNameModal({
   inputAriaLabel,
   initialValue,
   onConfirm,
+  showBackdrop,
 }: SubjectTabNameModalProps): React.ReactElement {
   const fieldId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +72,12 @@ export function SubjectTabNameModal({
   }
 
   return (
-    <NnModalShell open={open} onOpenChange={onOpenChange} title={label}>
+    <NnModalShell
+      open={open}
+      onOpenChange={onOpenChange}
+      title={label}
+      showBackdrop={showBackdrop}
+    >
       <NnModalBox className="h-[13.1875rem] items-center">
         <label
           htmlFor={fieldId}

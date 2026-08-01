@@ -23,9 +23,10 @@ async function tabMetrics(
   return metrics;
 }
 
-/** Client rule: tab length is dictated ONLY by the character count (+1 blank char each end), with no
- *  minimum. Rounding up to whole A–Z cells is the one allowed addition, so edges stay on cell lines. */
-test("subject tab length follows the character count with no 3-cell floor", async ({
+/** Client rule (2026-07-31): tab length is the label plus one blank character each end and NOTHING else
+ *  — explicitly not quantised to A–Z cells ("do not try to line it up"), because that rounding all landed
+ *  after the label. The only slack allowed is max-content's ~1px. */
+test("subject tab length is the label plus one character each end", async ({
   overlay,
   page,
 }, testInfo) => {
@@ -50,25 +51,21 @@ test("subject tab length follows the character count with no 3-cell floor", asyn
       `"${name}": ${m.boxWidth.toFixed(1)}px = ${cells.toFixed(2)} cells, label+padding needs ${needed.toFixed(1)}px`,
     );
 
-    expect(
-      Math.abs(cells - Math.round(cells)),
-      `"${name}" spans a whole number of cells (got ${cells.toFixed(2)})`,
-    ).toBeLessThan(0.05);
     expect(m.boxWidth, `"${name}" box holds label + padding`).toBeGreaterThan(
       needed - 1,
     );
-    // The discriminating check: a minimum span would over-pad a short label past this.
+    // The discriminating check: cell quantisation would add up to a whole cell of dead space after the label.
     expect(
       m.boxWidth,
-      `"${name}" adds at most one cell of rounding (no minimum span)`,
-    ).toBeLessThan(needed + cellPx);
-    measured.push({ name, ...m, cells: Math.round(cells) });
+      `"${name}" adds no cell rounding on top of label + padding`,
+    ).toBeLessThan(needed + 2);
+    measured.push({ name, ...m, cells });
   }
 
   expect(
     measured[0].cells,
-    "a 1-character tab is under the old 3-cell floor",
-  ).toBeLessThan(3);
+    "a 1-character tab is shorter than one A–Z cell",
+  ).toBeLessThan(1);
   for (let i = 1; i < measured.length; i += 1) {
     expect(
       measured[i].boxWidth,
@@ -122,6 +119,9 @@ test("the + button fills its cell with an even border and an uncrushed glyph", a
   overlay,
   page,
 }, testInfo) => {
+  // A subject tab first: with zero tabs the first-run backdrop covers the strip, so the painted-pixel
+  // scan below would read the backdrop instead of the button's white frame.
+  await createSubjectTab(overlay, "ALPHA");
   await page.waitForTimeout(300);
   const geom = await overlay
     .locator('[aria-label="Subject tabs"] [aria-label="Add subject tab"]')
@@ -314,16 +314,22 @@ test("label padding is one character at each end", async ({
     ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
     return ctx.measureText("0").width;
   });
-  const { padding } = await tabMetrics(overlay, "DESKS");
+  const { boxWidth, textWidth, padding } = await tabMetrics(overlay, "DESKS");
 
   // px-[1ch] = one "0" glyph per side (client: "blank space equating to one character").
   expect(Math.abs(padding / 2 - oneCharWidth)).toBeLessThan(1.5);
+  // …and the box adds nothing after it: the client's "'after' padding too much" was cell rounding.
+  expect(
+    boxWidth - textWidth - padding,
+    "no dead space past the label's one-character end",
+  ).toBeLessThan(2);
 });
 
-/** Junction lines are painted by the tab BELOW, so the last tab has nothing to close it — and every tab
- *  edge, junctions included, has to land on the A–Z line beside it. A border cannot close the last tab:
- *  it paints inside the box, 1.5px above the grid line, which reads as "the tab is a few pixels short". */
-test("every subject tab edge is a white line on the A–Z grid", async ({
+/** Junction lines are painted by the tab BELOW, so the last tab has nothing to close it. A border cannot
+ *  close it either: it paints inside the box, which reads as "the tab is a few pixels short" — hence the
+ *  outer shadow. Tab edges are deliberately NOT compared to the A–Z lines any more (client 2026-07-31:
+ *  "do not try to line it up with alpha index boxes"). */
+test("every subject tab edge is a 1px white line, last tab included", async ({
   overlay,
   page,
 }, testInfo) => {
@@ -336,44 +342,45 @@ test("every subject tab edge is a white line on the A–Z grid", async ({
   const strip = await overlay
     .locator('[aria-label="Subject tabs"]')
     .boundingBox();
-  const cell = await overlay.locator("[data-air-cell]").first().boundingBox();
-  if (!strip || !cell) {
+  if (!strip) {
     throw new Error("subject tabs not measurable");
   }
 
   const REACH = 6;
-  // Same rows, both columns: the tab edge and the A–Z line it must sit on.
   const firstWhiteRow = async (x: number, top: number) => {
     const shot = await page.screenshot({
       clip: { x, y: top, width: 1, height: REACH * 2 },
     });
-    return page.evaluate(async (dataUrl) => {
-      const img = await new Promise<HTMLImageElement>((res, rej) => {
-        const i = new Image();
-        i.onload = () => res(i);
-        i.onerror = rej;
-        i.src = dataUrl;
-      });
-      const canvas = document.createElement("canvas");
-      canvas.width = 1;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
-      const px = ctx.getImageData(0, 0, 1, canvas.height).data;
-      let first = -1;
-      let run = 0;
-      for (let y = 0; y < canvas.height; y += 1) {
-        const isWhite =
-          px[y * 4] > 246 && px[y * 4 + 1] > 246 && px[y * 4 + 2] > 246;
-        if (isWhite) {
-          run += 1;
-          if (first < 0) first = y;
-        } else if (first >= 0) {
-          break;
+    return page.evaluate(
+      async (dataUrl) => {
+        const img = await new Promise<HTMLImageElement>((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = dataUrl;
+        });
+        const canvas = document.createElement("canvas");
+        canvas.width = 1;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
+        const px = ctx.getImageData(0, 0, 1, canvas.height).data;
+        let first = -1;
+        let run = 0;
+        for (let y = 0; y < canvas.height; y += 1) {
+          const isWhite =
+            px[y * 4] > 246 && px[y * 4 + 1] > 246 && px[y * 4 + 2] > 246;
+          if (isWhite) {
+            run += 1;
+            if (first < 0) first = y;
+          } else if (first >= 0) {
+            break;
+          }
         }
-      }
-      return { first, run, devicePx: canvas.height };
-    }, `data:image/png;base64,${shot.toString("base64")}`);
+        return { first, run, devicePx: canvas.height };
+      },
+      `data:image/png;base64,${shot.toString("base64")}`,
+    );
   };
 
   const triggers = overlay.locator('[data-slot="tabs-trigger"]');
@@ -392,11 +399,10 @@ test("every subject tab edge is a white line on the A–Z grid", async ({
     }
     const top = box.y + box.height - REACH;
     const tabLine = await firstWhiteRow(strip.x + strip.width / 2, top);
-    const gridLine = await firstWhiteRow(cell.x + cell.width / 2, top);
     const perCssPx = tabLine.devicePx / (REACH * 2);
     const isLast = i === count - 1;
     console.log(
-      `"${label}"${isLast ? " (last)" : ""}: edge line ${(tabLine.run / perCssPx).toFixed(1)}px at device row ${tabLine.first}, A–Z line at ${gridLine.first}`,
+      `"${label}"${isLast ? " (last)" : ""}: edge line ${(tabLine.run / perCssPx).toFixed(1)}px at device row ${tabLine.first}`,
     );
 
     expect(tabLine.run, `"${label}" has a white edge line`).toBeGreaterThan(0);
@@ -404,11 +410,6 @@ test("every subject tab edge is a white line on the A–Z grid", async ({
       tabLine.run / perCssPx,
       `"${label}" edge line is 1px, not a band`,
     ).toBeLessThan(2.5);
-    // The whole point: it must not sit above the A–Z line, which is what a border does.
-    expect(
-      Math.abs(tabLine.first - gridLine.first),
-      `"${label}" edge shares the A–Z line's device row`,
-    ).toBeLessThanOrEqual(1);
   }
 
   await overlay

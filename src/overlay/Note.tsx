@@ -191,9 +191,10 @@ export function Note({
               headingFocusedRef.current = false;
               setHeadingFocused(false);
             }}
-            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-normal text-white outline-none cursor-pointer"
+            className="nn-cap-trim h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-normal text-white outline-none cursor-pointer"
           />
-          {!expanded && note.heading.trim() !== "" ? (
+          {/* LINK/ANCHOR are deliberately NOT gated on a typed label. */}
+          {!expanded ? (
             <CollapsedNoteNav
               note={note}
               isReadOnly={isReadOnly}

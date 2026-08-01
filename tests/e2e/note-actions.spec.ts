@@ -10,7 +10,12 @@ test.describe("note action row", () => {
     await createSubjectTab(overlay, "ALPHA");
     await addNote(overlay, "NOTE TITLE");
 
-    for (const name of [/navigate to url/i, /pick page anchor/i, /copy note/i, /paste/i]) {
+    for (const name of [
+      /navigate to url/i,
+      /pick page anchor/i,
+      /copy note/i,
+      /paste/i,
+    ]) {
       const weight = await overlay
         .getByRole("button", { name })
         .first()
@@ -24,7 +29,10 @@ test.describe("note action row", () => {
       .evaluate((el) => {
         const group = el.closest('[data-slot="button-group"]') as HTMLElement;
         const cs = getComputedStyle(group);
-        return { width: parseFloat(cs.borderRightWidth), style: cs.borderRightStyle };
+        return {
+          width: parseFloat(cs.borderRightWidth),
+          style: cs.borderRightStyle,
+        };
       });
     expect(border.width).toBeGreaterThan(0);
     expect(border.style).not.toBe("none");

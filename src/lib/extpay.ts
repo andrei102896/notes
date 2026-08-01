@@ -17,7 +17,8 @@ type ExtPayClient = {
   };
 };
 
-const extPayExtensionId = import.meta.env.VITE_EXTPAY_EXTENSION_ID?.trim() ?? "";
+const extPayExtensionId =
+  import.meta.env.VITE_EXTPAY_EXTENSION_ID?.trim() ?? "";
 export const EXTPAY_EXTENSION_ID = extPayExtensionId;
 
 export const isExtPayConfigured = extPayExtensionId.length > 0;
@@ -38,7 +39,9 @@ export function getExtPayClient(): ExtPayClient {
     return extPaySingleton;
   }
 
-  const createExtPay = ExtPay as unknown as (extensionId: string) => ExtPayClient;
+  const createExtPay = ExtPay as unknown as (
+    extensionId: string,
+  ) => ExtPayClient;
   extPaySingleton = createExtPay(extPayExtensionId);
   return extPaySingleton;
 }

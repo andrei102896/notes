@@ -44,7 +44,9 @@ test.describe("reorder drag cleanup", () => {
     await page.mouse.move(pressX, pressY + 20, { steps: 4 }); // exceed 4px → dragStart
 
     // Sanity: the drag actually started, so the row is dimmed mid-drag (state re-render is async).
-    await expect.poll(() => topNoteOpacity(page), { timeout: 2000 }).toBe("0.4");
+    await expect
+      .poll(() => topNoteOpacity(page), { timeout: 2000 })
+      .toBe("0.4");
 
     // Release the pointer OUTSIDE the panel iframe (on the host page, to its left).
     await page.mouse.move(iframe.x - 60, pressY + 20, { steps: 3 });

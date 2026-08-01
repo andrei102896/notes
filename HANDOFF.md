@@ -52,7 +52,8 @@ Required values:
 npm run pack
 ```
 
-This runs `vite build` then zips `dist/` to **`nn-extension-dist.zip`** (gitignored) — the
+This runs `vite build` then zips `dist/` to **`nn-extension-<version>.zip`** (gitignored, e.g.
+`nn-extension-1.0.3.zip`; the script deletes older `nn-extension-*.zip` first) — the
 artifact you upload to the Chrome Web Store. (`npm run build` alone produces the unpacked
 `dist/` without zipping.)
 
@@ -64,7 +65,7 @@ artifact you upload to the Chrome Web Store. (`npm run build` alone produces the
 ## 4. Loading & testing the build
 
 1. `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select `dist/`
-   (or unzip `nn-extension-dist.zip` and select that folder).
+   (or unzip `nn-extension-<version>.zip` and select that folder).
 2. **Reload any already-open tabs** so the content script attaches.
 3. Open a normal `http/https` page and click the toolbar icon to toggle the panel.
    (`chrome://` pages, the Web Store, and other restricted pages can't be injected — the
@@ -105,7 +106,7 @@ If this is skipped, payments go to the original developer's Stripe.
 
 ## 6. Chrome Web Store submission
 
-1. Upload `nn-extension-dist.zip` at the
+1. Upload `nn-extension-<version>.zip` at the
    [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
 2. Provide store listing assets (icon, screenshots, description) and a privacy disclosure.
    Note for the privacy form: all note data is stored **locally** via `chrome.storage.local`

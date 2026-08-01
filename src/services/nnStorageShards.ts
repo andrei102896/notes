@@ -39,7 +39,9 @@ export async function setIndex(index: NNNoteIndex): Promise<void> {
   await storageService.sync.set(NN_NOTE_INDEX_KEY, index);
 }
 
-export async function loadNotesForIds(noteIds: string[]): Promise<NNSyncNote[]> {
+export async function loadNotesForIds(
+  noteIds: string[],
+): Promise<NNSyncNote[]> {
   if (noteIds.length === 0) {
     return [];
   }
@@ -109,7 +111,9 @@ export async function writeShardedFromPayload(
   }
 }
 
-export async function pruneNotesFromAllLayouts(noteIds: string[]): Promise<void> {
+export async function pruneNotesFromAllLayouts(
+  noteIds: string[],
+): Promise<void> {
   if (noteIds.length === 0) {
     return;
   }

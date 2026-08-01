@@ -33,7 +33,10 @@ async function waitForOverlay(page: Page): Promise<void> {
 }
 
 /** Create a note whose URL is TARGET_URL and drop an anchor at the given source-page scroll offset. */
-async function noteWithAnchor(page: Page, anchorScrollY: number): Promise<void> {
+async function noteWithAnchor(
+  page: Page,
+  anchorScrollY: number,
+): Promise<void> {
   const overlay = overlayFrame(page);
   await createSubjectTab(overlay, "GARAGE");
   await addNote(overlay, "NOTE");

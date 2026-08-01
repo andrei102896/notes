@@ -67,9 +67,9 @@ export const RichTextBodyEditor = forwardRef<
       return;
     }
     const sel = win.getSelection();
-    const range =
-      sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
-    const isRangeInsideEditor = !!range && editor.contains(range.commonAncestorContainer);
+    const range = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+    const isRangeInsideEditor =
+      !!range && editor.contains(range.commonAncestorContainer);
     if (!isRangeInsideEditor) {
       pendingEnterFormatRef.current = null;
       onFormatStateChange({ bold: false, italic: false, underline: false });
@@ -149,8 +149,11 @@ export const RichTextBodyEditor = forwardRef<
 
   return (
     <div className="relative isolate overflow-hidden border-b bg-note">
-      {/* Same NN watermark as the modals, dimmed to 0.15 for the light note body. */}
-      <ModalWatermark className="opacity-[0.15]" />
+      {/* "NOTE LOGO BG": the modals' NN in accent blue, blurred and dimmed for the light note body. */}
+      <ModalWatermark
+        fill="var(--color-accent)"
+        className="opacity-[0.22] blur-[0.390625rem]"
+      />
       <div>
         <div
           ref={editorRef}
@@ -171,7 +174,11 @@ export const RichTextBodyEditor = forwardRef<
             isFocusedRef.current = false;
             setIsFocused(false);
             emitValue();
-            onFormatStateChange?.({ bold: false, italic: false, underline: false });
+            onFormatStateChange?.({
+              bold: false,
+              italic: false,
+              underline: false,
+            });
           }}
           onInput={() => {
             onInteract();
@@ -189,7 +196,9 @@ export const RichTextBodyEditor = forwardRef<
             }
             // Pasted image file(s) (e.g. a screenshot) carry no text/html, so read each as a data URL and insert a sanitized <img>.
             const imageFiles = Array.from(data.items)
-              .filter((it) => it.kind === "file" && it.type.startsWith("image/"))
+              .filter(
+                (it) => it.kind === "file" && it.type.startsWith("image/"),
+              )
               .map((it) => it.getAsFile())
               .filter((f): f is File => f !== null);
             if (imageFiles.length > 0) {
@@ -197,7 +206,9 @@ export const RichTextBodyEditor = forwardRef<
               const win = doc.defaultView;
               const sel = win?.getSelection();
               const savedRange =
-                sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+                sel && sel.rangeCount > 0
+                  ? sel.getRangeAt(0).cloneRange()
+                  : null;
               for (const file of imageFiles) {
                 const reader = new FileReader();
                 reader.onload = () => {
@@ -252,7 +263,8 @@ export const RichTextBodyEditor = forwardRef<
                 event.preventDefault();
                 const doc = editor.ownerDocument;
                 const desiredState =
-                  pendingEnterFormatRef.current ?? formatStateFromSelection(win, editor);
+                  pendingEnterFormatRef.current ??
+                  formatStateFromSelection(win, editor);
                 editor.focus();
                 doc.execCommand("insertParagraph");
                 // removeFormat stops inherited inline styles (eg. a bold ancestor) leaking into the new line against toolbar state.

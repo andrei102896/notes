@@ -63,10 +63,13 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  showOverlay = true,
   container: containerProp,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
+  /** False when the dialog paints over a backdrop already on screen — the dimming layer would darken it. */
+  showOverlay?: boolean;
   /** Portal target; defaults to the overlay host when available (else `document.body`). When set, overlay + content position `absolute` within it. */
   container?: HTMLElement | null;
 }) {
@@ -77,7 +80,7 @@ function DialogContent({
   const contained = Boolean(container);
   return (
     <DialogPortal container={container ?? undefined}>
-      {modal ? (
+      {!showOverlay ? null : modal ? (
         <DialogOverlay position={contained ? "absolute" : "fixed"} />
       ) : (
         <div

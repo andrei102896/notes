@@ -87,7 +87,10 @@ export function getTabSession(): Promise<TabSessionState | null> {
 export function patchTabSession(patch: Partial<TabSessionState>): void {
   try {
     chrome.runtime.sendMessage(
-      { type: "SET_TAB_SESSION", payload: patch } satisfies SetTabSessionMessage,
+      {
+        type: "SET_TAB_SESSION",
+        payload: patch,
+      } satisfies SetTabSessionMessage,
       () => void chrome.runtime.lastError,
     );
   } catch {

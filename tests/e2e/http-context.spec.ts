@@ -1,5 +1,10 @@
 import { expect, test } from "./fixtures";
-import { addNote, createSubjectTab, noteTitles, toggleOverlayForTab } from "./helpers";
+import {
+  addNote,
+  createSubjectTab,
+  noteTitles,
+  toggleOverlayForTab,
+} from "./helpers";
 
 /** `crypto.randomUUID` is secure-context-only (undefined on http → threw, so create silently failed); `generateId`
  * falls back to `getRandomValues`. The rest of the suite is https, so this spec drives a non-secure http host. */
@@ -23,7 +28,9 @@ test("tabs and notes can be created on a plain-http (non-secure) page", async ({
   expect(await page.evaluate(() => typeof crypto.randomUUID)).toBe("undefined");
 
   await toggleOverlayForTab(context, page);
-  const overlay = page.frameLocator("#nn-scroll-bookmarks-overlay-shell iframe");
+  const overlay = page.frameLocator(
+    "#nn-scroll-bookmarks-overlay-shell iframe",
+  );
   await overlay
     .locator("#nn-scroll-bookmarks-overlay-host")
     .waitFor({ state: "attached", timeout: 10_000 });

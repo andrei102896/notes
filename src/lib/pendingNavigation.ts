@@ -97,8 +97,10 @@ export function setPendingAnchorForNewTab(
 }
 
 function pendingOverlayStorageKeysForUrl(url: string): string[] {
-  return pendingAnchorStorageKeysForUrl(url).map((k) =>
-    PENDING_OVERLAY_STORAGE_PREFIX + k.slice(PENDING_ANCHOR_STORAGE_PREFIX.length),
+  return pendingAnchorStorageKeysForUrl(url).map(
+    (k) =>
+      PENDING_OVERLAY_STORAGE_PREFIX +
+      k.slice(PENDING_ANCHOR_STORAGE_PREFIX.length),
   );
 }
 
@@ -122,7 +124,9 @@ export function markOverlayReopenOnNextNavigation(
 
 /** Read and consume the pending overlay flag. Returns true if overlay should open. */
 export function claimPendingOverlay(tabWin: Window): Promise<boolean> {
-  const fromSession = tabWin.sessionStorage.getItem(PENDING_OVERLAY_SESSION_KEY);
+  const fromSession = tabWin.sessionStorage.getItem(
+    PENDING_OVERLAY_SESSION_KEY,
+  );
   if (fromSession !== null) {
     tabWin.sessionStorage.removeItem(PENDING_OVERLAY_SESSION_KEY);
     // Also drop the storage-backed twin so a leftover key can't reopen NN on a later tab visiting this same URL.

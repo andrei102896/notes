@@ -1,9 +1,11 @@
 # Modal + dashboard redesign — status (2026-07-28)
 
 Section-by-section reskin driven by fresh client Figma exports. Sections 1–28 are **committed**
-(2026-07-30, "New redesign"); §29, §30 and the 2026-07-31 client-feedback work are **uncommitted**
-working-tree state — 15 paths, user owns all git. `nn-extension-1.0.3.zip` is packed from exactly that
-tree (verified by identical bundle hash), so it needs no re-pack before testing.
+(2026-07-30, "New redesign"); §29, §30 and everything under "Client Windows design fixes" below are
+**uncommitted** working-tree state (user owns all git).
+**`nn-extension-1.0.3.zip` is STALE** — it was packed from the tree as of 2026-07-31 *before* that section;
+re-pack (`npm run pack`) before sending a build to the client.
+**Suite: 75 tests / 24 specs — 75 passed, 0 failed (2026-08-01), the whole client round included.**
 
 **How this sprint works:** the user sends one section at a time as a *screenshot + Figma CSS*, the
 section is implemented, reviewed against a Playwright screenshot artifact, then the next section
@@ -23,7 +25,7 @@ positions, blend modes, span-level text colours and layer order — expect to me
 
 | # | Section | Key files |
 |---|---------|-----------|
-| 1 | Collapsed-note LINK/ANCHOR (gated on a non-empty heading) | `hooks/useNoteLinkAnchor.ts`, `overlay/CollapsedNoteNav.tsx`, `overlay/Note.tsx` |
+| 1 | Collapsed-note LINK/ANCHOR (heading gate REMOVED 2026-07-31 — see the Windows fixes below) | `hooks/useNoteLinkAnchor.ts`, `overlay/CollapsedNoteNav.tsx`, `overlay/Note.tsx` |
 | 2 | Paid logo → NN updates page in a new tab | `lib/openInNewTab.ts`, `overlay/DashboardHeader.tsx` |
 | 3 | Purchase-modal full-panel BG | `overlay/ModalBackdrop.tsx`, `overlay/PaywallDialog.tsx` |
 | 4 | Dashboard modal BG behind every small modal | `NnModalShell` in `overlay/NnModalShell.tsx` |
@@ -33,16 +35,16 @@ positions, blend modes, span-level text colours and layer order — expect to me
 | 8 | Blue notes scrollbar | `.nn-scrollbar` in `overlay/styles.css` |
 | 9 | Blue metal brand band (logo plate only) | `BrandMetalHeaderBar` + `NnLogoPlate` in `overlay/BrandLockup.tsx` |
 | 10 | Header bottom edge: 2px white + 3px accent + blurred shadow | `overlay/DashboardHeader.tsx` |
-| 11 | Dynamic subject tabs, quantised to A–Z cells | `hooks/useSubjectTabCellSpans.ts`, `overlay/SubjectTabStrip.tsx` |
+| 11 | Dynamic subject tabs, quantised to A–Z cells — **quantisation REMOVED 2026-07-31**, hook deleted | `overlay/SubjectTabStrip.tsx` |
 | 12 | `+` button: **3px** white border, fills one A–Z cell, glyph **71%** of the blue box's width | `overlay/AddSubjectTabButton.tsx`, `overlay/SubjectTabStrip.tsx`, `.nn-…[data-add-tab-glyph]` in `overlay/styles.css` |
 | 13 | Panel outer border → accent blue | `overlay/App.tsx` |
 | 14 | A–Z index letters 26px → 24px | `--text-air-letter` in `overlay/styles.css` |
 | 15 | Logo plate: FULL bar height, flush to the panel/modal OUTER top, non-scaling rim | `METAL_BAR_PLATE_CLASS` in `overlay/BrandLockup.tsx`; `overlay/DashboardHeader.tsx`, `overlay/NnModalBox.tsx`, `overlay/ModalBackdrop.tsx` |
 | 16 | Rename subject tab (`RENAME SUB TAB MODAL 25-CHARACTER`) — verified, no code change needed | `overlay/SubjectTabNameModal.tsx` via `SubjectTabRenameDialog` |
-| 17 | Subject tab names keep upper **and** lower case | `overlay/SubjectTabStrip.tsx`, `hooks/useSubjectTabCellSpans.ts` |
+| 17 | Subject tab names keep upper **and** lower case (still true; sizing is CSS now) | `overlay/SubjectTabStrip.tsx` |
 | 18 | Scrollbar: 8px right gutter + pill ends | `.nn-scrollbar` in `overlay/styles.css` |
 | 19 | Footer = the header band (same bar, plate and rim); copyright line dropped | `overlay/DashboardFooter.tsx` |
-| 20 | Subject tabs: 3-cell floor dropped, length = character count | `hooks/useSubjectTabCellSpans.ts` |
+| 20 | Subject tabs: 3-cell floor dropped, length = character count — **superseded 2026-07-31**: no cells at all, `w-max` | `overlay/SubjectTabStrip.tsx` |
 | 21 | Lateral shadow down the panel's left edge (`SHADOW UNDER AI BOXES`) | `content/overlayShell.ts` |
 | 22 | Real NN updates URL wired to the paid-state logo (was a placeholder) | `overlay/DashboardHeader.tsx`, `tests/e2e/brand.spec.ts` |
 | 23 | Plate narrowed 3.5:1 → **3.1:1** (client: a little wider than ADD NOTE), still flush | `NN_PLATE_ASPECT` in `overlay/BrandLockup.tsx` |
@@ -52,7 +54,7 @@ positions, blend modes, span-level text colours and layer order — expect to me
 | 27 | NN ink back to the artwork's 52.5% width share — the horizontal counter-scale made it bulky | `overlay/BrandLockup.tsx`, `overlay/ModalBackdrop.tsx` |
 | 28 | Headed e2e window parked off-screen so runs stop covering the desktop | `tests/e2e/fixtures.ts` |
 | 29 | Nav strip `padding-bottom` 3px → **1px** so the white frame reads even on all four sides (the header's 2px `border-b` stacks under it) | `overlay/DashboardHeader.tsx`, `tests/e2e/nav-strip-frame.spec.ts` |
-| 30 | Final subject tab closed by an outer 1px shadow (a border paints *inside* the box, 1.5px above the A–Z line), and the strip shifted by `--air-cell-drift` so every tab edge sits exactly on an A–Z line | `overlay/SubjectTabStrip.tsx`, `overlay/styles.css`, `tests/e2e/subject-tab-sizing.spec.ts` |
+| 30 | Final subject tab closed by an outer 1px shadow (a border paints *inside* the box, so it reads short) — still live. The `--air-cell-drift` grid alignment in the same section is **GONE 2026-07-31**: the client dropped A–Z alignment | `overlay/SubjectTabStrip.tsx`, `overlay/styles.css`, `tests/e2e/subject-tab-sizing.spec.ts` |
 
 ### Shared modal architecture (the reusable spine)
 
@@ -161,6 +163,19 @@ If the client does want white rules flanking the field, they are a small additio
 
 ## Open questions (asked, not answered)
 
+0. ~~**Collapsed note: should ANCHOR always show?**~~ **ANSWERED by the client's full board (2026-08-01),
+   "COLLAPSED NOTE CONCEPT":** *"ANCHOR BUTTON WILL ONLY APPEAR IF AN ANCHOR HAS BEEN SET"*, and the arrow
+   marks the top pair "HERE ONLY" while the blue pair below is labelled CONCEPTUAL. Shipped behaviour (LINK
+   always, ANCHOR only once set) is correct — do not change it.
+0b. ~~**CONFLICT — note-body background**~~ **RESOLVED 2026-08-01: light body, blurred logo only.** The
+   client's full board shows the dashboard's note bodies light, with product photos and black text, and the
+   "NOTE LOGO BG" arrow pointing at a faint NN on that light surface — so "use the blurred logo for note
+   background" means the artwork, not the modal's dark treatment. The dark version (built one round earlier
+   from a CREATE-box crop) is reverted: the body is `bg-note` with #464646 text again, and the only change
+   from the pre-sprint state is `blur-[0.390625rem]` on the existing watermark.
+0d. **Product photos in notes.** The board's dashboard shows notes containing product images. Pasting an
+   image works today, but there is no dedicated "add image" affordance — that would be a feature, not a
+   design tweak.
 1. From the dashboard render: notes contain **product images**; note body renders as **one line**,
    not three; collapsed notes show **no LINK** button; a detached larger `+` floats above the panel.
    Which of these are real requirements?
@@ -260,9 +275,15 @@ nvm-windows to `C:\nvm4w\nodejs`.
 
 ## Deferred work
 
-- **Full suite: 68 passed, 0 failed (2026-07-31).** The five stale `visual.spec.ts` baselines were
-  regenerated and signed off after reviewing each new PNG — they had predated the whole sprint (the old
-  `header.png` still showed the deleted "NOTES FOR NET / CHROME EXTENSION" wordmark).
+- **Full suite: 75 passed, 0 failed (2026-08-01).** All six `visual.spec.ts` baselines were regenerated and
+  reviewed on that run; they had already been refreshed several times through the client round.
+  Three specs needed repointing when the round closed, all describing the OLD build rather than a
+  regression: `metal-bar` read the accent line off the header's `box-shadow` (it is an element now),
+  and `brand` + `subject-tab-sizing` ran with zero subject tabs, where the first-run backdrop covers the nav
+  row and the strip — the badge was unclickable and the `+` pixel scan read the backdrop. Both now create a
+  tab first.
+- **Known flake: `subject-tab-sizing` → "label padding is one character at each end".** Failed once in a full
+  run, passed in isolation and in every run since. Same profile as the flakes recorded in the Windows pass.
 - **Known defect, deliberately not fixed: `page.clock.setFixedTime` never reaches the overlay.** The
   content script builds the iframe with `document.write` *after* the clock is installed, so `Date.now()`
   inside the overlay is the real clock and `FIXED_NOW` (`fixtures.ts`) only applies to the host page. A
@@ -355,7 +376,7 @@ fault; it was the process. Do this instead.
 | rim | CSS-border overlay in `MetalBarPlate`: 5px on the dashboard band, footer and backdrops / 3px on the small modal box's bar | client: "double in size in the header", then −1px per side |
 | rim colour | `border-image: linear-gradient(#9EE2FF → #7DD3F7 15% → #3EA8D8 38% → #0081B8 58% → #14709A 80% → #0B5B80 100%)` | client: the WHITE HILITE must fade through it, and the lower half keeps darkening |
 | NN glyph padding | glyphs scaled `scale(1 0.895)` about the plate centre → 3.75px above/below | client: "+1px extra padding top and bottom" |
-| flanking boxes | `bg-accent/[0.86]` + `inset 0 -18px 11.2px 3px rgba(0,0,0,0.28)` | Figma `UPDATE____HEADER BOX` |
+| flanking boxes | `HEADER_BOX_CLASS`, one export in `BrandLockup.tsx` shared with `ModalMetalBar`: `relative` + `border-[0.5px] border-accent-deep` + `bg-accent/[0.86]` + `inset 0 -18px 11.2px 3px rgba(0,0,0,0.28)`. `relative` is load-bearing — a static band paints under the absolute hilite and washes out to near-white | Figma `UPDATE____HEADER BOX`; client 2026-07-31 |
 | footer | the same `BrandMetalHeaderBar` at `--air-cell` with the 5px rim — no copyright text | client: "the footer is the same as the header" |
 | glyph outline | `non-scaling-stroke` (both plates); **black** on `NnLogoPlate`, `#0081B8` on the purchase `ModalLogoBox` (reads as no outline) | two separate client exports — only the plate SIZE has to match |
 | which artwork where | `NnLogoPlate` everywhere; `ModalLogoBox` in the purchase modal only, via `ModalMetalBar`'s `plate` slot | client 2026-07-29 |
@@ -389,7 +410,9 @@ fault; it was the process. Do this instead.
    the line it must match — the client reads that as "the tab is a few pixels short". Use an outer
    `box-shadow`, which paints past the edge like the neighbouring cell's border would. Related: the
    `+` cell is device-snapped while the A–Z column is not, which put the whole strip ~0.12px off the
-   grid; `--air-cell-drift` (styles.css) adds that back below the `+`.
+   grid; `--air-cell-drift` (styles.css) added that back below the `+`. **Both the drift variable and the
+   alignment goal were dropped 2026-07-31** — tab edges no longer meet the A–Z lines by design. The rest of
+   the trap (a border cannot close a tab; use an outer shadow) still holds.
 6. **Element screenshots, not page screenshots,** for artifacts — a full-page shot can catch the
    overlay mid slide-in (or after slide-out) and come out shifted or blank.
 7. **Assert what you claim.** A "does hiding it change one pixel" check passed on a ghost logo that
@@ -401,7 +424,8 @@ fault; it was the process. Do this instead.
    the purchase bar to `h-[var(--air-cell)]` there produced a **57px** bar instead of 34.6, because the
    `height` resolved to `auto` and the layout degenerated silently — no error, no warning. `--air-cell`
    now lives on `:root` (`styles.css`). Anything a modal may need must be declared at the root.
-10. **Measure text in the document that owns the element.** `useSubjectTabCellSpans` built its canvas
+10. **Measure text in the document that owns the element.** (`useSubjectTabCellSpans` is deleted, but the
+   rule holds for any canvas measurement.) That hook built its canvas
    with the content-script realm's `document`, which has no Fjalla One — every label was measured with
    fallback metrics (~35% too wide), so a 9-character tab claimed 4–5 A–Z cells instead of 3. Use
    `container.ownerDocument.createElement("canvas")`. `document.fonts.check()` on the iframe's font set
@@ -459,6 +483,30 @@ fault; it was the process. Do this instead.
 20. **`--air-cell-snapped` is an inline property on the iframe root**, set by `syncOverlayViewportMetrics`.
    A stylesheet rule cannot override it for an experiment; `documentElement.style.removeProperty` can, and
    the next resize puts it back.
+### Added by the client round (2026-07-31 → 08-01) — full text in `AGENTS.md` §8
+
+22. **`text-box: trim-both cap alphabetic` centres GLYPHS, but only on the element that owns the text.**
+   Works on an `<input>`; a no-op on a flex container (its text is an anonymous item). Hence
+   `.nn-label-center` = trim + `display:block` + `align-content:center`, and `.nn-cap-trim` for inputs.
+23. **`bottom` on an absolute child is measured from the parent's PADDING box** — the blue line sat 2px high,
+   over the header's own white border, until the offsets carried `calc(9px + …)`.
+24. **A negative z-index child still paints above its parent's background and box-shadows.** The blue-line
+   shadow band could only be got out of the way by DOM order, not by `-z-10`.
+25. **An `absolute left-1/2` box with no width shrink-to-fits against half the container.** That is what
+   squeezed the purchase modal's square grid to 49.6% of the panel and smeared its columns together.
+26. **Radix `DialogContent` always paints a `bg-black/80` overlay under itself** — invisible under an opaque
+   backdrop, a visible dimming flash without one. `showOverlay` (`components/ui/dialog.tsx`) disables it.
+27. **A `sticky` element with a z-index is its own stacking context**, so a descendant (the trial badge)
+   cannot be raised above a sibling of that element (the first-run backdrop).
+28. **Runtime style sweeps must use the class's UNIT.** A `bottom` sweep in absolute px against a rem class
+   measured a geometry that never ships — rem is panel-scaled here (root ≈ 11.7px at the test panel).
+29. **Which "+" a test may click depends on state that arrives ASYNCHRONOUSLY.** The first-run panel mounts
+   after a storage read, so `createSubjectTab` resolving the target once could aim at the strip's `+` a beat
+   before the backdrop covered it — the click landed on the backdrop, no dialog, and the spec timed out at
+   90s. It only reproduced in full-suite runs (two anchor specs), never in isolation. The helper now
+   re-decides and retries up to three times; if a test ever hangs waiting for `[data-slot="dialog-content"]`,
+   this is the shape of it.
+
 21. **`page.screenshot({ clip })` silently clamps a negative origin and drops rows unevenly.** The strip `+`
    sits at `y = 0`, so `y: box.y - PAD` goes negative and the returned image is neither the requested height
    nor a predictable crop — which reads as "the element is all white". Clamp the origin to 0 and add the
@@ -476,6 +524,10 @@ fault; it was the process. Do this instead.
 | `tests/e2e/panel-shadow.spec.ts` | The panel's left-edge shadow, scanned in host-page pixels: darkest at the edge, monotonic fade to ~85px, present at the top and bottom of the edge as well as mid-panel |
 | `tests/e2e/session-persistence.spec.ts` | 7 tests for the 2026-07-31 behaviour work: the client's exact Back sequence (bfcache path, stale panel measured in painted frames), the same on a bfcache-ineligible page (`unload` handler; zero frames painted, which is what the pre-mount buys), the inverse (maximized survives Back), a forward navigation to a third site, the slide (frame-by-frame travel, no veil element), the reveal cap on a page whose subresource hangs, and notes being current after Back |
 | `tests/e2e/session-persistence.live.spec.ts` | The same Back/slide scenarios against **real** sites (`npm run test:e2e:live`, network required, excluded by default). Sites are two constants at the top of the file; ford.com + bugatti.com as committed |
+| `tests/e2e/metal-bar-layers.spec.ts` | The metal bar's LAYER look, header and footer, from the client's crop rather than their Figma CSS: deep top line, a sheen that never reaches the raw hilite colour, peak in the top 45%, monotonic fade, plate ≥1.5× the band's luminance, a darker seam between band and plate. Verified to FAIL on the pre-fix build |
+| `tests/e2e/blue-line.spec.ts` | The blue line under the nav bar: 4px accent (every device row, or the dark band's blur is washing it), the 3px white bar, the shadow stuck to that bar, and a second test that the shadow dies in the gap and leaves the first note's border unwashed |
+| `tests/e2e/paywall-statement.spec.ts` | The purchase STATEMENT box (four paragraphs verbatim, width share, height in rem, bg alpha, 0.3px hairline, Familjen Grotesk 17/21, symmetric top/bottom padding in painted pixels) and the BG SQUARES spreading across the panel (grid ≥75% wide — it measured 49.6% before the fix — with blue painted in all three thirds) |
+| `tests/e2e/first-run-swap.spec.ts` | Clicking the first-run "+" swaps the box: one backdrop and one box at all times, and a backdrop pixel sampled every frame must not move in either direction (lighter = it unmounted, darker = Radix's dimming overlay landed) |
 | `tests/e2e/nav-strip-frame.spec.ts` | The nav strip's white frame: `padding-bottom` 1px + the header's 2px `border-b` = the 3px the other sides get from padding, then the painted proof — a 1px column through ADD NOTE must show the same run of white above and below it (the padding and the border merge into one band, so only pixels can tell 3px from 5px) |
 
 `tests/e2e/functional.spec.ts` and `brand.spec.ts` also changed: two brand tests were **deleted** (they
@@ -487,7 +539,7 @@ default e2e state starts a fresh local trial and shows the red logo instead).
 
 Run a section's own spec after each change (`npx playwright test <spec>`); artifacts land in
 `test-results/<test>/*.png` and are the review currency with the user. **`npm run test:e2e` takes ~3
-minutes and is worth running before any handoff** — the suite is 68 tests / 21 specs and fully green.
+minutes and is worth running before any handoff** — the suite is 75 tests / 24 specs.
 
 ## Client feedback 2026-07-31 — behaviour, not design (SHIPPED, uncommitted)
 
@@ -517,11 +569,213 @@ Verified on real sites, not just stubs (`npm run test:e2e:live`): ford.com, tesl
 framed-shot.com are all **bfcache-ineligible**, so the real-world path is the rebuilt-page one; NN returns
 in ~300–670ms end to end, nearly all of it the page's own load.
 
+## Client Windows design fixes (2026-07-31, in progress — one item at a time)
+
+The client tested the packed build on Windows and sent design fixes. Scope rule for these: fix the
+element the item names and nothing else, and run only the specs covering it.
+
+1. **"Centre words vertically inside buttons"** (screenshot: the delete-confirm modal) — the delete
+   modal's CANCEL/OK. `align-items: center` centres the *line box*, and Fjalla One's metrics are
+   asymmetric (ascent 1.009em vs descent 0.248em), so the caps paint ~1–1.5px above the box centre at
+   every size and window. Fixed with `.nn-label-center` (`overlay/styles.css`): `text-box: trim-both cap
+   alphabetic` trims the line box to cap-height/baseline so the *ink* is what gets centred, plus
+   `display: block; align-content: center` because trim never reaches a flex container's text (it sits
+   in an anonymous item that inherits no trim — measured as a complete no-op). Font-derived, so it needs
+   no `IS_WINDOWS` gate: measured in painted pixels at dpr 1 **and** 2, at 1400×900 and 760×620, the
+   off-centre went 1.0–1.5px → 0–0.5px (the residual is the ±1 device-px parity floor, per trap 19).
+   Same class fixes the add/rename modal's CANCEL/OK and the header/note-action labels, which have the
+   identical defect (1.5px and 1.0px) — deliberately NOT applied, awaiting the client.
+2. **Subject tabs: one character of padding each end, and STOP quantising to A–Z cells** (client: "'before'
+   padding good, 'after' padding too much — do not try to line it up with alpha index boxes"). The excess
+   *was* the round-up to whole `--air-cell` multiples: the label is pinned to the start, so all of it landed
+   after the text (`GOLF` = 69px box for a 49.5px need → 19.5px dead space). The tab is now sized by its own
+   content — `w-max aspect-square` on the trigger (`SubjectTabStrip.tsx`), `aspect-square` keeping
+   height === width for the rotation constraint. Slack is max-content's ~1px; painted blank measures
+   ~10.5–12px before vs ~9.5–11px after against 1ch = 9.1px. **This supersedes §11, §20, §30 and trap 5's
+   grid-alignment goal**: `useSubjectTabCellSpans` (and its canvas/font-timing machinery, trap 10) is
+   deleted, as is `--air-cell-drift` and the strip's compensating `mt-`. `subject-tab-sizing.spec.ts` had two
+   tests asserting the old rule; both were retargeted (no cell rounding; edges are 1px white lines but are no
+   longer compared to the A–Z rows) and `full-panel.png` was regenerated.
+3. **Collapsed note: LINK/ANCHOR no longer gated on a typed label** (client: "do not make LINK/ANCHOR
+   visibility contingent on user adding text… keep it obvious no matter what"). `Note.tsx` rendered
+   `CollapsedNoteNav` only when `note.heading.trim() !== ""` (§1) — now on `!expanded` alone. ANCHOR still
+   appears only once an anchor is picked, which is independent of the label; flagged to the client. The same
+   item asked for the label to be centred vertically: the title `Input` got `.nn-cap-trim` — the trim
+   **does** reach an `<input>`'s inner editor (measured 1.00 → 0.25 css px high at dpr 2, and exactly even
+   at dpr 1), which is why the trim is now its own class and `.nn-label-center` only adds the block/centring
+   an `<input>` must not have.
+
+4. **First run = the full-panel NN backdrop, not the grey dashboard** (client: "we have the old initial tab
+   background, it should be like in the 2nd img" — the img being the `DASHBOARD MODAL BG` artboard with the
+   467×189 box on it). New `overlay/FirstRunPanel.tsx` composes what `NnModalShell` does (`ModalBackdrop` +
+   `ModalMetalBar` with the dashboard plate, `showTagline={false}`, box centred) but **not** as a Radix
+   dialog — there is nothing to dismiss and a focus trap would fight the add-tab dialog its "+" opens. It is
+   the last child of App's `<main>` at **z-40**, which is what clears the header row (z-20) and the strip's
+   "+" (z-30); at z-auto both floated on top of the backdrop. `DashboardContent` no longer knows about
+   `first-run` (its prop is now `"select-or-create" | null`, and `onRequestAddSubjectTab` moved to App).
+   **Decided 2026-08-01 — the backdrop covers everything, header included (`z-20`, i.e. unchanged).** The
+   first-run screen must match the client's render, full stop: "trebuie sa arate ca in design". A `z-50`
+   header was tried for one round so the trial/NN badge would stay reachable, and it was rejected on sight —
+   with the header above the backdrop the nav row is inset by the A–Z + strip columns while the backdrop's own
+   bar runs full width, so the row reads as indented with dark backdrop beside it.
+   **Known cost, accepted twice:** the badge is the only route to the BUY modal, and with an expired trial the
+   `+` is `disabled={isReadOnly}` in both copies, so a user whose trial runs out before creating any tab can
+   neither buy nor create. Do not "fix" this unasked.
+   For the record, raising **just the badge** is impossible: the header is `sticky` with a z-index, i.e. its
+   own stacking context, so no z-index on a descendant can beat a sibling of the header. The only ways to keep
+   purchase reachable without a nav row are to put a badge in the panel bar's own `right` slot (the purchase
+   modal already does exactly that) or to lower the backdrop — both deviate from the render.
+   `paywall.spec.ts` therefore creates a subject tab before reaching for the badge.
+   Test fallout: the shared `createSubjectTab` helper now prefers the box's "+" (the strip's is behind the
+   backdrop), two `functional.spec.ts` tests and two `modal-backdrop.spec.ts` tests were repointed the same
+   way, and `visual.spec.ts`'s first-run baseline captures the whole panel instead of the content area.
+
+5. **Dashboard header + footer: the flanking HEADER BOXes now read as a layer** (client: "missing layer
+   either side of logo that makes logo pronounced — got it right on the modals"). They were always in the
+   DOM; the defect was **paint order**. The bar's white hilite is absolutely positioned, so the dashboard's
+   *static* bands painted UNDER it and washed out to near-white (measured column: `158,226,255` at 40% height
+   vs the modal bar's `57,179,230`), while `ModalMetalBar`'s bands were `relative` and painted over it. The
+   two copies of the band class had drifted — the modal's also had a `border-[0.5px] border-accent-deep`
+   hairline. Now there is ONE `HEADER_BOX_CLASS` (exported from `BrandLockup.tsx`, `ModalMetalBar` appends
+   only its own `flex items-center`), carrying both `relative` and the hairline, so the dashboard band, the
+   footer and the small modal box's bar all match the backdrop bar. **Paint-only: every bar height and the
+   plate box are byte-identical** (34.61 / 35.61 / 25.51 px before and after; `metal-bar.spec.ts` 4/4 —
+   plate 3.1:1, NN ink 52.5%/49.4%, rim, flush-to-top, footer == header all still hold). Side effect worth
+   confirming: the small modal box's bar changed too, since it shares the component.
+   Baselines regenerated: `header.png` (its test now creates a tab first — on first run the new backdrop
+   covered the nav row, making that baseline depict the wrong thing), `first-run.png`, `full-panel.png`,
+   `add-subject-tab-modal.png`, `delete-confirm-modal.png`.
+   **Client CSS received afterwards (`UPDATE____HEADER BOX RIGHT` + `WHITE HILITE ON TOP BAR`) and it
+   confirms the fix.** Their band is `238×39`, `rgba(41,171,226,0.86)`, `inset 0 -18px 11.2px 3px
+   rgba(0,0,0,0.28)` — our values byte for byte (ours in rem, which is why they scale). Their hilite is
+   `606×14`, `#9EE2FF`, `blur(2.95px)`: 606 is the bar's full width (686 panel − two 40px tab columns), so
+   `inset-x-0` is right, and 14 of 39 = **36%**, not the 40% we had → `h-[40%]` → `h-[36%]` (paint-only).
+   The 0.86 alpha is the proof of paint order: with the hilite on top the bar's top reads near-white
+   `#9EE2FF`, which is what the client rejected; under the band, 14% of it bleeds through as the top sheen.
+   Their `238px` band also cross-checks the plate: at the 39px reference bar, `3.1 × 39 = 121px` leaves
+   242.6px per band vs their 238 (their own numbers imply 3.33:1) — the client fixed 3.1 on 2026-07-29, so
+   the plate ratio was left alone. The `border-[0.5px] border-accent-deep` hairline is NOT in their paste,
+   but copy-as-CSS is known to drop strokes and the modal bar they call correct has it, so it stays — flagged
+   for confirmation.
+   **The look is now pinned by tests, not by the Figma** (`tests/e2e/metal-bar-layers.spec.ts`, header +
+   footer): painted-pixel assertions taken from the client's crop — the bar's top row is a deep line
+   (`lum < 120`), the band's brightest row is NOT the hilite colour (`#9EE2FF`, `lum 209`) and stays under
+   `lum 175`, that peak sits in the bar's top 45%, the lower half fades monotonically, the plate's interior is
+   ≥1.5× the band's luminance beside it, and a darker seam separates band from plate. **Verified to fail on
+   the pre-fix build** (band peak measured exactly `158,226,255`, top row `86,182,223`), so it is a real guard
+   rather than a green rubber stamp. New spec file because `metal-bar.spec.ts` was at 266 LOC.
+
+6. **Trial modal: any click but BUY returns to the trial** (client: "clicked the logo to check time left…
+   there is no way to go back to NN trial mode but am forced to purchase. Had to go through with purchase
+   and then cancel"). It *was* dismissable — by Escape only, which nothing advertises: `DialogContent` is
+   `h-full w-full`, so Radix has no "outside" to close on, and `showCloseButton={false}` is deliberate.
+   Fix (explicit human approval, §7 file): one wrapper `div[data-paywall-dismiss]` around `ModalBackdrop`
+   with `onClick={() => onOpenChange(false)}`. **No payment wiring touched** — `onBuy`, ExtPay and the trial
+   math are untouched, and BUY's own handler already closed the modal, so its bubbling click changes nothing.
+   `paywall.spec.ts` now also asserts a click low in the panel and a click on the trial box both dismiss.
+   **This surfaced a real hole from item 4:** with zero subject tabs the first-run backdrop covers the nav
+   row, so `[aria-label="Open trial info"]` cannot be clicked at all — an expired-trial user with no tabs has
+   no route to BUY. The paywall spec now creates a tab before reaching for the badge, which keeps the suite
+   honest but does not fix the product hole, which the client's design deliberately keeps (see item 4).
+
+7. **BLUE LINE under the nav bar re-implemented for separation** (client: "not coming across as prominent as
+   it needs to… the line includes a white drop shadow on the line itself set pretty tight [minimum blur] along
+   with a blurred black solid below it in the stack"). The line was *there* — `getComputedStyle` reported a
+   clean `0 4px 0 0 #29abe2` — but the `SHADOW __BLUE LINE` band (593×8, `rgba(55,55,55,0.77)`, blur 4.8px,
+   which matches our CSS exactly) sat only 5px below the header, and a 4.8px Gaussian reaches ~7px, so its
+   tail painted the accent line **44,146,190 instead of 41,171,226** and greyed the white border above it.
+   Fixes, both paint-only: the missing tight white drop shadow is a second entry in the header's box-shadow
+   list (`0 6px 1px 0 rgba(255,255,255,0.95)`, painted under the accent entry since the list draws
+   first-on-top), and the dark band moved from `-bottom-[0.8125rem]` to `-bottom-[1.375rem]` (22px) so its
+   blur starts below the white instead of over the line. Swept 19/22/25/28px in painted pixels — 22px is the
+   first offset where all 8 device rows of the line read exactly the accent.
+   Stack now, measured downward from the header's bottom edge: 8 device rows of accent (`41,170,225` →
+   `42,163,214`, the last row an antialias blend into the white), a tight white pair (`238`), then the dark
+   falloff to `158` against a `246` notes area.
+   Pinned by `nav-strip-frame.spec.ts` → "the blue line separates the nav bar": every row of the line must
+   keep `b ≥ 205` and `g ≥ 155` (the pre-fix wash fails both — verified by reverting: `44,146,190`, worst
+   off 69), a white row above `lum 235` must follow it, and the dark band must sit ≥25 lum below the notes
+   area. That spec's older frame test also needed a subject tab now, since the first-run backdrop covers the
+   nav strip.
+   **Revised the same day** after the client added a **white bar** under the line ("the shadow must be sticked
+   to that white bar"). Final structure: the line and bar are no longer box-shadows on `<header>` but a
+   `div[data-nn-blue-line]` (4px `bg-accent` + 3px `bg-white`, in **px** — the accent line is the client's 4px
+   and must not thin out with the panel) rendered **after** the dark band, so the band's blur can hug the bar
+   without tinting either. Box-shadows could not do this: a `<header>` shadow paints under every child, and
+   negative z-index does not help (a negative-z child still paints above its parent's background and shadows).
+   Note `bottom` on an absolute child is measured from the PADDING box, so both offsets carry the header's 2px
+   `border-b` (`-bottom-[9px]`, `-bottom-[calc(9px+0.5rem)]`) — without it the line painted over the white
+   border and the nav-frame test dropped to 1px.
+   The band's blur landed on the first note (its accent border measured `47,126,159`), so per the client the
+   notes list's top padding went `py-4` → `pt-6 pb-4`: the gap is now 17.5px, the shadow runs its full depth
+   (darkest `134`) and fades to `163` before the card, whose border reads `41,169,223` of the accent's 226 —
+   the two shadows merge in the gap instead of the header's landing on the card.
+   Painted stack now: `41,171,226` ×4px, `255,255,255` ×3px, then the dark falloff. Pinned by the new
+   `tests/e2e/blue-line.spec.ts` (moved out of `nav-strip-frame.spec.ts`, which was near the 300 cap): two
+   tests — the line/bar/stuck-shadow one and "the shadow fades out before the first note", which asserts the
+   gap is >15px, carries shadow (`lum < 180`) and leaves the note's border ≥205 blue.
+
+8. **Purchase modal: the client's STATEMENT box, and the BG SQUARES fixed** (2026-07-31).
+   - `STATEMENT BOX` (their CSS: 665×219, `rgba(41,171,226,0.1)`, `0.3px solid #29ABE2`, text 17/21 white):
+     new optional `statement` slot on `ModalBackdrop`, filled only by `PaywallDialog`, pinned at 9% of the
+     inner frame with a `13.6875rem` height (= 219px at the 16px reference root, so it scales). Chrome floors
+     the 0.3px hairline at 0.5px — that is its minimum visible border, not a mistake.
+     **Font:** their type panel says *Familjen Grotesk Regular 17*, which the extension did not bundle;
+     `FamiljenGrotesk-Regular.ttf` (55 kB, SIL OFL 1.1, from Google Fonts) is now bundled exactly like Fjalla
+     One and Inter, exposed as `--font-statement`, and CRXJS adds it to `web_accessible_resources` on its own.
+     Replace the file if the client prefers their own copy.
+   - The statement forced a **second layout branch**: their render DECOUPLES the ghost NN (rides the frame's
+     top, half of it behind the box) from the wordmark and tagline (~42% / ~53% of the panel). The existing
+     grouped layout pins both texts to percentages *of the ghost box*, so it cannot express that; the
+     no-statement path (every dashboard modal) is untouched, and `BrandWordmark`/`Tagline` were extracted so
+     the two branches cannot drift.
+   - **BG SQUARES were a layout bug, not a styling one.** As `absolute top-1/2 left-1/2` with no width the
+     grid shrink-to-fits against what remains of the container — half its width — so the three 112px columns
+     were squeezed into 248px of a 500px panel and overlapped into one vertical smear down the middle ("looks
+     nothing like the design"). Wrapping it in an `inset-0` flex centring container gives it its natural
+     width: now 82% of the panel, three distinct columns, blue reaching both outer thirds.
+   - Pinned by the new `tests/e2e/paywall-statement.spec.ts` (own file, `paywall.spec.ts` is at the cap): the
+     four paragraphs verbatim, the box's width share/height-in-rem/position/bg-alpha/hairline/font/size, then
+     the grid's 15 squares, ≥0.75 width share (it measured **0.496** before the fix) and painted blue in the
+     left, middle and right thirds. All six visual baselines regenerated.
+
+9. **First run: "+" SWAPS the box, it does not reload the modal** (client 2026-08-01: "it looks like a
+   flicker… clicking the plus should render the add subject modal alone"). `FirstRunPanel` was unmounted the
+   moment `addDialogOpen` flipped, and `NnModalShell` mounted a second, identical full-panel backdrop with the
+   dialog's zoom/fade — the whole screen re-rendered for what should be a box swap. Now the panel stays
+   mounted and only hides its box (`showBox`), and the dialog draws **only its box**: `showBackdrop` threads
+   App → `SubjectTabStrip` → `SubjectTabAddDialog` → `SubjectTabNameModal` → `NnModalShell`.
+   Second half of the fix, found by measuring rather than by eye: Radix always paints a `bg-black/80` overlay
+   under `DialogContent`, which the opaque backdrop used to hide. Without a backdrop it dimmed the first-run
+   panel — the probe pixel went 65 → 13 — so `DialogContent` gained `showOverlay` (`components/ui/dialog.tsx`)
+   and the shell passes it alongside `showBackdrop`.
+   Guarded by `tests/e2e/first-run-swap.spec.ts`: one backdrop and one box at all times, and a backdrop pixel
+   sampled every frame through the click must not move in EITHER direction (lighter = it unmounted, darker =
+   the dimming overlay landed) — measured 65 across all 12 frames. CANCEL swaps back the same way.
+
+10. **Note body: the logo is blue and blurred, the background stays light** (client: "use the blurred logo
+    for note background", their board labels it "NOTE LOGO BG" over a light body; then "NN blue blurred").
+    Final state: `bg-note` with #464646 text as before, and the watermark is `ModalWatermark` in
+    `fill=var(--color-accent)` at `opacity-[0.22]` with `blur-[0.390625rem]` — accent rather than the old
+    white fill, and a touch more opacity than the modal box's 0.14, which is calibrated for a dark surface.
+    **Two rounds were spent on a wrong reading first**, recorded so nobody repeats them: the ghost PNG
+    (`GhostLogo`) was tried — accent blue at alpha 41/255, which on light grey reads as a blue haze — and
+    then `NnModalBox`'s full dark treatment (dark base + inset accent glow + light text), which the client's
+    board contradicts. `GhostLogo` is module-private again and the body text is #464646 again.
+    **No deviation in the end.** The glow's alpha was tempered to 0.35 for one round, reasoning that the
+    modal's `inset 0 23px 101px` at full accent is calibrated for a 189px box and floods a note body twice
+    that size; the client rejected it — "it must be the blurred logo but with a blurred blue background… now
+    it's a blurred NN with a gray background, it doesn't look in the design theme". The full-strength glow is
+    exactly what makes the body read blue instead of grey, and it matches the crop they sent. Verbatim it is.
+    A first pass used the ghost PNG (`GhostLogo`) instead; it is accent blue at alpha 41/255 and, without the
+    dark background under it, read as a blue haze on light grey — which is what prompted the client's second
+    message. `GhostLogo` is module-private again.
+
 ## Where polish left off (last updated 2026-07-29)
 
 Everything the client raised has been implemented and pixel-verified, and a full review pass has been
-applied on top (§ sections 22–26). Suite: **68 tests / 21 specs, all green.** Threads that are closed but
-likely to come back:
+applied on top (§ sections 22–26). Suite at that point: **68 tests / 21 specs, all green** (now 75/24 after
+the 2026-07-31 → 08-01 round). Threads that are closed but likely to come back:
 
 - The plate's *inner* blue glow spreads ~8px horizontally vs ~5px vertically, because
   `preserveAspectRatio="none"` stretches the artwork 1.19× vertically and dilutes the glow there. The rim

@@ -31,26 +31,29 @@ test("the panel casts a shadow down its left edge onto the page", async ({
   });
 
   // Canvas-decode in the page: a hand-rolled PNG reader gets the row filters wrong.
-  const scan = await page.evaluate(async (dataUrl) => {
-    const img = await new Promise<HTMLImageElement>((res, rej) => {
-      const i = new Image();
-      i.onload = () => res(i);
-      i.onerror = rej;
-      i.src = dataUrl;
-    });
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = 1;
-    const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(img, 0, 0);
-    const px = ctx.getImageData(0, 0, canvas.width, 1).data;
-    // Left → right = away from the panel → towards it. Reverse so index 0 abuts the edge.
-    const luma: number[] = [];
-    for (let x = canvas.width - 1; x >= 0; x -= 1) {
-      luma.push(px[x * 4]);
-    }
-    return { luma, devicePx: canvas.width };
-  }, `data:image/png;base64,${row.toString("base64")}`);
+  const scan = await page.evaluate(
+    async (dataUrl) => {
+      const img = await new Promise<HTMLImageElement>((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = dataUrl;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = 1;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const px = ctx.getImageData(0, 0, canvas.width, 1).data;
+      // Left → right = away from the panel → towards it. Reverse so index 0 abuts the edge.
+      const luma: number[] = [];
+      for (let x = canvas.width - 1; x >= 0; x -= 1) {
+        luma.push(px[x * 4]);
+      }
+      return { luma, devicePx: canvas.width };
+    },
+    `data:image/png;base64,${row.toString("base64")}`,
+  );
 
   const perCssPx = scan.devicePx / REACH;
   const at = (cssPx: number) => scan.luma[Math.round(cssPx * perCssPx)];
@@ -81,21 +84,24 @@ test("the panel casts a shadow down its left edge onto the page", async ({
     const strip = await page.screenshot({
       clip: { x: shell.x - 6, y, width: 5, height: 1 },
     });
-    const dark = await page.evaluate(async (dataUrl) => {
-      const img = await new Promise<HTMLImageElement>((res, rej) => {
-        const i = new Image();
-        i.onload = () => res(i);
-        i.onerror = rej;
-        i.src = dataUrl;
-      });
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = 1;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
-      const px = ctx.getImageData(0, 0, canvas.width, 1).data;
-      return px[(canvas.width - 1) * 4];
-    }, `data:image/png;base64,${strip.toString("base64")}`);
+    const dark = await page.evaluate(
+      async (dataUrl) => {
+        const img = await new Promise<HTMLImageElement>((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = dataUrl;
+        });
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = 1;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
+        const px = ctx.getImageData(0, 0, canvas.width, 1).data;
+        return px[(canvas.width - 1) * 4];
+      },
+      `data:image/png;base64,${strip.toString("base64")}`,
+    );
     console.log(`${label} of the edge: luma ${dark}`);
     expect(dark, `shadow present at the ${label} of the edge`).toBeLessThan(
       PAGE_BG - 30,

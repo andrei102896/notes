@@ -3,19 +3,23 @@ import { addNote, createSubjectTab } from "./helpers";
 
 /** Baselines = the app's current approved design (tests/e2e/__screenshots__). Refresh deliberately with `npm run test:e2e:update` after an intended design change. */
 test.describe("visual baselines", () => {
+  // A tab first: on first run the full-panel backdrop covers the nav row, which is not what this depicts.
   test("dashboard header band", async ({ overlay }) => {
+    await createSubjectTab(overlay, "ALPHA");
     await expect(overlay.locator("header")).toHaveScreenshot("header.png");
   });
 
+  // Whole panel, not just the content area: first run IS the full-panel backdrop (client 2026-07-31).
   test("first-run empty state", async ({ overlay }) => {
     await expect(
-      overlay.locator('[aria-label="Dashboard content"]'),
+      overlay.locator("#nn-scroll-bookmarks-overlay-host"),
     ).toHaveScreenshot("first-run.png");
   });
 
   test("add subject tab modal", async ({ overlay }) => {
+    // First run's backdrop covers the strip, so the box's "+" is the reachable one (same dialog).
     await overlay
-      .locator('[aria-label="Subject tabs"] button[aria-haspopup="dialog"]')
+      .locator('[data-nn-modal-box] [aria-label="Add subject tab"]')
       .click();
     const dialog = overlay.locator('[data-slot="dialog-content"]');
     await dialog.waitFor({ state: "visible" });

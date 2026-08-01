@@ -3,10 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import {
-  toOpenableUrl,
-  useNoteLinkAnchor,
-} from "@/hooks/useNoteLinkAnchor";
+import { toOpenableUrl, useNoteLinkAnchor } from "@/hooks/useNoteLinkAnchor";
 import type { FormatState } from "@/lib/richTextFormat";
 import { cn } from "@/lib/utils";
 import type { NNAnchorPosition } from "@/types/nnData";
@@ -280,9 +277,7 @@ export function NoteUrlEditor({
             }}
             className={cn(
               "h-full flex-1 rounded-none border-0 border-r border-black p-0 font-ui text-md font-bold",
-              formatState?.bold
-                ? "bg-accent text-white"
-                : "bg-note text-black",
+              formatState?.bold ? "bg-accent text-white" : "bg-note text-black",
             )}
           >
             B

@@ -62,7 +62,9 @@ export function NnLogoPlate({
           <rect width="120" height="29" fill="white" />
         </g>
         {/* Rim lives in MetalBarPlate as a CSS-border overlay — an svg stroke rescaled with the artwork and landed sub-pixel. */}
-        <g transform={`translate(0 14.5) scale(1 ${PLATE_GLYPH_SQUEEZE_Y}) translate(0 -14.66)`}>
+        <g
+          transform={`translate(0 14.5) scale(1 ${PLATE_GLYPH_SQUEEZE_Y}) translate(0 -14.66)`}
+        >
           <path
             d="M82.7412 6.65039L82.6113 6.74219C78.6338 9.5556 76.5451 11.072 72.6836 13.835L72.6816 13.8369L69.1514 16.3896V6.65039H61.3066V22.6504H70.0664L70.1973 22.5566L80.123 15.4658L80.125 15.4639L83.6553 12.9102V22.6504H91.5V6.65039H82.7412Z"
             fill="#0D7DAD"
@@ -193,10 +195,11 @@ export function MetalBarPlate({
   );
 }
 
-/** Flanking bands (Figma UPDATE____HEADER BOX LEFT/RIGHT): accent at 0.86 so the bar's stronger inset
- *  shadow reads through — darker and blue-nuanced, not flat. */
-const HEADER_BOX_CLASS =
-  "h-full flex-1 bg-accent/[0.86] shadow-[inset_0_-1.125rem_0.7rem_0.1875rem_rgba(0,0,0,0.28)]";
+/** Flanking bands (Figma UPDATE____HEADER BOX LEFT/RIGHT), shared with `ModalMetalBar`. `relative` is
+ *  load-bearing: the bar's hilite is absolutely positioned, so a static band paints under it and washes out
+ *  to near-white instead of reading as its own layer. */
+export const HEADER_BOX_CLASS =
+  "relative h-full flex-1 border-[0.5px] border-accent-deep bg-accent/[0.86] shadow-[inset_0_-1.125rem_0.7rem_0.1875rem_rgba(0,0,0,0.28)]";
 
 /** Blue metal bar (Figma TOP METAL BAR DB), shared by the dashboard brand band, the footer and the
  *  small-modal header — each passes its own height and rim thickness. */
@@ -218,11 +221,11 @@ export function BrandMetalHeaderBar({
         className,
       )}
     >
-      {/* WHITE HILITE ON TOP BAR (Figma 40% of the bar). Kept UNDER the plate: over it at full strength
-          it erases the rim's top edge and tints the glyphs — the rim carries its own copy of the ramp. */}
+      {/* WHITE HILITE ON TOP BAR (Figma 606×14 = the bar's full width, 36% of its height). Kept UNDER the
+          plate and the bands — through their 0.86 alpha it reads as a soft sheen, not a white wash. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[40%] bg-accent-hilite blur-[0.184375rem]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[36%] bg-accent-hilite blur-[0.184375rem]"
       />
       <div className={HEADER_BOX_CLASS} />
       <MetalBarPlate className={plateClassName} rimClassName={rimClassName}>

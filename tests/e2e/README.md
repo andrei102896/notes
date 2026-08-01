@@ -1,16 +1,21 @@
 # E2E suite (Playwright)
 
-> The 6 `__screenshots__/visual.spec.ts/*.png` baselines are the **current "metal" design**,
-> regenerated on client sign-off (2026-07-08). Refresh them with `npm run test:e2e:update` (calibration
-> machine only) after an intended design change.
+> The 6 `__screenshots__/visual.spec.ts/*.png` baselines are the **current design**, last regenerated
+> **2026-08-01** (client feedback round: first-run panel, blue-line stack, metal-bar layers, statement box,
+> note-body treatment). Refresh them with `npm run test:e2e:update` (calibration machine only) after an
+> intended design change — and review each PNG, since `maxDiffPixelRatio` hides small-area changes.
 
 Functional + visual-regression coverage for the NN overlay, driven through the real
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
-Specs (21 — the redesign and the 2026-07-31 behaviour work added `paywall`, `modal-backdrop`,
-`subject-tab-sizing`, `metal-bar`, `scrollbar`, `panel-shadow`, `nav-strip-frame`,
-`session-persistence`, plus the opt-in `session-persistence.live`): `functional`, `visual`,
+Specs (24 in the default run, plus the opt-in `session-persistence.live` — the redesign and the
+2026-07-31 behaviour work added `paywall`, `modal-backdrop`, `subject-tab-sizing`, `metal-bar`,
+`scrollbar`, `panel-shadow`, `nav-strip-frame`, `session-persistence`; the 2026-07-31 → 08-01 client
+feedback added `metal-bar-layers` (the bar's flanking layers, taken from the client's crop rather than
+their Figma CSS), `blue-line` (the accent line + white bar + the shadow that must die before the first
+note), `paywall-statement` (the statement box + the background squares' spread) and `first-run-swap`
+(clicking "+" swaps the box without the backdrop reloading)): `functional`, `visual`,
 `navigation` (single-tab persistence + subject-tab
 strip scroll restore after cross-site nav), `anchor` (cross-page fire + late-layout retry),
 `anchor-persist` (overlay stays visible after an anchor pick — the host shell, not just the
@@ -25,7 +30,7 @@ divider closes the group after PASTE).
 ## Run
 
 ```bash
-npm run test:e2e          # build dist-e2e, run the whole hermetic suite (68 tests)
+npm run test:e2e          # build dist-e2e, run the whole hermetic suite (75 tests / 24 specs)
 npm run test:e2e:update   # same, but refresh the visual baselines
 npm run test:e2e:live     # *.live.spec.ts against REAL sites (ford.com + bugatti.com; needs network)
 npx playwright test functional   # functional specs only (after a build:e2e)
@@ -34,6 +39,13 @@ npx playwright test functional   # functional specs only (after a build:e2e)
 `*.live.spec.ts` is excluded from the default run (`testIgnore`, lifted by `NN_LIVE=1`): it depends on the
 internet and on sites that change. Run it for navigation/restore work, because stub pages are always
 bfcache-eligible while the real sites are not — opposite code paths.
+
+**With zero subject tabs the panel is in its first-run state**, whose full-panel backdrop covers the nav row,
+the A–Z rail and the strip: the trial badge cannot be clicked and a pixel scan over the strip's `+` reads the
+backdrop. Specs that need either must `createSubjectTab` first. That helper also re-decides which `+` to click
+and retries — the panel mounts after an async storage read, so resolving the target once could aim at the
+strip's `+` just before the backdrop covered it, and the dialog never opened (only ever reproduced in
+full-suite runs).
 
 Each test boots a fresh Chromium profile with the extension loaded, so windows
 open/close per test — that is expected. The profile keeps the browser's

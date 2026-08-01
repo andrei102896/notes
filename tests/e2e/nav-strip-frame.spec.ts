@@ -1,4 +1,5 @@
 import { expect, test } from "./fixtures";
+import { createSubjectTab } from "./helpers";
 
 /** Client rule: the white frame around the nav strip must read equally thick on all four sides. The
  *  bottom is the trap — the header's own 2px white border-b stacks under the strip's padding, so an even
@@ -8,6 +9,8 @@ test("the nav strip's white frame is even on all four sides", async ({
   overlay,
   page,
 }, testInfo) => {
+  // A subject tab first: with zero tabs the first-run backdrop covers the nav strip (client 2026-07-31).
+  await createSubjectTab(overlay, "ALPHA");
   await page.waitForTimeout(600);
   const strip = overlay.locator("header > div:has(> button)");
   const box = await strip

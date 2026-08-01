@@ -118,7 +118,9 @@ test.describe("live sites", () => {
     await setOverlay(context, page, true);
 
     await visit(page, SITE_B);
-    await expect.poll(() => overlayOnScreen(page), { timeout: 20_000 }).toBe(true);
+    await expect
+      .poll(() => overlayOnScreen(page), { timeout: 20_000 })
+      .toBe(true);
 
     await setOverlay(context, page, false);
 
@@ -131,9 +133,10 @@ test.describe("live sites", () => {
 
     // On a bfcache restore the frozen frame repaints before any script runs — one or two frames is the
     // floor. A rebuilt page must never paint it at all.
-    expect(probe.onScreenFrames, "no visible flash of a stale panel").toBeLessThan(
-      probe.bfcache ? 4 : 1,
-    );
+    expect(
+      probe.onScreenFrames,
+      "no visible flash of a stale panel",
+    ).toBeLessThan(probe.bfcache ? 4 : 1);
     expect(await overlayOnScreen(page), "still minimized").toBe(false);
   });
 
@@ -146,12 +149,16 @@ test.describe("live sites", () => {
     await setOverlay(context, page, true);
 
     await visit(page, SITE_B);
-    await expect.poll(() => overlayOnScreen(page), { timeout: 20_000 }).toBe(true);
+    await expect
+      .poll(() => overlayOnScreen(page), { timeout: 20_000 })
+      .toBe(true);
 
     await page.goBack({ waitUntil: "commit" });
     const probe = await readProbe(page);
     console.log(`back to ${SITE_A} maximized: bfcache=${probe.bfcache}`);
-    await expect.poll(() => overlayOnScreen(page), { timeout: 20_000 }).toBe(true);
+    await expect
+      .poll(() => overlayOnScreen(page), { timeout: 20_000 })
+      .toBe(true);
   });
 
   test("NN slides back in on a real cross-site load, and is back fast", async ({
@@ -164,7 +171,9 @@ test.describe("live sites", () => {
 
     const startedAt = Date.now();
     await visit(page, SITE_B);
-    await expect.poll(() => overlayOnScreen(page), { timeout: 20_000 }).toBe(true);
+    await expect
+      .poll(() => overlayOnScreen(page), { timeout: 20_000 })
+      .toBe(true);
     const backOnScreenMs = Date.now() - startedAt;
 
     await page.waitForTimeout(2000);

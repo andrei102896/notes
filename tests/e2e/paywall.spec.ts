@@ -1,7 +1,7 @@
 import { expect, test, toggleOverlay } from "./fixtures";
+import { createSubjectTab } from "./helpers";
 
 import type { BrowserContext, FrameLocator, Page } from "@playwright/test";
-
 
 /** Seeds an active trial + open banner into chrome.storage.local. Stamped from the WORKER's clock: the
  *  page clock is frozen in the past, so elapsed goes negative — still an active trial. */
@@ -109,7 +109,9 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
   // so they are compared directly rather than against a recorded number.
   const plates = await host.evaluate((hostEl) => {
     const doc = hostEl.ownerDocument;
-    const dash = doc.querySelector("header [data-nn-plate]")!.getBoundingClientRect();
+    const dash = doc
+      .querySelector("header [data-nn-plate]")!
+      .getBoundingClientRect();
     const pay = doc
       .querySelector('[data-slot="dialog-content"] [data-nn-plate]')!
       .getBoundingClientRect();
@@ -119,7 +121,10 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
       pay: { w: pay.width, h: pay.height },
     };
   });
-  expect(Math.abs(plates.gap), "purchase plate flush to the outer top").toBeLessThan(0.6);
+  expect(
+    Math.abs(plates.gap),
+    "purchase plate flush to the outer top",
+  ).toBeLessThan(0.6);
   expect(
     Math.abs(plates.pay.h - plates.dash.h),
     `purchase plate height ${plates.pay.h} vs dashboard ${plates.dash.h}`,
@@ -137,29 +142,41 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
         p.getBoundingClientRect(),
       );
       return {
-        w: Math.max(...rects.map((r) => r.right)) - Math.min(...rects.map((r) => r.left)),
-        h: Math.max(...rects.map((r) => r.bottom)) - Math.min(...rects.map((r) => r.top)),
+        w:
+          Math.max(...rects.map((r) => r.right)) -
+          Math.min(...rects.map((r) => r.left)),
+        h:
+          Math.max(...rects.map((r) => r.bottom)) -
+          Math.min(...rects.map((r) => r.top)),
       };
     };
     const doc = hostEl.ownerDocument;
     return {
       dash: read(doc.querySelector("header [data-nn-plate]")!),
-      pay: read(doc.querySelector('[data-slot="dialog-content"] [data-nn-plate]')!),
+      pay: read(
+        doc.querySelector('[data-slot="dialog-content"] [data-nn-plate]')!,
+      ),
     };
   });
   console.log(
     `NN ink — dashboard ${inks.dash.w.toFixed(2)}×${inks.dash.h.toFixed(2)}, ` +
       `purchase ${inks.pay.w.toFixed(2)}×${inks.pay.h.toFixed(2)}`,
   );
-  expect(inks.pay.w, "purchase NN ink width == dashboard's").toBeCloseTo(inks.dash.w, 0);
-  expect(inks.pay.h, "purchase NN ink height == dashboard's").toBeCloseTo(inks.dash.h, 0);
+  expect(inks.pay.w, "purchase NN ink width == dashboard's").toBeCloseTo(
+    inks.dash.w,
+    0,
+  );
+  expect(inks.pay.h, "purchase NN ink height == dashboard's").toBeCloseTo(
+    inks.dash.h,
+    0,
+  );
 
   // Inspection artifact for design review.
   await page.screenshot({ path: testInfo.outputPath("paywall-full.png") });
 
   // Figma TRIAL PERIOD BOX; the buy box carries the same outline. Values are rem-based, so they are
   // compared back at the 16px reference.
-  for (const sel of ['[data-paywall-trial-box]', '[aria-label="Buy now"]']) {
+  for (const sel of ["[data-paywall-trial-box]", '[aria-label="Buy now"]']) {
     const box = await overlay.locator(sel).evaluate((el) => {
       const cs = getComputedStyle(el);
       const rootPx = parseFloat(
@@ -177,7 +194,7 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
     expect(box.border, `${sel} outline`).toBe("2px rgb(0, 129, 184)");
     expect(box.bg, `${sel} accent at 0.6`).toContain("0.6");
     expect(box.shadow, `${sel} inset depth`).toContain("inset");
-    if (sel === '[data-paywall-trial-box]') {
+    if (sel === "[data-paywall-trial-box]") {
       expect(box.refWidth, "trial box width").toBeCloseTo(184.34, 0);
       expect(box.refHeight, "trial box height").toBeCloseTo(30, 0);
     }
@@ -200,7 +217,7 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
   expect(Math.abs(leftGap - rightGap)).toBeLessThan(8);
 
   // Ghost NN must contribute visible pixels: hiding it has to change the region.
-  const ghost = overlay.locator("[data-modal-ghost]");
+  const ghost = dialog.locator("[data-modal-ghost]");
   const ghostBox = await ghost.boundingBox();
   if (!ghostBox) {
     throw new Error("ghost logo not measurable");
@@ -223,7 +240,10 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
   // Human-visible presence, not just "some pixel changed": the letters must alter a real share of the region.
   const ratio = await pixelDiffRatio(page, withGhost, withoutGhost);
   console.log(`ghost NN visible-pixel ratio: ${(ratio * 100).toFixed(1)}%`);
-  expect(ratio, "ghost NN is not visibly present in its region").toBeGreaterThan(0.05);
+  expect(
+    ratio,
+    "ghost NN is not visibly present in its region",
+  ).toBeGreaterThan(0.05);
 });
 
 test("purchase modal is dismissable via Escape and via BUY", async ({
@@ -234,6 +254,26 @@ test("purchase modal is dismissable via Escape and via BUY", async ({
   const dialog = overlay.locator('[data-slot="dialog-content"]');
 
   await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+
+  // A tab first: with zero tabs the first-run backdrop covers the nav row, the trial badge included.
+  await createSubjectTab(overlay, "ALPHA");
+  // Client 2026-07-31: clicking anywhere but BUY returns to the trial — the modal fills the panel, so
+  // Escape was the only way out and the user believed they had to purchase.
+  await overlay.locator('[aria-label="Open trial info"]').click();
+  await expect(dialog).toBeVisible();
+  const box = await dialog.boundingBox();
+  if (!box) {
+    throw new Error("paywall dialog not measurable");
+  }
+  // Low in the panel, clear of the metal bar's trial and BUY boxes.
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height * 0.8);
+  await expect(dialog).toBeHidden();
+
+  // The trial box itself also dismisses (it is not a control).
+  await overlay.locator('[aria-label="Open trial info"]').click();
+  await expect(dialog).toBeVisible();
+  await overlay.locator("[data-paywall-trial-box]").click();
   await expect(dialog).toBeHidden();
 
   // Reopen through the header logo (trial state → red logo button).

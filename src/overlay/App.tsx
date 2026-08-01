@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNNDashboardSession } from "@/hooks/useNNDashboardSession";
-import {
-  getExtPayClient,
-  isExtPayConfigured,
-} from "@/lib/extpay";
+import { getExtPayClient, isExtPayConfigured } from "@/lib/extpay";
 import { AlphabetIndexRollout } from "@/overlay/AlphabetIndexRollout";
 import {
   DashboardContent,
@@ -12,20 +9,18 @@ import {
 } from "@/overlay/DashboardContent";
 import { DashboardFooter } from "@/overlay/DashboardFooter";
 import { DashboardHeader } from "@/overlay/DashboardHeader";
+import { FirstRunPanel } from "@/overlay/FirstRunPanel";
 import { PaywallDialog } from "@/overlay/PaywallDialog";
 import {
   SubjectTabStrip,
   type SubjectTabStripHandle,
 } from "@/overlay/SubjectTabStrip";
 
-
 const TRIAL_START_STORAGE_KEY = "nn_trial_started_at";
 const TRIAL_BANNER_OPEN_KEY = "nn_trial_banner_open";
 
 const IS_PROD_TRIAL = import.meta.env.VITE_TRIAL_MODE === "prod";
-const TRIAL_WINDOW_MS = IS_PROD_TRIAL
-  ? 7 * 24 * 60 * 60 * 1000
-  : 7 * 60 * 1000;
+const TRIAL_WINDOW_MS = IS_PROD_TRIAL ? 7 * 24 * 60 * 60 * 1000 : 7 * 60 * 1000;
 const TRIAL_UNIT_MS = IS_PROD_TRIAL ? 24 * 60 * 60 * 1000 : 60 * 1000;
 type TrialUnit = "days" | "minutes";
 const TRIAL_UNIT: TrialUnit = IS_PROD_TRIAL ? "days" : "minutes";
@@ -33,14 +28,17 @@ const TRIAL_UNIT: TrialUnit = IS_PROD_TRIAL ? "days" : "minutes";
 async function getOrInitLocalTrialStartMs(): Promise<number> {
   const result = await chrome.storage.local.get(TRIAL_START_STORAGE_KEY);
   const existing = result[TRIAL_START_STORAGE_KEY];
-  if (typeof existing === "number" && Number.isFinite(existing) && existing > 0) {
+  if (
+    typeof existing === "number" &&
+    Number.isFinite(existing) &&
+    existing > 0
+  ) {
     return existing;
   }
   const now = Date.now();
   await chrome.storage.local.set({ [TRIAL_START_STORAGE_KEY]: now });
   return now;
 }
-
 
 export function App(): React.ReactElement {
   const {
@@ -74,8 +72,12 @@ export function App(): React.ReactElement {
 
   const subjectTabStripRef = useRef<SubjectTabStripHandle>(null);
   const dashboardContentRef = useRef<DashboardContentHandle>(null);
-  const trialExpiryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trialExpiryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
   const trialStartMsRef = useRef<number | null>(null);
   const [hasInvalidUrlDraft, setHasInvalidUrlDraft] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
@@ -193,7 +195,6 @@ export function App(): React.ReactElement {
     void chrome.storage.local.set({ [TRIAL_BANNER_OPEN_KEY]: trialBannerOpen });
   }, [trialBannerOpen, trialBannerLoaded]);
 
-
   useEffect(() => {
     const handler = () => {
       void refreshBillingAccess();
@@ -237,6 +238,7 @@ export function App(): React.ReactElement {
         activeSubjectTabId={pageSession.activeSubjectTabId}
         addDialogOpen={addDialogOpen}
         onAddDialogOpenChange={setAddDialogOpen}
+        addDialogOnFirstRunBackdrop={emptyState === "first-run"}
         isReadOnly={isReadOnly}
         onSelectTab={(id) => {
           if (pageSession.activeSubjectTabId === id) {
@@ -320,8 +322,11 @@ export function App(): React.ReactElement {
           browserTabUrlKey={browserTabUrlKey}
           activeSubjectTabId={pageSession.activeSubjectTabId}
           activeNoteId={effectiveActiveNoteId}
-          emptyState={addDialogOpen ? null : emptyState}
-          onRequestAddSubjectTab={() => setAddDialogOpen(true)}
+          emptyState={
+            !addDialogOpen && emptyState === "select-or-create"
+              ? "select-or-create"
+              : null
+          }
           isReadOnly={isReadOnly}
           onUpdateNote={(noteId, patch) => {
             if (isReadOnly) {
@@ -356,6 +361,15 @@ export function App(): React.ReactElement {
         <DashboardFooter />
       </div>
 
+      {/* Last child so it paints over the dashboard. Stays mounted while the add-tab dialog is open — only
+          its box hides — so "+" swaps boxes instead of remounting the backdrop. */}
+      {emptyState === "first-run" ? (
+        <FirstRunPanel
+          onRequestAddSubjectTab={() => setAddDialogOpen(true)}
+          isReadOnly={isReadOnly}
+          showBox={!addDialogOpen}
+        />
+      ) : null}
     </main>
   );
 }

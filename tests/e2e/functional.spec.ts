@@ -27,9 +27,9 @@ test.describe("first run", () => {
   test("the first-run + opens the add dialog and creates the first tab", async ({
     overlay,
   }) => {
-    // The + inside the first-run modal (not the strip's) — same dialog.
+    // The + inside the first-run box (not the strip's, which the full-panel backdrop covers) — same dialog.
     await overlay
-      .locator('[aria-label="Dashboard content"] [aria-label="Add subject tab"]')
+      .locator('[data-nn-modal-box] [aria-label="Add subject tab"]')
       .click();
     const dialog = overlay.locator('[data-slot="dialog-content"]');
     await dialog.waitFor({ state: "visible" });
@@ -64,7 +64,7 @@ test.describe("subject tabs", () => {
     overlay,
   }) => {
     await overlay
-      .locator('[aria-label="Subject tabs"] button[aria-haspopup="dialog"]')
+      .locator('[data-nn-modal-box] [aria-label="Add subject tab"]')
       .click();
     const dialog = overlay.locator('[data-slot="dialog-content"]');
     await dialog.waitFor({ state: "visible" });
@@ -249,9 +249,7 @@ test.describe("notes", () => {
     await expectTitles(overlay, ["KEEP ME"]);
   });
 
-  test("DELETE TAB removes the tab and its notes only", async ({
-    overlay,
-  }) => {
+  test("DELETE TAB removes the tab and its notes only", async ({ overlay }) => {
     await createSubjectTab(overlay, "ALPHA");
     await addNote(overlay, "ALPHA NOTE");
     await createSubjectTab(overlay, "BRAVO");

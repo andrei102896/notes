@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useBrowserTabLocation } from "@/hooks/useBrowserTabLocation";
 import { visibleNotesForDashboard } from "@/lib/nnDashboardNotes";
@@ -52,7 +47,12 @@ export function useNNDashboardSession(): {
   addNote: () => Promise<string | null>;
   updateNote: (
     noteId: string,
-    patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt">>,
+    patch: Partial<
+      Pick<
+        NNSyncNote,
+        "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt"
+      >
+    >,
   ) => Promise<void>;
   deleteNote: (noteId: string) => Promise<void>;
   deleteAllNotesInSubjectTab: (subjectTabId: string) => Promise<void>;
@@ -125,16 +125,13 @@ export function useNNDashboardSession(): {
     });
   }, []);
 
-  const patchSession = useCallback(
-    (patch: Partial<NNPageSessionState>) => {
-      setPageSession((prev) => ({ ...prev, ...patch }));
-      // Persist the subject so it follows the tab across navigation (docs/1).
-      if ("activeSubjectTabId" in patch) {
-        patchTabSession({ activeSubjectTabId: patch.activeSubjectTabId ?? null });
-      }
-    },
-    [],
-  );
+  const patchSession = useCallback((patch: Partial<NNPageSessionState>) => {
+    setPageSession((prev) => ({ ...prev, ...patch }));
+    // Persist the subject so it follows the tab across navigation (docs/1).
+    if ("activeSubjectTabId" in patch) {
+      patchTabSession({ activeSubjectTabId: patch.activeSubjectTabId ?? null });
+    }
+  }, []);
 
   // Cross-tab safety: if the selected subject was deleted in another tab, fall back to the default view instead of a stale id rendering an empty, instruction-less list.
   useEffect(() => {
@@ -194,7 +191,12 @@ export function useNNDashboardSession(): {
   const updateNote = useCallback(
     async (
       noteId: string,
-      patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt">>,
+      patch: Partial<
+        Pick<
+          NNSyncNote,
+          "url" | "heading" | "body" | "anchor" | "isExpanded" | "createdAt"
+        >
+      >,
     ) => {
       await persistUpdateNote(noteId, patch);
       setSync(migrateNNSyncPayload(await getNNSync()));

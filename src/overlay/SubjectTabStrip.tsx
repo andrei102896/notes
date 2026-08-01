@@ -7,10 +7,6 @@ import {
 } from "react";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  SUBJECT_TAB_DEFAULT_SPAN,
-  useSubjectTabCellSpans,
-} from "@/hooks/useSubjectTabCellSpans";
 import { useSubjectTabStripScroll } from "@/hooks/useSubjectTabStripScroll";
 import { indexOfFirstTabForLetter, type AirLetter } from "@/lib/airSubjectTabs";
 import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
@@ -46,6 +42,8 @@ type SubjectTabStripProps = {
   /** Add-tab dialog open state, lifted to the parent so the empty-state panel can hide while it's open. */
   addDialogOpen: boolean;
   onAddDialogOpenChange: (open: boolean) => void;
+  /** True while the first-run panel is on screen: its backdrop stays, so the dialog draws only its box. */
+  addDialogOnFirstRunBackdrop?: boolean;
   /** Select this tab without toggling off (e.g. SUBJECT-TABS-2 rename). */
   onEnsureActiveSubjectTab: (subjectTabId: string) => void | Promise<void>;
   onRenameSubjectTab: (
@@ -68,6 +66,7 @@ export const SubjectTabStrip = forwardRef<
     onCreateTab,
     addDialogOpen,
     onAddDialogOpenChange,
+    addDialogOnFirstRunBackdrop = false,
     onEnsureActiveSubjectTab,
     onRenameSubjectTab,
     isReadOnly = false,
@@ -83,10 +82,6 @@ export const SubjectTabStrip = forwardRef<
   );
 
   const tabsScrollAreaRef = useRef<HTMLDivElement>(null);
-  const cellSpans = useSubjectTabCellSpans(
-    sortedTabs.map((t) => t.name),
-    tabsScrollAreaRef,
-  );
   const { onScroll: handleStripScroll } = useSubjectTabStripScroll({
     scrollRef: tabsScrollAreaRef,
     activeSubjectTabId,
@@ -148,6 +143,7 @@ export const SubjectTabStrip = forwardRef<
         open={addDialogOpen}
         onOpenChange={onAddDialogOpenChange}
         onConfirm={(name) => onCreateTab(name)}
+        showBackdrop={!addDialogOnFirstRunBackdrop}
       />
 
       <SubjectTabRenameDialog
@@ -187,9 +183,7 @@ export const SubjectTabStrip = forwardRef<
         <Tabs
           value={activeSubjectTabId ?? ""}
           orientation="vertical"
-          /* The "+" cell above is device-snapped, the A–Z column is not: adding the difference back puts
-             every tab edge on an A–Z line instead of ~0.12px above it. */
-          className="mt-[var(--air-cell-drift)] flex min-h-0 min-w-10 flex-1 flex-col overflow-hidden"
+          className="flex min-h-0 min-w-10 flex-1 flex-col overflow-hidden"
           onValueChange={(next) => {
             if (next) {
               onSelectTab(next);
@@ -237,16 +231,12 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  /* width === height: rotation is a transform, so the column stacks by the UNROTATED
-                     height while the visible length is the width. pt centres the label on the strip. */
-                  style={{
-                    width: `calc(var(--air-cell) * ${cellSpans[tab.name] ?? SUBJECT_TAB_DEFAULT_SPAN})`,
-                    height: `calc(var(--air-cell) * ${cellSpans[tab.name] ?? SUBJECT_TAB_DEFAULT_SPAN})`,
-                  }}
-                  /* Junction lines are painted by the tab below, so the last tab would end open. An
-                     OUTER shadow (+x = the visual bottom under the rotation), not a border: a border
-                     paints inside the box and lands 1.5px above the A–Z grid line it must match. */
-                  className="shrink-0 justify-start leading-tight px-[1ch] pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left last:shadow-[1px_0_0_0_#ffffff]"
+                  /* w-max = the label plus its px-[1ch] ends; tabs are deliberately NOT quantised to A–Z
+                     cells. aspect-square keeps height === width — rotation is a transform, so the column
+                     stacks by the UNROTATED height while the visible length is the width. */
+                  /* Junction lines come from the tab below, so the last tab closes with an OUTER shadow: a
+                     border paints inside the box and reads short. */
+                  className="w-max aspect-square shrink-0 justify-start leading-tight px-[1ch] pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left last:shadow-[1px_0_0_0_#ffffff]"
                 >
                   {/* Case as typed: the client requires upper and lower case names (A–Z index matching and sorting are case-insensitive). */}
                   {tab.name}

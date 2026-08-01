@@ -33,7 +33,9 @@ async function expectPlateSpansBar(bar: Locator, label: string) {
   // Metal visible left and right, plate centred horizontally.
   expect(left, `${label} left metal`).toBeGreaterThan(0.5);
   expect(right, `${label} right metal`).toBeGreaterThan(0.5);
-  expect(Math.abs(left - right), `${label} horizontal centering`).toBeLessThan(1.5);
+  expect(Math.abs(left - right), `${label} horizontal centering`).toBeLessThan(
+    1.5,
+  );
 }
 
 test("header logo plate spans the metal band top to bottom", async ({
@@ -52,25 +54,24 @@ test("header logo plate spans the metal band top to bottom", async ({
       "nn-scroll-bookmarks-overlay-host",
     )!;
     const plate = el.querySelector(":scope > [data-nn-plate]")!;
-    return (
-      plate.getBoundingClientRect().top - host.getBoundingClientRect().top
-    );
+    return plate.getBoundingClientRect().top - host.getBoundingClientRect().top;
   });
-  expect(Math.abs(hostGap), "plate flush to the panel's outer top").toBeLessThan(0.6);
+  expect(
+    Math.abs(hostGap),
+    "plate flush to the panel's outer top",
+  ).toBeLessThan(0.6);
 
   // The client's anchor: the plate reads a little wider than the ADD NOTE button under it.
-  const vsAddNote = await overlay
-    .locator("header")
-    .evaluate((header) => {
-      const plate = header.querySelector("[data-nn-plate]")!;
-      const addNote = [...header.querySelectorAll("button")].find(
-        (b) => b.textContent?.trim().toLowerCase() === "add note",
-      )!;
-      return (
-        plate.getBoundingClientRect().width /
-        addNote.getBoundingClientRect().width
-      );
-    });
+  const vsAddNote = await overlay.locator("header").evaluate((header) => {
+    const plate = header.querySelector("[data-nn-plate]")!;
+    const addNote = [...header.querySelectorAll("button")].find(
+      (b) => b.textContent?.trim().toLowerCase() === "add note",
+    )!;
+    return (
+      plate.getBoundingClientRect().width /
+      addNote.getBoundingClientRect().width
+    );
+  });
   console.log(`header plate is ${vsAddNote.toFixed(2)}× the ADD NOTE button`);
   expect(vsAddNote, "plate wider than ADD NOTE").toBeGreaterThan(1);
   expect(vsAddNote, "plate not far wider than ADD NOTE").toBeLessThan(1.55);
@@ -101,11 +102,18 @@ test("header logo plate spans the metal band top to bottom", async ({
   console.log(
     `NN ink covers ${(ink.pctW * 100).toFixed(1)}% of the plate width, ${(ink.pctH * 100).toFixed(1)}% of its height`,
   );
-  expect(ink.pctW, "NN ink keeps the artwork's 52.5% width share").toBeCloseTo(0.525, 2);
+  expect(ink.pctW, "NN ink keeps the artwork's 52.5% width share").toBeCloseTo(
+    0.525,
+    2,
+  );
   expect(ink.pctH, "NN ink height share").toBeCloseTo(0.494, 2);
   // Centred in the plate on both axes.
-  expect(Math.abs(ink.gapL - ink.gapR), "NN centred horizontally").toBeLessThan(0.6);
-  expect(Math.abs(ink.gapT - ink.gapB), "NN centred vertically").toBeLessThan(0.6);
+  expect(Math.abs(ink.gapL - ink.gapR), "NN centred horizontally").toBeLessThan(
+    0.6,
+  );
+  expect(Math.abs(ink.gapT - ink.gapB), "NN centred vertically").toBeLessThan(
+    0.6,
+  );
 
   const plate = await bar.evaluate((el) => {
     const p = el.querySelector(":scope > [data-nn-plate]")!;
@@ -136,14 +144,19 @@ test("header logo plate spans the metal band top to bottom", async ({
     const rim = el.querySelector(":scope > [data-nn-plate] > div:last-child")!;
     const src = getComputedStyle(rim).borderImageSource;
     const stops = [...src.matchAll(/rgba?\(([^)]+)\)/g)].map((m) =>
-      m[1].split(",").slice(0, 3).map((n) => parseFloat(n)),
+      m[1]
+        .split(",")
+        .slice(0, 3)
+        .map((n) => parseFloat(n)),
     );
     return { src, stops };
   });
   expect(ramp.src, "rim carries a gradient, not a flat colour").toContain(
     "linear-gradient",
   );
-  expect(ramp.stops.length, "gradient has intermediate stops").toBeGreaterThan(2);
+  expect(ramp.stops.length, "gradient has intermediate stops").toBeGreaterThan(
+    2,
+  );
   // Blue channel darkens step by step; no stop may jump more than a third of the full range.
   const blues = ramp.stops.map((s) => s[2]);
   const range = blues[0] - blues[blues.length - 1];
@@ -156,7 +169,9 @@ test("header logo plate spans the metal band top to bottom", async ({
   }
   // Nothing above the iframe's top edge: clipping there thins the top rim while getComputedStyle
   // still reports its full width.
-  expect(plate.top, "plate not clipped by the iframe edge").toBeGreaterThan(-0.01);
+  expect(plate.top, "plate not clipped by the iframe edge").toBeGreaterThan(
+    -0.01,
+  );
 
   await bar.screenshot({ path: testInfo.outputPath("header-metal-bar.png") });
 });
@@ -172,12 +187,16 @@ test("header rows meet with no black seam and a 4px accent bottom line", async (
     const bar = header.querySelector("[data-nn-metal-bar]")!;
     const cs = getComputedStyle(header);
     const barCs = getComputedStyle(bar);
+    // The accent line is an element, not a box-shadow: it has to paint over the shadow band below it.
+    const line = header.querySelector("[data-nn-blue-line] > div")!;
+    const lineCs = getComputedStyle(line);
     return {
       barBottomBorder: barCs.borderBottomWidth,
       barBottomStyle: barCs.borderBottomStyle,
       whiteBorder: cs.borderBottomWidth,
       whiteColor: cs.borderBottomColor,
-      shadow: cs.boxShadow,
+      lineHeight: lineCs.height,
+      lineColor: lineCs.backgroundColor,
     };
   });
 
@@ -187,9 +206,9 @@ test("header rows meet with no black seam and a 4px accent bottom line", async (
   ).toBe(true);
   expect(edge.whiteBorder).toBe("2px");
   expect(edge.whiteColor).toBe("rgb(255, 255, 255)");
-  // Accent line stacked under it via box-shadow: 4px tall, accent colour.
-  expect(edge.shadow).toContain("rgb(41, 171, 226)");
-  expect(edge.shadow).toMatch(/0px 4px 0px 0px/);
+  // Accent line stacked under it: 4px tall, accent colour.
+  expect(edge.lineHeight).toBe("4px");
+  expect(edge.lineColor).toBe("rgb(41, 171, 226)");
 });
 
 test("small-modal logo plate spans its metal bar top to bottom", async ({
@@ -219,7 +238,10 @@ test("small-modal logo plate spans its metal bar top to bottom", async ({
         rim: getComputedStyle(plate.lastElementChild!).borderTopWidth,
       };
     });
-  expect(Math.abs(modalPlate.gap), "plate flush to the modal's outer top").toBeLessThan(0.6);
+  expect(
+    Math.abs(modalPlate.gap),
+    "plate flush to the modal's outer top",
+  ).toBeLessThan(0.6);
   // Modal plates keep the client render's ~3.5:1 box and the standard 3px rim.
   expect(modalPlate.ratio, "modal plate box ratio").toBeCloseTo(3.5, 1);
   expect(modalPlate.rim, "modal rim").toBe("3px");
@@ -230,7 +252,10 @@ test("small-modal logo plate spans its metal bar top to bottom", async ({
 });
 
 /** Client rule: the footer is the same bar as the header — same height, same plate, same rim. */
-test("footer bar matches the header band", async ({ overlay, page }, testInfo) => {
+test("footer bar matches the header band", async ({
+  overlay,
+  page,
+}, testInfo) => {
   await page.waitForTimeout(600);
   const both = await overlay
     .locator("#nn-scroll-bookmarks-overlay-host")
@@ -254,10 +279,19 @@ test("footer bar matches the header band", async ({ overlay, page }, testInfo) =
       };
     });
 
-  expect(both.footer.barH, "footer bar height").toBeCloseTo(both.header.barH, 1);
+  expect(both.footer.barH, "footer bar height").toBeCloseTo(
+    both.header.barH,
+    1,
+  );
   expect(both.footer.barW, "footer bar width").toBeCloseTo(both.header.barW, 1);
-  expect(both.footer.plateH, "footer plate height").toBeCloseTo(both.header.plateH, 1);
-  expect(both.footer.plateW, "footer plate width").toBeCloseTo(both.header.plateW, 1);
+  expect(both.footer.plateH, "footer plate height").toBeCloseTo(
+    both.header.plateH,
+    1,
+  );
+  expect(both.footer.plateW, "footer plate width").toBeCloseTo(
+    both.header.plateW,
+    1,
+  );
   expect(both.footer.rim, "footer rim").toBe(both.header.rim);
 
   await overlay

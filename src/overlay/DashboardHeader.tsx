@@ -43,7 +43,8 @@ export function DashboardHeader({
   isReadOnly = false,
 }: DashboardHeaderProps): React.ReactElement {
   const canDeleteSubjectTab = activeSubjectTabId !== null && !isReadOnly;
-  const canAddNote = activeSubjectTabId !== null && !disableAddNote && !isReadOnly;
+  const canAddNote =
+    activeSubjectTabId !== null && !disableAddNote && !isReadOnly;
   const canActOnNotes = activeSubjectTabId !== null;
   const canDeleteNotes = canActOnNotes && !isReadOnly;
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -58,9 +59,11 @@ export function DashboardHeader({
     }
   }, [activeSubjectTabId]);
 
-  // The accent line under the white border-b is a box-shadow: one element carries only one border-bottom.
+  // z-20 keeps the header UNDER the first-run backdrop (z-40): the client's render shows the whole panel as
+  // the backdrop, with no nav row. Cost, accepted: the trial badge is the only route to BUY, so a user whose
+  // trial expires with zero subject tabs cannot buy (and cannot create a tab either — the "+" is disabled).
   return (
-    <header className="sticky top-0 z-20 flex h-auto flex-col border-b-2 border-white bg-air-box shadow-[0_4px_0_0_var(--color-accent)]">
+    <header className="sticky top-0 z-20 flex h-auto flex-col border-b-2 border-white bg-air-box">
       {/* Narrower than the modals' plate: the client anchors its width to the ADD NOTE button below. */}
       <BrandMetalHeaderBar
         className="relative z-[1] h-[var(--air-cell)]"
@@ -161,12 +164,24 @@ export function DashboardHeader({
         />
       </div>
 
-      {/* SHADOW __BLUE LINE (Figma). The bottom offset clears the 2px white border plus the 4px accent
-          line so the band starts right beneath them. */}
+      {/* SHADOW __BLUE LINE (Figma 593×8, rgba(55,55,55,0.77), blur 4.8px), top edge flush under the white
+          bar. The line and bar are painted AFTER this div on purpose: as box-shadows on <header> they sat
+          under every child and this blur washed them out (a negative z-index does not fix that). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-[0.40625rem] -bottom-[0.8125rem] h-2 bg-[rgba(55,55,55,0.77)] blur-[0.3rem]"
+        className="pointer-events-none absolute inset-x-[0.40625rem] -bottom-[calc(9px+0.5rem)] h-2 bg-[rgba(55,55,55,0.77)] blur-[0.3rem]"
       />
+
+      {/* BLUE LINE + its white bar, in px (a fixed 4px line, bar proportioned against it). Offsets carry
+          +2px because `bottom` is measured from the PADDING box, i.e. inside the white border-b. */}
+      <div
+        aria-hidden
+        data-nn-blue-line=""
+        className="pointer-events-none absolute inset-x-0 -bottom-[9px] flex h-[7px] flex-col"
+      >
+        <div className="h-[4px] bg-accent" />
+        <div className="flex-1 bg-white" />
+      </div>
 
       <SubjectTabDeleteConfirmDialog
         open={deleteConfirmOpen}

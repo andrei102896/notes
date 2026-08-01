@@ -1,7 +1,14 @@
-export type FormatState = { bold: boolean; italic: boolean; underline: boolean };
+export type FormatState = {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+};
 
 export function isRichTextEmpty(html: string): boolean {
-  const plain = html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+  const plain = html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
   return plain.length === 0;
 }
 
@@ -24,7 +31,9 @@ function probeFormatAtNode(
   let underline = false;
 
   let cur: Node | null =
-    node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Node | null);
+    node.nodeType === Node.TEXT_NODE
+      ? node.parentElement
+      : (node as Node | null);
   while (cur && cur !== editor) {
     if (cur instanceof HTMLElement) {
       const tag = cur.tagName;

@@ -51,6 +51,8 @@ type NnModalShellProps = {
   /** Visually-hidden accessible title (Radix requires one). */
   title: string;
   children: React.ReactNode;
+  /** False when a full-panel backdrop is already on screen: a second one makes the box swap read as a reload. */
+  showBackdrop?: boolean;
 };
 
 /** Wrapper for every small modal: the full-panel NN backdrop (Figma DASHBOARD MODAL BG) with the box
@@ -60,27 +62,29 @@ export function NnModalShell({
   onOpenChange,
   title,
   children,
+  showBackdrop = true,
 }: NnModalShellProps): React.ReactElement {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
+        showOverlay={showBackdrop}
         className="top-0 left-0 block h-full w-full max-w-none translate-x-0 translate-y-0 gap-0 rounded-none border-0 bg-transparent p-0 shadow-none sm:max-w-none"
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
         <DialogDescription className="sr-only">{title}</DialogDescription>
         {/* Dashboard plate, not the purchase one: this bar stands where the brand band was, so the logo
             design must not change when a modal opens. */}
-        <ModalBackdrop
-          header={
-            <ModalMetalBar
-              plate={
-                <NnLogoPlate className="h-full w-full" />
-              }
-            />
-          }
-          showTagline={false}
-        />
+        {showBackdrop ? (
+          <ModalBackdrop
+            header={
+              <ModalMetalBar
+                plate={<NnLogoPlate className="h-full w-full" />}
+              />
+            }
+            showTagline={false}
+          />
+        ) : null}
         <div className="absolute inset-0 flex items-center justify-center p-4">
           {children}
         </div>

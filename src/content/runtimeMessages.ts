@@ -1,6 +1,12 @@
-import { hideOverlay, showOverlay, toggleOverlay } from "@/content/overlayShell";
+import {
+  hideOverlay,
+  showOverlay,
+  toggleOverlay,
+} from "@/content/overlayShell";
 
-type RuntimeMessage = { type: "TOGGLE_OVERLAY" } | { type: "PAYMENT_COMPLETED" };
+type RuntimeMessage =
+  | { type: "TOGGLE_OVERLAY" }
+  | { type: "PAYMENT_COMPLETED" };
 
 type OverlayVisibilityEventDetail = {
   visible: boolean;

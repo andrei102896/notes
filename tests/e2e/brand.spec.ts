@@ -1,4 +1,5 @@
 import { expect, test, toggleOverlay } from "./fixtures";
+import { createSubjectTab } from "./helpers";
 
 const NN_UPDATES_URL = "https://www.notesfornet.com/updates";
 
@@ -7,7 +8,9 @@ test.describe("brand mark centering", () => {
   // Standalone header logo box (red on trial / blue when paid): the fat NN must sit dead-center in the
   // bordered box. Geometric like the test above — the box is symmetric (uniform 3px border), so ink center
   // == box center and left/right + top/bottom gaps are equal when centered.
-  test("fat NN glyph is centered in the header logo box", async ({ overlay }) => {
+  test("fat NN glyph is centered in the header logo box", async ({
+    overlay,
+  }) => {
     const svg = overlay
       .locator('header [aria-label="Open trial info"] svg')
       .first();
@@ -20,7 +23,10 @@ test.describe("brand mark centering", () => {
       const svgR = s.getBoundingClientRect();
       const vb = s.viewBox.baseVal;
 
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      let minX = Infinity,
+        minY = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
       for (const p of Array.from(s.querySelectorAll("path"))) {
         const b = (p as SVGGraphicsElement).getBBox();
         minX = Math.min(minX, b.x);
@@ -30,7 +36,12 @@ test.describe("brand mark centering", () => {
       }
       const cx = (u: number) => svgR.x + ((u - vb.x) / vb.width) * svgR.width;
       const cy = (u: number) => svgR.y + ((u - vb.y) / vb.height) * svgR.height;
-      const ink = { left: cx(minX), right: cx(maxX), top: cy(minY), bottom: cy(maxY) };
+      const ink = {
+        left: cx(minX),
+        right: cx(maxX),
+        top: cy(minY),
+        bottom: cy(maxY),
+      };
 
       return {
         offset: {
@@ -60,7 +71,10 @@ test("the header NN logo opens the NN updates page in a new tab", async ({
   page,
 }) => {
   await context.route("https://www.notesfornet.com/**", (route) =>
-    route.fulfill({ contentType: "text/html", body: "<!doctype html><title>NN updates stub</title>" }),
+    route.fulfill({
+      contentType: "text/html",
+      body: "<!doctype html><title>NN updates stub</title>",
+    }),
   );
 
   // Default e2e state starts a fresh local trial (red logo). An expired start reaches the off-trial
@@ -77,7 +91,11 @@ test("the header NN logo opens the NN updates page in a new tab", async ({
   await page.reload({ waitUntil: "load" });
   await toggleOverlay(context, page);
 
-  const overlay = page.frameLocator("#nn-scroll-bookmarks-overlay-shell iframe");
+  const overlay = page.frameLocator(
+    "#nn-scroll-bookmarks-overlay-shell iframe",
+  );
+  // A subject tab first: with zero tabs the first-run backdrop covers the nav row, this logo included.
+  await createSubjectTab(overlay, "ALPHA");
   const logo = overlay.locator('header [aria-label="Open NN updates page"]');
   await expect(logo).toBeVisible();
   await expect(

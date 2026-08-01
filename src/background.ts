@@ -1,7 +1,4 @@
-import {
-  getExtPayClient,
-  isExtPayConfigured,
-} from "@/lib/extpay";
+import { getExtPayClient, isExtPayConfigured } from "@/lib/extpay";
 import { setPendingOverlayForNewTab } from "@/lib/pendingNavigation";
 import {
   DEFAULT_TAB_SESSION,
@@ -18,9 +15,13 @@ if (isExtPayConfigured) {
       chrome.tabs.query({}, (tabs) => {
         for (const tab of tabs) {
           if (tab.id) {
-            chrome.tabs.sendMessage(tab.id, { type: "PAYMENT_COMPLETED" }, () => {
-              void chrome.runtime.lastError;
-            });
+            chrome.tabs.sendMessage(
+              tab.id,
+              { type: "PAYMENT_COMPLETED" },
+              () => {
+                void chrome.runtime.lastError;
+              },
+            );
           }
         }
       });
@@ -57,7 +58,10 @@ function readTabSession(tabId: number): Promise<TabSessionState> {
         return;
       }
       const stored = result[key];
-      resolve({ ...DEFAULT_TAB_SESSION, ...(stored as Partial<TabSessionState>) });
+      resolve({
+        ...DEFAULT_TAB_SESSION,
+        ...(stored as Partial<TabSessionState>),
+      });
     });
   });
 }
@@ -94,7 +98,9 @@ async function reinjectContentScriptsIntoOpenTabs(): Promise<void> {
       continue;
     }
     // Skip the ExtPay content script (extensionpay.com only).
-    if (script.matches?.some((pattern) => pattern.includes("extensionpay.com"))) {
+    if (
+      script.matches?.some((pattern) => pattern.includes("extensionpay.com"))
+    ) {
       continue;
     }
     let tabs: chrome.tabs.Tab[];
@@ -107,10 +113,13 @@ async function reinjectContentScriptsIntoOpenTabs(): Promise<void> {
       if (typeof tab.id !== "number" || !tab.url || !/^https?:/.test(tab.url)) {
         continue;
       }
-      chrome.scripting.executeScript({ target: { tabId: tab.id }, files }, () => {
-        // Restricted pages (CSP, store pages, etc.) throw — ignore.
-        void chrome.runtime.lastError;
-      });
+      chrome.scripting.executeScript(
+        { target: { tabId: tab.id }, files },
+        () => {
+          // Restricted pages (CSP, store pages, etc.) throw — ignore.
+          void chrome.runtime.lastError;
+        },
+      );
     }
   }
 }
@@ -166,4 +175,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   return false;
 });
-

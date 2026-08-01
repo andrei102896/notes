@@ -168,7 +168,15 @@ export function useNoteLinkAnchor({
         setIsPicking(false);
       }
     },
-    [anchor, anchorUrl, isPicking, isReadOnly, navigateSameTab, onInteract, onSaveAnchor],
+    [
+      anchor,
+      anchorUrl,
+      isPicking,
+      isReadOnly,
+      navigateSameTab,
+      onInteract,
+      onSaveAnchor,
+    ],
   );
 
   const handleAnchorContextMenu = useCallback(

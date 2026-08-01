@@ -14,7 +14,12 @@ import {
 import type { NNNoteListLayout } from "@/types/nnData";
 
 /** A visible row's vertical extent (incl. the dimmed dragged note), captured once at drag start, in list-container px. */
-export type SnapshotRow = { id: string; top: number; bottom: number; mid: number };
+export type SnapshotRow = {
+  id: string;
+  top: number;
+  bottom: number;
+  mid: number;
+};
 
 /** Where/how to draw the drop indicator during a drag (list-container px). */
 export type DropIndicatorState = {

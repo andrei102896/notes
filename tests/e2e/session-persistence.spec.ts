@@ -49,15 +49,27 @@ const stubPage = (title: string, linkTo?: string): string =>
   `</body></html>`;
 
 async function routeStubs(page: Page): Promise<void> {
-  await page.context().route(`${PAGE_A}**`, (route) =>
-    route.fulfill({ contentType: "text/html", body: stubPage("Ford", PAGE_B) }),
-  );
-  await page.context().route(`${PAGE_B}**`, (route) =>
-    route.fulfill({ contentType: "text/html", body: stubPage("Tesla", PAGE_C) }),
-  );
-  await page.context().route(`${PAGE_C}**`, (route) =>
-    route.fulfill({ contentType: "text/html", body: stubPage("Rivian") }),
-  );
+  await page
+    .context()
+    .route(`${PAGE_A}**`, (route) =>
+      route.fulfill({
+        contentType: "text/html",
+        body: stubPage("Ford", PAGE_B),
+      }),
+    );
+  await page
+    .context()
+    .route(`${PAGE_B}**`, (route) =>
+      route.fulfill({
+        contentType: "text/html",
+        body: stubPage("Tesla", PAGE_C),
+      }),
+    );
+  await page
+    .context()
+    .route(`${PAGE_C}**`, (route) =>
+      route.fulfill({ contentType: "text/html", body: stubPage("Rivian") }),
+    );
   await page.addInitScript(PAGE_PROBE);
 }
 
@@ -86,14 +98,14 @@ async function overlayOnScreen(page: Page): Promise<boolean> {
 }
 
 async function expectOnScreen(page: Page, on: boolean): Promise<void> {
-  await expect
-    .poll(() => overlayOnScreen(page), { timeout: 6000 })
-    .toBe(on);
+  await expect.poll(() => overlayOnScreen(page), { timeout: 6000 }).toBe(on);
 }
 
 async function logRestoreMode(page: Page, label: string): Promise<void> {
   const bfcache = await page.evaluate(
-    () => (window as unknown as { __nnRestoredFromBfcache?: boolean }).__nnRestoredFromBfcache === true,
+    () =>
+      (window as unknown as { __nnRestoredFromBfcache?: boolean })
+        .__nnRestoredFromBfcache === true,
   );
   console.log(`${label}: restored from bfcache = ${bfcache}`);
 }
@@ -267,7 +279,10 @@ test("a cross-site restore slides NN in instead of fading it in", async ({
           const shell = document.querySelector(selector);
           if (shell instanceof HTMLElement) {
             const rect = shell.getBoundingClientRect();
-            if (getComputedStyle(shell).visibility !== "hidden" && rect.width > 0) {
+            if (
+              getComputedStyle(shell).visibility !== "hidden" &&
+              rect.width > 0
+            ) {
               shown.push((window.innerWidth - rect.left) / rect.width);
             }
             if (shell.querySelector("#nn-overlay-loading-veil")) {
@@ -297,7 +312,10 @@ test("a cross-site restore slides NN in instead of fading it in", async ({
   expect(track.veilSeen, "the frosted veil is gone").toBe(false);
   expect(landed, "NN ends up fully on screen").toBeGreaterThan(0);
   // A jump-cut would go straight from parked to landed with nothing in between.
-  expect(midSlide, "NN travels across frames (slide, not snap)").toBeGreaterThan(1);
+  expect(
+    midSlide,
+    "NN travels across frames (slide, not snap)",
+  ).toBeGreaterThan(1);
 });
 
 /** The reveal waits for the panel's first frame — but never on a page that will not finish loading. */
@@ -328,9 +346,7 @@ test("a page that never finishes loading still gets NN back", async ({
   await page.waitForURL(PAGE_B, { waitUntil: "commit" });
 
   // Cap is 700ms after the panel mounts; 4s covers the content-script injection on a stalled document.
-  await expect
-    .poll(() => overlayOnScreen(page), { timeout: 4000 })
-    .toBe(true);
+  await expect.poll(() => overlayOnScreen(page), { timeout: 4000 }).toBe(true);
 });
 
 /** Reads the panel through the iframe's document: Playwright's frame handle goes stale across a bfcache
@@ -347,9 +363,9 @@ async function panelState(
       titles: [...(doc?.querySelectorAll("[data-note-title]") ?? [])].map(
         (input) => (input as HTMLInputElement).value,
       ),
-      tabs: [...(doc?.querySelectorAll('[data-slot="tabs-trigger"]') ?? [])].map(
-        (tab) => `${tab.textContent}:${tab.getAttribute("aria-selected")}`,
-      ),
+      tabs: [
+        ...(doc?.querySelectorAll('[data-slot="tabs-trigger"]') ?? []),
+      ].map((tab) => `${tab.textContent}:${tab.getAttribute("aria-selected")}`),
     };
   }, SHELL);
 }
@@ -369,7 +385,9 @@ test("a note added on the next page is there after the back button", async ({
   await toggleOverlayForTab(context, page);
   await expectOnScreen(page, true);
 
-  const overlay = page.frameLocator("#nn-scroll-bookmarks-overlay-shell iframe");
+  const overlay = page.frameLocator(
+    "#nn-scroll-bookmarks-overlay-shell iframe",
+  );
   await createSubjectTab(overlay, "GARAGE");
   await addNote(overlay, "FIRST");
   expect(await titleValues(overlay)).toEqual(["FIRST"]);

@@ -6,7 +6,7 @@ import { NnModalShell } from "@/overlay/NnModalShell";
 
 /** Figma CANCEL BOX / OK BOX: 109.11×39.34, 0.5px white edge, Fjalla 24px. */
 const CONFIRM_BUTTON_CLASS =
-  "inline-flex h-[2.46rem] w-[6.82rem] cursor-pointer items-center justify-center border-[0.5px] border-white text-subject-label uppercase leading-none transition-colors";
+  "nn-label-center h-[2.46rem] w-[6.82rem] cursor-pointer border-[0.5px] border-white text-subject-label uppercase leading-none transition-colors";
 
 type DeleteConfirmModalProps = {
   open: boolean;

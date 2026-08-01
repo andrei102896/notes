@@ -65,7 +65,5 @@ export function indexOfFirstTabForLetter(
   if (L.length !== 1 || L < "A" || L > "Z") {
     return -1;
   }
-  return sortedTabs.findIndex(
-    (tab) => firstSubjectTabLetter(tab.name) === L,
-  );
+  return sortedTabs.findIndex((tab) => firstSubjectTabLetter(tab.name) === L);
 }

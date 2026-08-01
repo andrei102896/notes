@@ -10,7 +10,6 @@ import {
 
 import { buildDefaultNoteListLayout } from "@/lib/nnNoteLayout";
 import { getTabSession, patchTabSession } from "@/lib/tabSession";
-import { AddSubjectTabButton } from "@/overlay/AddSubjectTabButton";
 import { NnModalBox } from "@/overlay/NnModalBox";
 import { NoteDeleteConfirmDialog } from "@/overlay/NoteDeleteConfirmDialog";
 import { NotesList } from "@/overlay/NotesList";
@@ -26,9 +25,8 @@ type DashboardContentProps = {
   browserTabUrlKey: string | null;
   activeSubjectTabId: string | null;
   activeNoteId: string | null;
-  emptyState: "first-run" | "select-or-create" | null;
-  /** Opens the strip's Add Subject Tab dialog; wired to the first-run "+". */
-  onRequestAddSubjectTab: () => void;
+  /** First run has its own full-panel treatment (FirstRunPanel), so only this one lands here. */
+  emptyState: "select-or-create" | null;
   onUpdateNote: (
     noteId: string,
     patch: Partial<Pick<NNSyncNote, "url" | "heading" | "body">>,
@@ -60,7 +58,6 @@ export const DashboardContent = forwardRef<
     activeSubjectTabId,
     activeNoteId,
     emptyState,
-    onRequestAddSubjectTab,
     onUpdateNote,
     onHighlightNote,
     onHasInvalidUrlDraftChange,
@@ -203,32 +200,13 @@ export const DashboardContent = forwardRef<
         <div className="flex min-h-0 flex-1 items-center justify-center p-4">
           <NnModalBox>
             <div className="flex flex-1 flex-col items-center justify-center px-3 text-center text-subject-label leading-[1.875rem] uppercase text-modal-foreground">
-              {emptyState === "first-run" ? (
-                // Figma "CREATE A SUBJECT TAB...": the "+" here opens the strip's Add dialog.
-                <div className="flex items-center justify-center gap-4">
-                  <p>
-                    <span className="text-accent">Create</span> a{" "}
-                    <span className="text-accent">subject tab</span> by clicking
-                  </p>
-                  {/* Square, superseding Figma "Rectangle 28" (41×39): only a square box sits the square
-                      glyph equidistant, and 41×39 also threw off centring against the sentence. */}
-                  <AddSubjectTabButton
-                    onClick={onRequestAddSubjectTab}
-                    disabled={isReadOnly}
-                    className="size-[2.5625rem]"
-                  />
-                </div>
-              ) : (
-                // Figma "SELECT A SUB TAB..": message block 296×59 (two 30px lines).
-                <>
-                  <p>
-                    <span className="text-accent">Select</span> or{" "}
-                    <span className="text-accent">create</span> a{" "}
-                    <span className="text-accent">subject tab</span>
-                  </p>
-                  <p>to view, edit or add notes to</p>
-                </>
-              )}
+              {/* Figma "SELECT A SUB TAB..": message block 296×59 (two 30px lines). */}
+              <p>
+                <span className="text-accent">Select</span> or{" "}
+                <span className="text-accent">create</span> a{" "}
+                <span className="text-accent">subject tab</span>
+              </p>
+              <p>to view, edit or add notes to</p>
             </div>
           </NnModalBox>
         </div>
@@ -244,7 +222,9 @@ export const DashboardContent = forwardRef<
       <div
         ref={notesScrollRef}
         onScroll={handleNotesScroll}
-        className="nn-scrollbar min-h-0 flex-1 overflow-auto py-4 px-6"
+        /* pt > pb: the header's blue-line stack must fade out before the first note, so the two shadows
+           merge in the gap instead of the header's landing on the card. */
+        className="nn-scrollbar min-h-0 flex-1 overflow-auto pt-6 pb-4 px-6"
       >
         {notes.length > 0 ? (
           <NotesList

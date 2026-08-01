@@ -129,9 +129,7 @@ export function coerceNoteListLayout(v: unknown): NNNoteListLayout | null {
     }
     const gr = g as Record<string, unknown>;
     const id =
-      typeof gr.id === "string" && gr.id.length > 0
-        ? gr.id
-        : generateId();
+      typeof gr.id === "string" && gr.id.length > 0 ? gr.id : generateId();
     const ids = Array.isArray(gr.noteIds)
       ? gr.noteIds.map((x) => String(x)).filter((s) => s.length > 0)
       : [];
