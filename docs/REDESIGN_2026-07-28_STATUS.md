@@ -479,7 +479,14 @@ fault; it was the process. Do this instead.
    keeping it.** `translateX(0.5px)` recentred the strip `+` on Windows at dpr 1 and pushed it two device px
    right on the Mac at dpr 2. The offset it corrects is the remainder flex centring rounds, and that
    remainder is set by the box width, which rides the panel width continuously — no single constant is right
-   across dpr and window size. Prefer living with the ±1 device px.
+   across dpr and window size.
+   **Resolved 2026-08-01 — the ±1 is gone, but only because the correction is COMPUTED, not constant.**
+   `useSymmetricAddGlyph` reads the box on the device grid and forces an even leftover per axis, so the
+   warning above still stands for any fixed nudge. It shipped gated to fractional dpr; the Mac then measured
+   3 of 16 axis checks off at a clean dpr 2, so the gate came off — the defect is odd-parity, not dpr-specific.
+   Verified on the Mac at dpr 2 and dpr 1: 8/8 widths symmetric on both axes, all six visual baselines
+   unchanged. At 1400×900 (the fixture default) the painted gaps are identical to before, which is why no
+   baseline moved; the glyph's share of the box reads 71.3%/57.9% vs 71.0%/57.6% before.
 20. **`--air-cell-snapped` is an inline property on the iframe root**, set by `syncOverlayViewportMetrics`.
    A stylesheet rule cannot override it for an experiment; `documentElement.style.removeProperty` can, and
    the next resize puts it back.
@@ -770,6 +777,22 @@ element the item names and nothing else, and run only the specs covering it.
     A first pass used the ghost PNG (`GhostLogo`) instead; it is accent blue at alpha 41/255 and, without the
     dark background under it, read as a blue haze on light grey — which is what prompted the client's second
     message. `GhostLogo` is module-private again.
+
+11. **Deleting the URL devoids every command that needs one** (client 2026-08-01: "deleting the URL makes
+    devoid ALL commands only associated with having a URL populated"). Expanded row: ANCHOR was disabled
+    only in read-only mode, so with no URL it still ran the whole pick flow — hid the panel, saved an
+    anchor — and then bailed silently on click, because `handleAnchorClick` needs `toOpenableUrl(anchorUrl)`.
+    It now greys on an empty URL: `disabled={draft.trim() === "" || (isReadOnly && !anchor)}` — the live
+    draft, not the persisted value, so it greys as the field empties instead of on blur. Collapsed header:
+    `CollapsedNoteNav` returns `null` on an empty URL — the client asked for **nothing there, not greyed
+    buttons** (this narrows §3's "not gated on a typed label", which stands: the gate is the URL, never the
+    label). Collapsed LINK keeps its own `!canOpenLink` guard, since the early return now only proves the URL
+    is non-empty. COPY/PASTE/BIU are untouched — none need a URL, and PASTE is how a URL comes back.
+    **The gate is emptiness, not openability, deliberately** (asked and decided 2026-08-01): the client's rule
+    is about *deleting* the URL and nothing else. Accepted consequence — a half-typed URL (`asdf`) greys LINK,
+    which has always used openability, while ANCHOR stays live and does nothing when clicked. Do not "fix"
+    that divergence unasked; take it back to the client if it is ever reported.
+    Both surfaces are pinned by `note-actions.spec.ts` (anchor-set case included).
 
 ## Where polish left off (last updated 2026-07-29)
 

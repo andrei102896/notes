@@ -7,9 +7,10 @@ const GLYPH_SHARE = 0.71;
  * Lays the "+" on the device grid so its accent gap is equal on each axis — left == right AND top == bottom.
  * The two axes still differ from each other, which the client accepts: the A–Z cell is not square.
  *
- * Flex centring splits the leftover in CSS px, and at fractional DPR (Windows at 125%) the rasteriser rounds
- * that split a whole device px onto one side — read by the client as "the + is half a pixel to the left".
- * Inert at integer DPR, so the Mac keeps the plain 71% rule in styles.css and renders unchanged.
+ * Flex centring splits the leftover in CSS px, and whenever that leftover is odd in device px the rasteriser
+ * puts the extra one on a single side — read by the client as "the + is half a pixel to the left".
+ * Fractional DPR (Windows at 125%) hits it most, but it is NOT dpr-specific: measured on the Mac at dpr 2,
+ * 3 of 16 axis checks were off by one. Runs at every dpr for that reason.
  */
 export function useSymmetricAddGlyph(): React.RefObject<SVGSVGElement | null> {
   const glyphRef = useRef<SVGSVGElement>(null);
@@ -22,14 +23,6 @@ export function useSymmetricAddGlyph(): React.RefObject<SVGSVGElement | null> {
       return;
     }
     const dpr = box.ownerDocument.defaultView?.devicePixelRatio ?? 1;
-    // NOT Number.isInteger: Chrome reports 2.0000000298023224 for a plain 2x screen, so an exact test leaks
-    // the correction onto displays that never needed it.
-    if (Math.abs(dpr - Math.round(dpr)) < 1e-3) {
-      glyph.removeAttribute("style");
-      glyph.removeAttribute("preserveAspectRatio");
-      return;
-    }
-
     const rect = box.getBoundingClientRect();
     const cs = getComputedStyle(box);
     const left = rect.left + parseFloat(cs.borderLeftWidth);
