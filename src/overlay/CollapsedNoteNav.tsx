@@ -22,7 +22,7 @@ export function CollapsedNoteNav({
   onActivate,
   onHighlightNote,
   onUpdateNote,
-}: CollapsedNoteNavProps): React.ReactElement {
+}: CollapsedNoteNavProps): React.ReactElement | null {
   const nav = useNoteLinkAnchor({
     linkUrl: note.url,
     anchorUrl: note.url,
@@ -40,6 +40,11 @@ export function CollapsedNoteNav({
       onHighlightNote(note.id);
     },
   });
+
+  // No URL, no commands: the collapsed header shows nothing here, not greyed buttons (client 2026-08-01).
+  if (note.url.trim() === "") {
+    return null;
+  }
 
   return (
     <div className="flex shrink-0 items-stretch">

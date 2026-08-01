@@ -173,7 +173,9 @@ export function NoteUrlEditor({
             aria-label={
               anchor ? "Navigate to anchor position" : "Pick page anchor"
             }
-            disabled={isReadOnly && !anchor}
+            // Deleted URL greys ANCHOR whether or not one is set (client 2026-08-01); the live draft, so it
+            // greys as the field empties rather than on blur.
+            disabled={draft.trim() === "" || (isReadOnly && !anchor)}
             onMouseDown={(event) => {
               // Stop row-level selection handlers treating anchor clicks (notably Cmd/Ctrl+click) as note-selection gestures.
               event.stopPropagation();
