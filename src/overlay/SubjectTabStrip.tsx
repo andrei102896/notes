@@ -231,9 +231,8 @@ export const SubjectTabStrip = forwardRef<
                     }
                     setRenameTarget(tab);
                   }}
-                  /* w-max = the label plus its px-[1ch] ends; tabs are deliberately NOT quantised to A–Z
-                     cells. aspect-square keeps height === width — rotation is a transform, so the column
-                     stacks by the UNROTATED height while the visible length is the width. */
+                  /* w-max = label + px-[1ch] ends, deliberately NOT quantised to A–Z cells. aspect-square: rotation
+                     is a transform, so the column stacks by UNROTATED height while the visible length is the width. */
                   /* Junction lines come from the tab below, so the last tab closes with an OUTER shadow: a
                      border paints inside the box and reads short. */
                   className="w-max aspect-square shrink-0 justify-start leading-tight px-[1ch] pt-[0.3125rem] rotate-90 translate-x-[2.5rem] origin-top-left last:shadow-[1px_0_0_0_#ffffff]"

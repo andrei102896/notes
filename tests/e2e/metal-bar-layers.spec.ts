@@ -3,9 +3,8 @@ import { createSubjectTab } from "./helpers";
 
 import type { FrameLocator, Locator, Page } from "@playwright/test";
 
-/** Pins the metal bar's LOOK from the client's render rather than their Figma CSS (copy-as-CSS drops
- *  strokes, blend modes and layer order): deep top line, a sheen that never reaches the raw hilite colour,
- *  a monotonic fade to the bottom, and a plate that stands clear of the bands with a seam between. */
+/** Pins the metal bar's LOOK from the client's render, not their Figma CSS (copy-as-CSS drops strokes,
+ *  blend modes and layer order): deep top line, capped sheen, monotonic fade, plate standing clear of the bands. */
 const HILITE = [158, 226, 255];
 
 const lum = ([r, g, b]: number[]) => 0.299 * r + 0.587 * g + 0.114 * b;

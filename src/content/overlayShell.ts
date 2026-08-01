@@ -199,12 +199,8 @@ export function showOverlay({
   }
 }
 
-/**
- * Mounts the panel parked off-screen (visible, so it really paints; still pointer-transparent) without
- * deciding whether it should be shown. The open-hint that triggers this is per-origin, so it cannot know
- * about a minimize that happened on another origin — only the tab session can, and that read is async.
- * Pre-mounting means the authoritative read has a fully painted panel to slide in a few ms later.
- */
+/** Parks the panel off-screen (visible, so it really paints) without deciding whether to show it — the
+ *  per-origin hint can't know about minimizes elsewhere. The async session read then slides in a painted panel. */
 export function premountOverlay(): void {
   ensureOverlayMounted().style.visibility = "visible";
 }

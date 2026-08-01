@@ -1,10 +1,8 @@
 import { expect, test } from "./fixtures";
 import { createSubjectTab } from "./helpers";
 
-/** Client rule: the white frame around the nav strip must read equally thick on all four sides. The
- *  bottom is the trap — the header's own 2px white border-b stacks under the strip's padding, so an even
- *  3px padding paints 5px there. Measured in painted pixels: the two whites merge into one run, which no
- *  element-scoped geometry check can see. */
+/** Client rule: the nav strip's white frame must read equally thick on all four sides. The bottom trap: the
+ *  header's 2px border-b stacks under the strip's padding into one painted run no geometry check can see. */
 test("the nav strip's white frame is even on all four sides", async ({
   overlay,
   page,

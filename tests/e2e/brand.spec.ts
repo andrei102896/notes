@@ -5,9 +5,8 @@ const NN_UPDATES_URL = "https://www.notesfornet.com/updates";
 
 /** Geometric, not a screenshot: vector math, so it is stable across machines/DPR unlike the antialiasing-sensitive visual baselines. */
 test.describe("brand mark centering", () => {
-  // Standalone header logo box (red on trial / blue when paid): the fat NN must sit dead-center in the
-  // bordered box. Geometric like the test above — the box is symmetric (uniform 3px border), so ink center
-  // == box center and left/right + top/bottom gaps are equal when centered.
+  // Header logo box (red on trial / blue when paid): the fat NN must sit dead-center. The box's border
+  // is a uniform 3px, so ink center == box center means equal gaps on both axes.
   test("fat NN glyph is centered in the header logo box", async ({
     overlay,
   }) => {

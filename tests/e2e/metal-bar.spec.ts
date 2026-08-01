@@ -76,9 +76,8 @@ test("header logo plate spans the metal band top to bottom", async ({
   expect(vsAddNote, "plate wider than ADD NOTE").toBeGreaterThan(1);
   expect(vsAddNote, "plate not far wider than ADD NOTE").toBeLessThan(1.55);
 
-  // What the client actually eyeballs: how much of the plate the NN ink covers. 52.5% wide is the
-  // artwork's own fraction (63 of the 120-unit viewBox) — widening it past that reads as "too bulky",
-  // which a horizontal counter-scale did. A ratio, so it holds at any panel width.
+  // What the client eyeballs: the NN ink's share of the plate. 52.5% is the artwork's own fraction
+  // (63/120 viewBox); widening past it read as "too bulky". A ratio, so it holds at any panel width.
   const ink = await bar.evaluate((el) => {
     const plate = el.querySelector(":scope > [data-nn-plate]")!;
     const svg = plate.querySelector("svg")!;

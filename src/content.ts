@@ -50,11 +50,8 @@ function initTabSessionOverlay(): void {
   });
 }
 
-/**
- * Back/forward restores this page from the bfcache with the script frozen, not re-run: the overlay comes
- * back exactly as it was, even if the tab was minimized on another page since. Re-apply the session (which
- * also repairs this origin's hint) and let the panel reload data it missed while frozen.
- */
+/** A bfcache Back repaints the frozen overlay even if the tab was minimized elsewhere since. Re-apply
+ *  the session (which also repairs this origin's hint) and let the panel reload data it missed. */
 function initBackForwardRestore(): void {
   window.addEventListener("pageshow", (event) => {
     if (!event.persisted) {
@@ -79,9 +76,8 @@ function initBackForwardRestore(): void {
 // Drop any orphaned shell from a prior (re-injected) script so this instance owns the overlay.
 document.getElementById(OVERLAY_SHELL_ID)?.remove();
 
-// The hint only pre-mounts the panel off-screen; it never shows it. Being per-origin it goes stale the
-// moment NN is toggled on another origin, and painting from it flashed a panel the user had minimized.
-// The async session read below is the only thing that puts NN on screen.
+// The per-origin hint goes stale when NN is toggled on another origin — painting from it flashed a
+// minimized panel. So it only pre-mounts off-screen; the async session read alone puts NN on screen.
 try {
   if (readOpenHint()) {
     premountOverlay();

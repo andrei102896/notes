@@ -3,9 +3,8 @@ import { addNote, createSubjectTab } from "./helpers";
 
 import type { Page } from "@playwright/test";
 
-/** The nav bar's bottom stack: 4px accent line, 3px white bar, blurred dark solid hugging it, all fading
- *  out before the first note. Painted pixels only — the defect it guards (the band's blur washing the line)
- *  is invisible to `getComputedStyle`, which reports a clean accent shadow either way. */
+/** Nav bar's bottom stack: 4px accent line, 3px white bar, blurred dark solid, all fading out before the
+ *  first note. Painted pixels only — the guarded defect (blur washing the line) is invisible to getComputedStyle. */
 const ACCENT = [41, 171, 226];
 
 const lum = ([r, g, b]: number[]) => 0.299 * r + 0.587 * g + 0.114 * b;

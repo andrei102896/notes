@@ -59,9 +59,8 @@ export function DashboardHeader({
     }
   }, [activeSubjectTabId]);
 
-  // z-20 keeps the header UNDER the first-run backdrop (z-40): the client's render shows the whole panel as
-  // the backdrop, with no nav row. Cost, accepted: the trial badge is the only route to BUY, so a user whose
-  // trial expires with zero subject tabs cannot buy (and cannot create a tab either — the "+" is disabled).
+  // z-20 keeps the header UNDER the first-run backdrop (z-40): the client's render shows the whole panel
+  // as the backdrop. Accepted cost: with zero tabs an expired trial has no route to BUY (badge covered).
   return (
     <header className="sticky top-0 z-20 flex h-auto flex-col border-b-2 border-white bg-air-box">
       {/* Narrower than the modals' plate: the client anchors its width to the ADD NOTE button below. */}

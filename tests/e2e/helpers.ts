@@ -37,9 +37,8 @@ export async function createSubjectTab(
     '[data-nn-modal-box] [aria-label="Add subject tab"]',
   );
   const dialog = overlay.locator('[data-slot="dialog-content"]');
-  // Which "+" is reachable depends on whether the first-run panel is up, and that mounts after an async
-  // storage read — so re-decide and retry rather than resolving it once: a click aimed at the strip's "+"
-  // just before the backdrop covers it lands on the backdrop and opens nothing.
+  // The first-run panel mounts after an async storage read, so re-decide which "+" is reachable on each
+  // try: a click aimed at the strip's "+" just before the backdrop covers it opens nothing.
   for (let attempt = 0; ; attempt += 1) {
     const addTrigger =
       (await firstRunAdd.count()) > 0

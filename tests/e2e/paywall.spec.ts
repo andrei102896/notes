@@ -133,9 +133,8 @@ test("purchase modal covers the panel with visible ghost NN and centered trial b
     Math.abs(plates.pay.w - plates.dash.w),
     `purchase plate width ${plates.pay.w} vs dashboard ${plates.dash.w}`,
   ).toBeLessThan(1);
-  // …and the NN inside it matches the dashboard's in BOTH dimensions (client rule: same size AND
-  // proportions). Compared directly, since a shared number would not catch the two svgs' different
-  // viewBox heights rendering the same squeeze 6% shorter.
+  // …and the NN inside matches the dashboard's in BOTH dimensions (client: same size AND proportions).
+  // Compared directly — a shared number misses the two viewBox heights rendering the squeeze 6% apart.
   const inks = await host.evaluate((hostEl) => {
     const read = (plate: Element) => {
       const rects = [...plate.querySelectorAll("path")].map((p) =>

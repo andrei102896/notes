@@ -9,9 +9,8 @@ import {
   PLATE_GLYPH_SQUEEZE_Y,
 } from "@/overlay/BrandLockup";
 
-/** This svg's viewBox is 31 units tall where NnLogoPlate's is 29, so the same numeric squeeze would render
- *  its NN 6% shorter. Scaled by 31/29 the ink comes out the same height — the client requires the purchase
- *  plate to match the dashboard's size AND proportions. */
+/** This viewBox is 31 units tall vs NnLogoPlate's 29, so the same squeeze renders its NN 6% shorter.
+ *  31/29 evens the ink — the client requires the purchase plate to match the dashboard's size AND proportions. */
 const MODAL_GLYPH_SQUEEZE_Y = (PLATE_GLYPH_SQUEEZE_Y * 31) / 29;
 
 /** Ghost NN watermark (Figma OLD LOGO REDO 4): the client PNG export — blur and layer compositing already baked in, which the SVG export dropped. */

@@ -15,11 +15,8 @@ const PAGE_C = "https://www.rivian.com/";
 
 const SHELL = "#nn-scroll-bookmarks-overlay-shell";
 
-/**
- * Runs at document_start in the page itself: records whether this document came from the bfcache, and
- * samples the panel every frame from the very first one. A flash lasting a few frames is over long before
- * a `page.evaluate` from the test could start, so it has to be measured from inside.
- */
+/** Runs at document_start in the page itself: records bfcache restores and samples the panel every frame.
+ *  A flash lasting a few frames is over before any `page.evaluate` could start, so measure from inside. */
 const PAGE_PROBE = `
   window.__nnRestoredFromBfcache = false;
   window.__nnOnScreenFrames = 0;
@@ -131,9 +128,8 @@ test("minimizing on one page keeps NN minimized after the back button", async ({
   await page.waitForURL(PAGE_A, { waitUntil: "commit" });
   await logRestoreMode(page, "back to A");
 
-  // A bfcache restore repaints the frozen DOM — panel included — before any script can run, so the
-  // correction costs one frame. Measured in painted frames rather than asserted at t=0, which no
-  // implementation could satisfy; a regression to a real flash shows up as tens of frames.
+  // A bfcache restore repaints the frozen DOM — panel included — before any script runs, so the correction
+  // costs one frame. No implementation could pass at t=0; a regression to a real flash shows tens of frames.
   const staleFrames = await page.evaluate(async (selector) => {
     let frames = 0;
     const start = performance.now();
@@ -168,11 +164,8 @@ test("minimizing on one page keeps NN minimized after the back button", async ({
   }
 });
 
-/**
- * The other half of the same bug. On a page the bfcache refuses, Back re-runs the content script, and its
- * per-origin open-hint still says "open" — the minimize happened on another origin, which cannot clear it.
- * Blocked here with an `unload` handler, the one bfcache disqualifier that needs no network.
- */
+/** The other half of the bug: on a page the bfcache refuses, Back re-runs the content script and the stale
+ *  per-origin hint still says "open". Blocked via `unload`, the one bfcache disqualifier needing no network. */
 test("a page the bfcache refuses keeps NN minimized after the back button", async ({
   context,
   page,
@@ -370,11 +363,8 @@ async function panelState(
   }, SHELL);
 }
 
-/**
- * A bfcache-restored panel resumes with the data it was frozen with: `chrome.storage.onChanged` events
- * fired while frozen were never delivered, so a note added on the other page would be missing until a
- * manual refresh.
- */
+/** A bfcache-restored panel resumes with the data it froze with: storage.onChanged events fired meanwhile
+ *  were never delivered, so a note added on the other page would be missing until a manual refresh. */
 test("a note added on the next page is there after the back button", async ({
   context,
   page,

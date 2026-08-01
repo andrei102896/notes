@@ -23,9 +23,8 @@ async function tabMetrics(
   return metrics;
 }
 
-/** Client rule (2026-07-31): tab length is the label plus one blank character each end and NOTHING else
- *  — explicitly not quantised to A–Z cells ("do not try to line it up"), because that rounding all landed
- *  after the label. The only slack allowed is max-content's ~1px. */
+/** Client rule (2026-07-31): tab length is the label plus one blank character each end and NOTHING else —
+ *  not quantised to A–Z cells ("do not try to line it up"). The only slack allowed is max-content's ~1px. */
 test("subject tab length is the label plus one character each end", async ({
   overlay,
   page,
@@ -325,10 +324,8 @@ test("label padding is one character at each end", async ({
   ).toBeLessThan(2);
 });
 
-/** Junction lines are painted by the tab BELOW, so the last tab has nothing to close it. A border cannot
- *  close it either: it paints inside the box, which reads as "the tab is a few pixels short" — hence the
- *  outer shadow. Tab edges are deliberately NOT compared to the A–Z lines any more (client 2026-07-31:
- *  "do not try to line it up with alpha index boxes"). */
+/** Junction lines come from the tab BELOW, so the last tab closes with an OUTER shadow — a border paints
+ *  inside the box and reads short. Edges are NOT compared to A–Z lines (client 2026-07-31: "do not line it up"). */
 test("every subject tab edge is a 1px white line, last tab included", async ({
   overlay,
   page,
@@ -389,9 +386,8 @@ test("every subject tab edge is a 1px white line, last tab included", async ({
 
   for (let i = 0; i < count; i += 1) {
     const tab = triggers.nth(i);
-    // The trigger is square and rotated about its top-left, so its bounding box is the same square
-    // either way: only the vertical extent is the tab's, and half its width hangs outside the clipped
-    // strip. Take x from the strip, y from the tab.
+    // The trigger is square and rotated about its top-left, so its bounding box is the same square either
+    // way; half its width hangs outside the clipped strip. Take x from the strip, y from the tab.
     const box = await tab.boundingBox();
     const label = (await tab.textContent())?.trim();
     if (!box) {

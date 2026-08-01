@@ -38,9 +38,8 @@ test("dashboard modal backdrop fills the panel behind the rename modal", async (
   });
   expect(Math.abs(backdropPlateGap)).toBeLessThan(0.6);
 
-  // Client rule: the backdrop bar stands where the brand band was, so it carries the DASHBOARD plate, not
-  // the purchase one — same artwork as the modal box's own bar. The visual baselines cannot guard this: the
-  // plate is small enough that swapping its artwork stays under maxDiffPixelRatio and they still pass.
+  // Client rule: the backdrop bar replaces the brand band, so it carries the DASHBOARD plate, not the
+  // purchase one. Visual baselines can't guard this: a swapped plate stays under maxDiffPixelRatio.
   const artwork = await overlay
     .locator('[data-slot="dialog-content"]')
     .evaluate((dlg) => {

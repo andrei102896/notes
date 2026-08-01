@@ -6,10 +6,8 @@ import { cn } from "@/lib/utils";
  *  NN_PLATE_CLASS below — Tailwind's scanner cannot read a template literal, so the class is a literal. */
 export const NN_PLATE_ASPECT = 3.1;
 
-/** Vertical squeeze on the plate glyphs: +1px padding above and below the NN, and it undoes part of the
- *  stretch from preserveAspectRatio="none". The glyphs are deliberately NOT counter-scaled horizontally —
- *  the client renders this same artwork in a 3.1:1 box, so the NN keeps its share of the plate (52.5% of
- *  the width) and takes the same non-uniform scale their comps show. Widening it reads as bulky. */
+/** Vertical squeeze on the plate glyphs: undoes part of the preserveAspectRatio="none" stretch. Deliberately
+ *  NOT counter-scaled horizontally — the client's comps keep the NN at 52.5% of the plate; wider reads bulky. */
 export const PLATE_GLYPH_SQUEEZE_Y = 0.895;
 
 /** Fat NN mark (Figma "NN FAT LOGO"). The N's are nudged ±0.5u apart (viewBox widened to 47) or the
@@ -196,8 +194,7 @@ export function MetalBarPlate({
 }
 
 /** Flanking bands (Figma UPDATE____HEADER BOX LEFT/RIGHT), shared with `ModalMetalBar`. `relative` is
- *  load-bearing: the bar's hilite is absolutely positioned, so a static band paints under it and washes out
- *  to near-white instead of reading as its own layer. */
+ *  load-bearing: a static band paints under the absolutely-positioned hilite and washes out to near-white. */
 export const HEADER_BOX_CLASS =
   "relative h-full flex-1 border-[0.5px] border-accent-deep bg-accent/[0.86] shadow-[inset_0_-1.125rem_0.7rem_0.1875rem_rgba(0,0,0,0.28)]";
 

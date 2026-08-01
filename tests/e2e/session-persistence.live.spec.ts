@@ -3,12 +3,8 @@ import { type BrowserContext, type Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import { toggleOverlayForTab } from "./helpers";
 
-/**
- * The same scenarios as `session-persistence.spec.ts`, against the REAL sites the client used. Stub pages
- * are trivial documents that the bfcache always accepts; real ones bring redirects, heavy JS, analytics
- * sockets and unload handlers, and are often bfcache-INELIGIBLE — the opposite path. Opt in:
- * `npm run test:e2e:live` (needs network; excluded from the default suite in playwright.config.ts).
- */
+/** The session-persistence scenarios against the REAL sites the client used: stub pages are always
+ *  bfcache-eligible, real ones often are NOT — the opposite path. Opt in: `npm run test:e2e:live` (needs network). */
 
 const SITE_A = "https://www.ford.com/";
 const SITE_B = "https://www.bugatti.com/";
@@ -79,11 +75,8 @@ async function visit(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45_000 });
 }
 
-/**
- * Drives NN to `want` and confirms it. TOGGLE_OVERLAY is dropped when the content script is not listening
- * yet, which on a slow real site is a coin flip — so re-toggle until the state matches instead of assuming
- * one message landed. Re-checking before each toggle keeps a dropped message from flipping it back.
- */
+/** Drives NN to `want`. TOGGLE_OVERLAY is dropped while the content script isn't listening — a coin flip
+ *  on a slow real site — so re-check and re-toggle until the state matches, never assume a message landed. */
 async function setOverlay(
   context: BrowserContext,
   page: Page,
