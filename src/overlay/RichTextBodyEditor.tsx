@@ -149,11 +149,10 @@ export const RichTextBodyEditor = forwardRef<
 
   return (
     <div className="relative isolate overflow-hidden border-b bg-note">
-      {/* "NOTE LOGO BG": the modals' NN in accent blue, blurred and dimmed for the light note body. */}
-      <ModalWatermark
-        fill="var(--color-accent)"
-        className="opacity-[0.22] blur-[0.390625rem]"
-      />
+      {/* "NOTE LOGO BG": the modals' NN, blurred. Off-white (the component default), not accent blue —
+          the client's Figma note body has no blue in it (2026-08-02). Opacity is far above the blue's
+          0.22 because white on #d9d9d9 tops out at 38 levels of contrast; 0.22 would be invisible. */}
+      <ModalWatermark className="opacity-[0.6] blur-[0.390625rem]" />
       <div>
         <div
           ref={editorRef}

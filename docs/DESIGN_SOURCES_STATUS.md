@@ -40,8 +40,9 @@ any of those areas. Notably now stale in the older snapshots:
   BOXES"); it lives on the host-page shell, not in the iframe. No older snapshot shows it.
 - The paid-state header logo opens `https://www.notesfornet.com/updates` (client 2026-07-29).
 - **Client feedback round, 2026-07-31 → 2026-08-01** — every older snapshot is stale on these:
-  - **Note body**: still #D9D9D9 with #464646 text — the NN watermark is now accent blue and BLURRED
-    ("note logo BG" / "NN blue blurred").
+  - **Note body**: still #D9D9D9 with #464646 text — the NN watermark is BLURRED ("note logo BG"). It was
+    accent blue for that round; **the client reversed that on 2026-08-02** ("no blue letters… the Figma is a
+    blurred off white"), so it is off-white at `opacity-[0.6]` now.
   - **First run**: was a box on the grey dashboard; now the full-panel NN backdrop with the box on it, and
     the nav row, A–Z rail and strip are covered. Clicking its `+` swaps the box, backdrop untouched.
   - **Purchase modal**: gained the client's STATEMENT box (665×219, `rgba(41,171,226,0.1)`, 0.3px accent
@@ -124,8 +125,9 @@ gradients instead):
   base `bg-subject-tab` color stays opaque — the shorthand was resetting it to transparent, flashing a
   see-through gap for a frame when the tab activated).
 
-**Tests:** the suite is **75 tests / 24 specs**, 75 passed on **2026-08-01**, with all six baselines
-regenerated and reviewed on that run. Refresh
+**Tests:** the suite is **80 tests / 26 specs**, all 80 passed on **2026-08-02**, with
+`add-subject-tab-modal.png` (modal-button centering) and `note-card.png` (off-white body watermark)
+regenerated on that run. Refresh
 with `npm run test:e2e:update` (calibration machine only) after any further intended design change, and
 review each new PNG before accepting it — that command *is* the design sign-off.
 
@@ -134,7 +136,7 @@ review each new PNG before accepting it — that command *is* the design sign-of
 | Source | Says | App today | Where |
 |---|---|---|---|
 | `css.txt` ~3179 | "+" button glyph = Fjalla 55.77 font glyph | Inline SVG vector plus, symmetric `0 0 24 24` viewBox on every platform, sized `71%` of whichever axis of its box is tighter | `src/overlay/AddSubjectTabButton.tsx`, `src/overlay/styles.css` |
-| every snapshot | note body's NN watermark is hard-edged and white | Same watermark, accent blue + blurred (client 2026-08-01); background and text colour unchanged | `src/overlay/RichTextBodyEditor.tsx` |
+| every snapshot | note body's NN watermark is hard-edged and white | Same watermark, off-white + blurred, `opacity-[0.6]` — blurring is the only real divergence now that the client dropped the one-round accent-blue fill (2026-08-02); background and text colour unchanged | `src/overlay/RichTextBodyEditor.tsx` |
 | every snapshot | first run is a box on the dashboard | Full-panel NN backdrop carrying the box; nav row, A–Z rail and strip covered (client 2026-07-31) | `src/overlay/FirstRunPanel.tsx` |
 | `desired-look.*` | subject tabs align to the A–Z grid | Length = label + one blank character; edges deliberately do NOT meet the A–Z lines (client 2026-07-31) | `src/overlay/SubjectTabStrip.tsx` |
 | Figma "Rectangle 28" 41×39 | first-run "+" is wider than tall | Square (`size-[2.5625rem]`) — 41×39 around a square glyph left 5.5px of blue at the sides vs 4.5px above | `src/overlay/DashboardContent.tsx` |

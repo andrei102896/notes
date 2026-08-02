@@ -9,13 +9,14 @@ Functional + visual-regression coverage for the NN overlay, driven through the r
 extension (service worker → `TOGGLE_OVERLAY` → overlay iframe), exactly like the
 toolbar click.
 
-Specs (24 in the default run, plus the opt-in `session-persistence.live` — the redesign and the
+Specs (26 in the default run, plus the opt-in `session-persistence.live` — the redesign and the
 2026-07-31 behaviour work added `paywall`, `modal-backdrop`, `subject-tab-sizing`, `metal-bar`,
 `scrollbar`, `panel-shadow`, `nav-strip-frame`, `session-persistence`; the 2026-07-31 → 08-01 client
 feedback added `metal-bar-layers` (the bar's flanking layers, taken from the client's crop rather than
 their Figma CSS), `blue-line` (the accent line + white bar + the shadow that must die before the first
 note), `paywall-statement` (the statement box + the background squares' spread) and `first-run-swap`
-(clicking "+" swaps the box without the backdrop reloading)): `functional`, `visual`,
+(clicking "+" swaps the box without the backdrop reloading); 2026-08-02 added `modal-label-centre` (every
+modal box's label ink is vertically centred, purchase boxes included)): `functional`, `visual`,
 `navigation` (single-tab persistence + subject-tab
 strip scroll restore after cross-site nav), `anchor` (cross-page fire + late-layout retry),
 `anchor-persist` (overlay stays visible after an anchor pick — the host shell, not just the
@@ -30,7 +31,7 @@ divider closes the group after PASTE).
 ## Run
 
 ```bash
-npm run test:e2e          # build dist-e2e, run the whole hermetic suite (75 tests / 24 specs)
+npm run test:e2e          # build dist-e2e, run the whole hermetic suite (80 tests / 26 specs)
 npm run test:e2e:update   # same, but refresh the visual baselines
 npm run test:e2e:live     # *.live.spec.ts against REAL sites (ford.com + bugatti.com; needs network)
 npx playwright test functional   # functional specs only (after a build:e2e)

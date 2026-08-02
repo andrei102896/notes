@@ -5,7 +5,7 @@ Section-by-section reskin driven by fresh client Figma exports. Sections 1–28 
 **uncommitted** working-tree state (user owns all git).
 **`nn-extension-1.0.3.zip` is STALE** — it was packed from the tree as of 2026-07-31 *before* that section;
 re-pack (`npm run pack`) before sending a build to the client.
-**Suite: 75 tests / 24 specs — 75 passed, 0 failed (2026-08-01), the whole client round included.**
+**Suite: 80 tests / 26 specs — 80 passed, 0 failed (2026-08-02), the 08-02 client round included.**
 
 **How this sprint works:** the user sends one section at a time as a *screenshot + Figma CSS*, the
 section is implemented, reviewed against a Playwright screenshot artifact, then the next section
@@ -532,6 +532,7 @@ fault; it was the process. Do this instead.
 | `tests/e2e/session-persistence.spec.ts` | 7 tests for the 2026-07-31 behaviour work: the client's exact Back sequence (bfcache path, stale panel measured in painted frames), the same on a bfcache-ineligible page (`unload` handler; zero frames painted, which is what the pre-mount buys), the inverse (maximized survives Back), a forward navigation to a third site, the slide (frame-by-frame travel, no veil element), the reveal cap on a page whose subresource hangs, and notes being current after Back |
 | `tests/e2e/session-persistence.live.spec.ts` | The same Back/slide scenarios against **real** sites (`npm run test:e2e:live`, network required, excluded by default). Sites are two constants at the top of the file; ford.com + bugatti.com as committed |
 | `tests/e2e/metal-bar-layers.spec.ts` | The metal bar's LAYER look, header and footer, from the client's crop rather than their Figma CSS: deep top line, a sheen that never reaches the raw hilite colour, peak in the top 45%, monotonic fade, plate ≥1.5× the band's luminance, a darker seam between band and plate. Verified to FAIL on the pre-fix build |
+| `tests/e2e/modal-label-centre.spec.ts` | Every modal box's label ink is vertically centred **in painted pixels**: add / rename / delete-confirm CANCEL + OK, and the purchase modal's TRIAL PERIOD + BUY. Gaps are measured against the box's arithmetic inner edges, never the screenshot clip's — clipping at the inner edge rounds a fractionally-placed box onto a half device row and biases the read by a whole pixel, which silently flipped the defect's sign mid-fix. Tolerance 2 device px; the defects it guards were 3.2–5.2. Verified to FAIL on the pre-fix build |
 | `tests/e2e/blue-line.spec.ts` | The blue line under the nav bar: 4px accent (every device row, or the dark band's blur is washing it), the 3px white bar, the shadow stuck to that bar, and a second test that the shadow dies in the gap and leaves the first note's border unwashed |
 | `tests/e2e/paywall-statement.spec.ts` | The purchase STATEMENT box (four paragraphs verbatim, width share, height in rem, bg alpha, 0.3px hairline, Familjen Grotesk 17/21, symmetric top/bottom padding in painted pixels) and the BG SQUARES spreading across the panel (grid ≥75% wide — it measured 49.6% before the fix — with blue painted in all three thirds) |
 | `tests/e2e/first-run-swap.spec.ts` | Clicking the first-run "+" swaps the box: one backdrop and one box at all times, and a backdrop pixel sampled every frame must not move in either direction (lighter = it unmounted, darker = Radix's dimming overlay landed) |
@@ -546,7 +547,7 @@ default e2e state starts a fresh local trial and shows the red logo instead).
 
 Run a section's own spec after each change (`npx playwright test <spec>`); artifacts land in
 `test-results/<test>/*.png` and are the review currency with the user. **`npm run test:e2e` takes ~3
-minutes and is worth running before any handoff** — the suite is 75 tests / 24 specs.
+minutes and is worth running before any handoff** — the suite is 80 tests / 26 specs.
 
 ## Client feedback 2026-07-31 — behaviour, not design (SHIPPED, uncommitted)
 
@@ -591,7 +592,8 @@ element the item names and nothing else, and run only the specs covering it.
    no `IS_WINDOWS` gate: measured in painted pixels at dpr 1 **and** 2, at 1400×900 and 760×620, the
    off-centre went 1.0–1.5px → 0–0.5px (the residual is the ±1 device-px parity floor, per trap 19).
    Same class fixes the add/rename modal's CANCEL/OK and the header/note-action labels, which have the
-   identical defect (1.5px and 1.0px) — deliberately NOT applied, awaiting the client.
+   identical defect (1.5px and 1.0px) — deliberately NOT applied, awaiting the client. **The modal half of
+   that was asked for on 2026-08-02, see §12; the header/note-action labels are still untouched.**
 2. **Subject tabs: one character of padding each end, and STOP quantising to A–Z cells** (client: "'before'
    padding good, 'after' padding too much — do not try to line it up with alpha index boxes"). The excess
    *was* the round-up to whole `--air-cell` multiples: the label is pinned to the start, so all of it landed
@@ -762,6 +764,8 @@ element the item names and nothing else, and run only the specs covering it.
 
 10. **Note body: the logo is blue and blurred, the background stays light** (client: "use the blurred logo
     for note background", their board labels it "NOTE LOGO BG" over a light body; then "NN blue blurred").
+    **⚠ The blue fill here is SUPERSEDED by §13 (client reversed it 2026-08-02). Everything else in this
+    item still stands — light body, #464646 text, no dark treatment, no `GhostLogo`.**
     Final state: `bg-note` with #464646 text as before, and the watermark is `ModalWatermark` in
     `fill=var(--color-accent)` at `opacity-[0.22]` with `blur-[0.390625rem]` — accent rather than the old
     white fill, and a touch more opacity than the modal box's 0.14, which is calibrated for a dark surface.
@@ -793,6 +797,36 @@ element the item names and nothing else, and run only the specs covering it.
     which has always used openability, while ANCHOR stays live and does nothing when clicked. Do not "fix"
     that divergence unasked; take it back to the client if it is ever reported.
     Both surfaces are pinned by `note-actions.spec.ts` (anchor-set case included).
+
+12. **Every modal centres its button text, not just the delete confirm** (client 2026-08-02: "centering text
+    in modal buttons should include all modals and not just the example I sent you"). Three boxes carried §1's
+    defect. Add/rename CANCEL/OK took `.nn-label-center` verbatim (`SubjectTabNameModal`, replacing
+    `inline-flex items-center justify-center`). The purchase modal's TRIAL PERIOD and BUY boxes cannot: they
+    are flex rows and `.nn-label-center`'s `display:block` would break the BUY + $5 row, so each **leaf** label
+    span took `.nn-cap-trim` and the boxes' own `items-center` then centres cap boxes instead of line boxes.
+    `$` and `5` are trimmed too — trimming only `BUY` would have aligned it to an untrimmed neighbour and
+    knocked the lockup's baselines apart by 1px; with all three trimmed the `$` also stops colliding with the
+    box's 2px border. Measured in painted ink, `modal-label-centre.spec.ts`, dpr 2: add/rename **4.09 → 0.09**,
+    TRIAL PERIOD **3.22 → 1.22**, BUY **5.20 → 1.20** device px off-centre (delete confirm 0.53, untouched).
+    The purchase boxes' ~1.2 is the raster floor, not a miss: their trimmed spans are *exactly* centred in the
+    DOM (top gap == bottom gap), but the interiors are fractionally tall (38.64 device px) and glyph rows are
+    integers, so the closest split available is 4.32/4.32 → 3.72/4.92. `add-subject-tab-modal.png` was
+    regenerated with `--update-snapshots=all` (the 1px shift is under `maxDiffPixelRatio`, so plain `-u`
+    refuses to rewrite it — same trap as the first-run `+`).
+    **Scope held to modals**, per the client's words: the header (ADD NOTE / DELETE TAB / MIN MAX) and
+    note-action (LINK / ANCHOR / COPY / PASTE) labels still centre their line boxes and still read ~1px high.
+
+13. **Note-body watermark is off-white, not accent blue** (client 2026-08-02, screenshot of the shipped note
+    beside their Figma note: "there should not be blue letters for the logo in the note background… the
+    example in Figma is a blurred off white"). **This reverses their own "NN blue blurred" from §10** — the
+    reversal is theirs, in writing, with their board in hand; do not restore the blue on the strength of §10.
+    `RichTextBodyEditor` drops the `fill` override, so `ModalWatermark`'s default white applies.
+    **The opacity had to move with it: 0.22 → 0.6.** That is not a taste call — `bg-note` is #d9d9d9, so a
+    white mark tops out at 38 levels of contrast even at alpha 1 (measured: 217 → 225 at 0.22, 240 at 0.6),
+    whereas the blue got its presence from hue, not luminance. At 0.22 the mark was invisible. Nothing else
+    changed: same artwork, same `blur-[0.390625rem]`, same size, light body, #464646 text.
+    `note-card.png` regenerated (`--update-snapshots=all`); that baseline also re-baked its note date to
+    2026-08-02, which is why it had been failing since 08-01.
 
 ## Where polish left off (last updated 2026-07-29)
 

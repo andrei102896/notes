@@ -72,7 +72,9 @@ export function PaywallDialog({
                     data-paywall-trial-box=""
                     className={`${HEADER_BOX_CLASS} h-[1.875rem] w-[11.52rem]`}
                   >
-                    <span className="text-[1rem] uppercase leading-none text-white">
+                    {/* nn-cap-trim on every leaf label in this bar: items-center otherwise centres the
+                        line box, which paints Fjalla's caps ~1px high (client 2026-08-02). */}
+                    <span className="nn-cap-trim text-[1rem] uppercase leading-none text-white">
                       {trialLabel}
                     </span>
                   </div>
@@ -87,14 +89,16 @@ export function PaywallDialog({
                     }}
                     className={`${HEADER_BOX_CLASS} h-[2rem] w-[5.4rem] cursor-pointer gap-1.5`}
                   >
-                    <span className="text-[1.5rem] uppercase leading-none text-white">
+                    <span className="nn-cap-trim text-[1.5rem] uppercase leading-none text-white">
                       BUY
                     </span>
+                    {/* Trimmed too, or items-start would align the $ to an untrimmed line box and break
+                        its level with BUY's caps. */}
                     <span className="flex items-start">
-                      <span className="text-[0.875rem] leading-none text-white">
+                      <span className="nn-cap-trim text-[0.875rem] leading-none text-white">
                         $
                       </span>
-                      <span className="text-[1.5rem] leading-none text-white">
+                      <span className="nn-cap-trim text-[1.5rem] leading-none text-white">
                         5
                       </span>
                     </span>
