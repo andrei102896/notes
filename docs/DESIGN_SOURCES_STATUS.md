@@ -42,7 +42,9 @@ any of those areas. Notably now stale in the older snapshots:
 - **Client feedback round, 2026-07-31 → 2026-08-01** — every older snapshot is stale on these:
   - **Note body**: still #D9D9D9 with #464646 text — the NN watermark is BLURRED ("note logo BG"). It was
     accent blue for that round; **the client reversed that on 2026-08-02** ("no blue letters… the Figma is a
-    blurred off white"), so it is off-white at `opacity-[0.6]` now.
+    blurred off white"), so it is now their OWN artwork: `NoteWatermark.tsx` = their `N.svg` + `N (1).svg`
+    paths (160×100 and 170×100, a 10-unit channel between them) in #E4E8E9 at their exported 0.5 fill-opacity
+    — 6 levels of contrast, a bare shade, per their hi-res export.
   - **First run**: was a box on the grey dashboard; now the full-panel NN backdrop with the box on it, and
     the nav row, A–Z rail and strip are covered. Clicking its `+` swaps the box, backdrop untouched.
   - **Purchase modal**: gained the client's STATEMENT box (665×219, `rgba(41,171,226,0.1)`, 0.3px accent
@@ -53,8 +55,9 @@ any of those areas. Notably now stale in the older snapshots:
   - **Nav-bar bottom edge**: accent line + a 3px WHITE BAR + the blurred dark band beneath, with the notes
     list's top padding deepened so the two shadows merge before the first note.
   - **Subject tabs**: no longer quantised to A–Z cells — the label plus one blank character, nothing more.
-  - **Buttons/labels**: modal CANCEL/OK and the collapsed note's title are centred on their GLYPHS
-    (`text-box` trim), not on the line box.
+  - **Buttons/labels**: modal CANCEL/OK are centred on their GLYPHS (`text-box` trim), not on the line box.
+    The note title got the same trim on 08-01 and **lost it again on 08-02** — an input clips its inner
+    editor, so the trim cropped the caps and every descender (client-reported).
   - **Fonts**: Familjen Grotesk 400 is bundled (SIL OFL 1.1) for the statement box only.
 - `docs/2_NN_SUBJECT TAB ATTRIBUTES AND BEHAVIOR.txt`: "character limit of nine [8]" → **25 chars
   incl. spaces**; "boxes will be one size equivalent to [3] alphabetical index boxes" → **the label plus
@@ -125,9 +128,9 @@ gradients instead):
   base `bg-subject-tab` color stays opaque — the shorthand was resetting it to transparent, flashing a
   see-through gap for a frame when the tab activated).
 
-**Tests:** the suite is **80 tests / 26 specs**, all 80 passed on **2026-08-02**, with
-`add-subject-tab-modal.png` (modal-button centering) and `note-card.png` (off-white body watermark)
-regenerated on that run. Refresh
+**Tests:** the suite is **81 tests / 27 specs**, last full green run 80/26 on **2026-08-02**, with
+`add-subject-tab-modal.png` (modal-button centering), `note-card.png` and `full-panel.png` (the client's
+own note watermark artwork) regenerated on that run. Refresh
 with `npm run test:e2e:update` (calibration machine only) after any further intended design change, and
 review each new PNG before accepting it — that command *is* the design sign-off.
 
@@ -136,7 +139,7 @@ review each new PNG before accepting it — that command *is* the design sign-of
 | Source | Says | App today | Where |
 |---|---|---|---|
 | `css.txt` ~3179 | "+" button glyph = Fjalla 55.77 font glyph | Inline SVG vector plus, symmetric `0 0 24 24` viewBox on every platform, sized `71%` of whichever axis of its box is tighter | `src/overlay/AddSubjectTabButton.tsx`, `src/overlay/styles.css` |
-| every snapshot | note body's NN watermark is hard-edged and white | Same watermark, off-white + blurred, `opacity-[0.6]` — blurring is the only real divergence now that the client dropped the one-round accent-blue fill (2026-08-02); background and text colour unchanged | `src/overlay/RichTextBodyEditor.tsx` |
+| every snapshot | note body's NN watermark is hard-edged and white | The client's own `N.svg` / `N (1).svg` artwork at their #E4E8E9 / 0.5 fill-opacity, 10-unit channel, blurred (2026-08-02) — blur is the only divergence left from their files; background and text colour unchanged | `src/overlay/NoteWatermark.tsx` |
 | every snapshot | first run is a box on the dashboard | Full-panel NN backdrop carrying the box; nav row, A–Z rail and strip covered (client 2026-07-31) | `src/overlay/FirstRunPanel.tsx` |
 | `desired-look.*` | subject tabs align to the A–Z grid | Length = label + one blank character; edges deliberately do NOT meet the A–Z lines (client 2026-07-31) | `src/overlay/SubjectTabStrip.tsx` |
 | Figma "Rectangle 28" 41×39 | first-run "+" is wider than tall | Square (`size-[2.5625rem]`) — 41×39 around a square glyph left 5.5px of blue at the sides vs 4.5px above | `src/overlay/DashboardContent.tsx` |

@@ -191,7 +191,10 @@ export function Note({
               headingFocusedRef.current = false;
               setHeadingFocused(false);
             }}
-            className="nn-cap-trim h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-normal text-white outline-none cursor-pointer"
+            /* No `nn-cap-trim` here: an input clips its inner editor, so trimming the line box to the cap
+               band cuts the caps' tops and every descender. It also bought nothing — the cap band is
+               already centred without it (measured 2026-08-02). */
+            className="h-full w-full rounded-none border-0 bg-muted-foreground px-3 leading-none font-normal text-white outline-none cursor-pointer"
           />
           {/* LINK/ANCHOR are deliberately NOT gated on a typed label. */}
           {!expanded ? (

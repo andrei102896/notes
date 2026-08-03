@@ -13,7 +13,7 @@ import {
   formatStateFromSelection,
 } from "@/lib/richTextFormat";
 import { sanitizeNoteHtml } from "@/lib/sanitizeNoteHtml";
-import { ModalWatermark } from "@/overlay/NnModalShell";
+import { NoteWatermark } from "@/overlay/NoteWatermark";
 
 export type RichTextBodyEditorHandle = {
   applyFormat: (command: "bold" | "italic" | "underline") => void;
@@ -149,10 +149,9 @@ export const RichTextBodyEditor = forwardRef<
 
   return (
     <div className="relative isolate overflow-hidden border-b bg-note">
-      {/* "NOTE LOGO BG": the modals' NN, blurred. Off-white (the component default), not accent blue —
-          the client's Figma note body has no blue in it (2026-08-02). Opacity is far above the blue's
-          0.22 because white on #d9d9d9 tops out at 38 levels of contrast; 0.22 would be invisible. */}
-      <ModalWatermark className="opacity-[0.6] blur-[0.390625rem]" />
+      {/* Width is the client's own geometry: their 340-unit mark in a 543.52 note interior (BG_NOTE_01
+          555.52 less its 6px border). Opacity lives in the artwork's fill, not here. */}
+      <NoteWatermark className="w-[62.6%] blur-[0.390625rem]" />
       <div>
         <div
           ref={editorRef}

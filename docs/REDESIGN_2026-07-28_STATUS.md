@@ -5,7 +5,8 @@ Section-by-section reskin driven by fresh client Figma exports. Sections 1–28 
 **uncommitted** working-tree state (user owns all git).
 **`nn-extension-1.0.3.zip` is STALE** — it was packed from the tree as of 2026-07-31 *before* that section;
 re-pack (`npm run pack`) before sending a build to the client.
-**Suite: 80 tests / 26 specs — 80 passed, 0 failed (2026-08-02), the 08-02 client round included.**
+**Suite: 81 tests / 27 specs (2026-08-02, the whole 08-02 client round included). Last full green run was
+at 80/26; since then only the specs touching each change were run, per the standing scope rule.**
 
 **How this sprint works:** the user sends one section at a time as a *screenshot + Figma CSS*, the
 section is implemented, reviewed against a Playwright screenshot artifact, then the next section
@@ -493,8 +494,9 @@ fault; it was the process. Do this instead.
 ### Added by the client round (2026-07-31 → 08-01) — full text in `AGENTS.md` §8
 
 22. **`text-box: trim-both cap alphabetic` centres GLYPHS, but only on the element that owns the text.**
-   Works on an `<input>`; a no-op on a flex container (its text is an anonymous item). Hence
-   `.nn-label-center` = trim + `display:block` + `align-content:center`, and `.nn-cap-trim` for inputs.
+   A no-op on a flex container (its text is an anonymous item). Hence `.nn-label-center` = trim +
+   `display:block` + `align-content:center`. **Never on an `<input>`, though** — see §14: it reaches the inner
+   editor, and the input then CLIPS to the trimmed band, cropping cap tops and every descender.
 23. **`bottom` on an absolute child is measured from the parent's PADDING box** — the blue line sat 2px high,
    over the header's own white border, until the offsets carried `calc(9px + …)`.
 24. **A negative z-index child still paints above its parent's background and box-shadows.** The blue-line
@@ -532,6 +534,7 @@ fault; it was the process. Do this instead.
 | `tests/e2e/session-persistence.spec.ts` | 7 tests for the 2026-07-31 behaviour work: the client's exact Back sequence (bfcache path, stale panel measured in painted frames), the same on a bfcache-ineligible page (`unload` handler; zero frames painted, which is what the pre-mount buys), the inverse (maximized survives Back), a forward navigation to a third site, the slide (frame-by-frame travel, no veil element), the reveal cap on a page whose subresource hangs, and notes being current after Back |
 | `tests/e2e/session-persistence.live.spec.ts` | The same Back/slide scenarios against **real** sites (`npm run test:e2e:live`, network required, excluded by default). Sites are two constants at the top of the file; ford.com + bugatti.com as committed |
 | `tests/e2e/metal-bar-layers.spec.ts` | The metal bar's LAYER look, header and footer, from the client's crop rather than their Figma CSS: deep top line, a sheen that never reaches the raw hilite colour, peak in the top 45%, monotonic fade, plate ≥1.5× the band's luminance, a darker seam between band and plate. Verified to FAIL on the pre-fix build |
+| `tests/e2e/note-title-clipping.spec.ts` | The note title input is not cropped by its own text-box trim: painted ink height in em (cap band alone is 0.83em, caps+descenders 1.07em) plus descender rows below the baseline, expanded and collapsed, at five panel widths. Encodes two dead ends — an input-border-box gap check passes while the defect shows, and top-edge "abruptness" is device-grid phase, not clipping. Verified to FAIL on the pre-fix build (20 failures) |
 | `tests/e2e/modal-label-centre.spec.ts` | Every modal box's label ink is vertically centred **in painted pixels**: add / rename / delete-confirm CANCEL + OK, and the purchase modal's TRIAL PERIOD + BUY. Gaps are measured against the box's arithmetic inner edges, never the screenshot clip's — clipping at the inner edge rounds a fractionally-placed box onto a half device row and biases the read by a whole pixel, which silently flipped the defect's sign mid-fix. Tolerance 2 device px; the defects it guards were 3.2–5.2. Verified to FAIL on the pre-fix build |
 | `tests/e2e/blue-line.spec.ts` | The blue line under the nav bar: 4px accent (every device row, or the dark band's blur is washing it), the 3px white bar, the shadow stuck to that bar, and a second test that the shadow dies in the gap and leaves the first note's border unwashed |
 | `tests/e2e/paywall-statement.spec.ts` | The purchase STATEMENT box (four paragraphs verbatim, width share, height in rem, bg alpha, 0.3px hairline, Familjen Grotesk 17/21, symmetric top/bottom padding in painted pixels) and the BG SQUARES spreading across the panel (grid ≥75% wide — it measured 49.6% before the fix — with blue painted in all three thirds) |
@@ -547,7 +550,7 @@ default e2e state starts a fresh local trial and shows the red logo instead).
 
 Run a section's own spec after each change (`npx playwright test <spec>`); artifacts land in
 `test-results/<test>/*.png` and are the review currency with the user. **`npm run test:e2e` takes ~3
-minutes and is worth running before any handoff** — the suite is 80 tests / 26 specs.
+minutes and is worth running before any handoff** — the suite is 81 tests / 27 specs.
 
 ## Client feedback 2026-07-31 — behaviour, not design (SHIPPED, uncommitted)
 
@@ -612,7 +615,8 @@ element the item names and nothing else, and run only the specs covering it.
    item asked for the label to be centred vertically: the title `Input` got `.nn-cap-trim` — the trim
    **does** reach an `<input>`'s inner editor (measured 1.00 → 0.25 css px high at dpr 2, and exactly even
    at dpr 1), which is why the trim is now its own class and `.nn-label-center` only adds the block/centring
-   an `<input>` must not have.
+   an `<input>` must not have. **⚠ REVERTED 2026-08-02 — see §14. That centring was real but it cost the
+   glyphs: the input clips to the trimmed band. Do not put the trim back on an input.**
 
 4. **First run = the full-panel NN backdrop, not the grey dashboard** (client: "we have the old initial tab
    background, it should be like in the 2nd img" — the img being the `DASHBOARD MODAL BG` artboard with the
@@ -820,13 +824,47 @@ element the item names and nothing else, and run only the specs covering it.
     beside their Figma note: "there should not be blue letters for the logo in the note background… the
     example in Figma is a blurred off white"). **This reverses their own "NN blue blurred" from §10** — the
     reversal is theirs, in writing, with their board in hand; do not restore the blue on the strength of §10.
-    `RichTextBodyEditor` drops the `fill` override, so `ModalWatermark`'s default white applies.
-    **The opacity had to move with it: 0.22 → 0.6.** That is not a taste call — `bg-note` is #d9d9d9, so a
-    white mark tops out at 38 levels of contrast even at alpha 1 (measured: 217 → 225 at 0.22, 240 at 0.6),
-    whereas the blue got its presence from hue, not luminance. At 0.22 the mark was invisible. Nothing else
-    changed: same artwork, same `blur-[0.390625rem]`, same size, light body, #464646 text.
-    `note-card.png` regenerated (`--update-snapshots=all`); that baseline also re-baked its note date to
-    2026-08-02, which is why it had been failing since 08-01.
+    Shipped in two passes; **the second is the real one**, and the first (commit `1a50062`: `ModalWatermark`'s
+    default white at `opacity-[0.6]`) is superseded — do not treat that commit as the reference.
+    **Final state — the client's own files, used verbatim.** They followed up with `N.svg` + `N (1).svg`, the
+    `BG_NOTE_01` CSS (555.52×277.41, 6px #0D0D0D border, #D9D9D9 body) and a hi-res Figma export of the note.
+    New `overlay/NoteWatermark.tsx` carries their two paths (**unequal widths: 160×100 and 170×100** — their
+    mark is not two copies of one glyph), `fill="#E4E8E9"` at their exported `fillOpacity="0.5"`, a **10-unit
+    channel** between the glyphs (client: "there should be seen a clear padding… of at least 10px"), viewBox
+    `0 0 340 100`, sized `w-[62.6%]` = 340 in their 543.52 interior. Their frame is 1:1 with viewBox units, so
+    their px and these units are the same number. `ModalWatermark` is untouched and still owns the modal boxes
+    — the two artworks genuinely differ (3.19:1 vs 3.40:1, and the letterforms by a few %).
+    **Do not "restore" contrast here.** #E4E8E9 at 0.5 on #D9D9D9 is 6 levels — measured 217 → 223, a bare
+    shade, which is exactly what they asked for: *"the NN are more dimmed or blurry, they are not that
+    evident as now, see the shade of them barely."* Mid-round I read an early low-res screenshot as showing a
+    stronger mark and shipped their colour at full opacity (delta 12); their hi-res export disproved it. When
+    their render and their file disagree, get a hi-res render before overriding the file.
+    `note-card.png` and `full-panel.png` regenerated (`--update-snapshots=all`); note-card also re-baked its
+    date to 2026-08-02, which is why that baseline had been failing since 08-01.
+
+14. **Note title was cut off top AND bottom — `.nn-cap-trim` removed from the input** (client 2026-08-02,
+    screenshot of a header reading "Raptor Automatic  S398" with the caps shaved and the descender gone).
+    §3 put `.nn-cap-trim` on the title `Input` to centre its glyphs. The trim does reach an input's inner
+    editor — but that editor is **clipped** (`overflow: clip` on both axes), so trimming the line box to the
+    cap band cropped everything outside it: ~1 CSS px off the cap tops (Fjalla's ink exceeds its declared
+    cap metric) and every descender in full. Measured in painted ink at five panel widths: ink height
+    **0.81–0.84em before → 1.06–1.09em after**, descender rows **0 → 7–8**. `Note.tsx` drops the class; no
+    replacement, because the sweep showed none is needed and none works:
+    - **Padding does not restore the ink** — the clip is at the trimmed box, not the padding box.
+    - **`line-height` is inert on a single-line input** — 1, 1.05, 1.073 and 1.1 render pixel-identically,
+      because Chrome centres the inner editor from font metrics. The `leading-none` in that class does
+      nothing either; it is left alone as pre-existing.
+    - **So the cap band cannot be sub-pixel tuned inside an input.** Without the trim it sits 0–2 device px
+      (0–1 CSS px) high depending on panel width — 0 at 1400, 3–4 device px at 1180/1460/1520. §3's centring
+      was therefore real, and it is partly back to what the client raised on 08-01. **Accepted**: a shaved
+      glyph is a worse defect than a half-pixel of centring, and the trim is the only lever that moved it.
+      If they raise the centring again, the answer is a taller header row or a text-shifting hack — not the
+      trim.
+    New `tests/e2e/note-title-clipping.spec.ts` (expanded + collapsed × 5 widths), verified to fail on the
+    pre-fix build with 20 failures. Two dead ends encoded in it: a gap check against the input's own border
+    box PASSES while the defect is visible, and "the top ink row is abrupt" is not a usable signal — whether
+    the cap top gets an antialiased row depends on where it lands on the device grid, so a clean edge reads
+    as a cut at 1520. `note-card.png` + `full-panel.png` regenerated again.
 
 ## Where polish left off (last updated 2026-07-29)
 
